@@ -33,7 +33,7 @@ function cambiarPantalla(ocultar, mostrar) {
         console.log('✅ Clase active agregada y display: block forzado');
     
     // Mostrar sidebar en pantallas del sistema
-    const pantallasSistema = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'configuracion'];
+    const pantallasSistema = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'chat-ai', 'configuracion'];
     const sidebar = document.getElementById('sidebar');
     
     if (pantallasSistema.includes(mostrar)) {
@@ -764,6 +764,154 @@ function crearGrafico6() {
             }
         }
     });
+}
+
+// Notificaciones
+function marcarLeida(id) {
+    const notificacion = document.querySelector(`[onclick*="${id}"]`)?.closest('.notificacion-card');
+    if (notificacion) {
+        notificacion.style.opacity = '0.6';
+        notificacion.style.transform = 'translateX(-20px)';
+        setTimeout(() => {
+            notificacion.remove();
+            actualizarContadorNotificaciones();
+        }, 300);
+        ToastNotification.show('Notificación marcada como leída', 'success', 2000);
+    }
+}
+
+function marcarTodasLeidas() {
+    const notificaciones = document.querySelectorAll('.notificacion-card');
+    notificaciones.forEach((notif, index) => {
+        setTimeout(() => {
+            notif.style.opacity = '0.6';
+            notif.style.transform = 'translateX(-20px)';
+            setTimeout(() => notif.remove(), 300);
+        }, index * 100);
+    });
+    setTimeout(() => {
+        actualizarContadorNotificaciones();
+        ToastNotification.show('Todas las notificaciones marcadas como leídas', 'success', 2000);
+    }, notificaciones.length * 100);
+}
+
+function gestionarNotificacion(tipo) {
+    ToastNotification.show(`Gestionando: ${tipo}`, 'info', 2000);
+    // Aquí se podría navegar a la sección correspondiente
+    if (tipo.includes('inventario')) {
+        navegar('inventario');
+    } else if (tipo.includes('menu')) {
+        navegar('planificacion');
+    } else if (tipo.includes('pedidos') || tipo.includes('compra')) {
+        navegar('compras');
+    } else if (tipo.includes('encuestas')) {
+        navegar('servicio');
+    }
+}
+
+function actualizarContadorNotificaciones() {
+    const contador = document.querySelector('[data-section="notificaciones"] .nav-badge');
+    const notificaciones = document.querySelectorAll('.notificacion-card').length;
+    if (contador) {
+        contador.textContent = notificaciones || '';
+        if (notificaciones === 0) {
+            contador.style.display = 'none';
+        }
+    }
+}
+
+// Chat AI
+const respuestasAI = {
+    'optimizar': {
+        mensaje: 'Basándome en el análisis de consumo, te recomiendo:\n\n• Reducir el consumo de arroz en 8% ajustando las porciones\n• Implementar rotación de menús para balancear ingredientes\n• Monitorear el consumo diario para ajustar compras\n\n¿Te gustaría que genere un plan detallado de optimización?',
+        tiempo: 1500
+    },
+    'sugiere': {
+        mensaje: 'Para mañana te sugiero este menú balanceado:\n\n🍽️ Desayuno:\n• Huevos revueltos con frijoles\n• Arroz\n• Fruta fresca\n\n🍽️ Almuerzo:\n• Pollo a la plancha\n• Ensalada mixta\n• Arroz integral\n• Postre\n\n🍽️ Cena:\n• Sopa de verduras\n• Pan integral\n\nEste menú optimiza el uso de inventario actual.',
+        tiempo: 2000
+    },
+    'analiza': {
+        mensaje: 'Análisis de inventario actual:\n\n✅ Niveles óptimos:\n• Arroz: 450 kg (120% del mínimo)\n• Pollo: 280 kg (115% del mínimo)\n\n⚠️ Atención requerida:\n• Frijoles: 8 kg (80% del mínimo) - COMPRA URGENTE\n• Verduras: 200 kg (95% del mínimo)\n\n📊 Recomendación: Generar orden de compra para frijoles y verduras.',
+        tiempo: 1800
+    },
+    'comprar': {
+        mensaje: 'Recomendaciones de compra basadas en consumo y planificación:\n\n🛒 Compra Urgente:\n• Frijoles: 50 kg ($1,250)\n• Verduras mixtas: 100 kg ($2,500)\n\n🛒 Compra Programada:\n• Arroz: 200 kg ($3,000)\n• Pollo: 150 kg ($4,500)\n• Carne: 100 kg ($5,000)\n\n💰 Total estimado: $16,250\n\n¿Deseas que genere la orden de compra?',
+        tiempo: 2000
+    },
+    'default': {
+        mensaje: 'Entiendo tu consulta. Basándome en los datos del sistema, puedo ayudarte con análisis, recomendaciones y optimizaciones. ¿Podrías ser más específico sobre qué área te gustaría mejorar?',
+        tiempo: 1500
+    }
+};
+
+function enviarMensajeAI(mensajeTexto) {
+    const input = document.getElementById('chatInput');
+    const mensaje = mensajeTexto || input.value.trim();
+    
+    if (!mensaje) return;
+    
+    // Limpiar input
+    if (input) input.value = '';
+    
+    // Agregar mensaje del usuario
+    const chatMessages = document.getElementById('chatMessages');
+    const userMessage = document.createElement('div');
+    userMessage.className = 'chat-message user-message';
+    userMessage.innerHTML = `
+        <div class="message-content">
+            <div class="message-text">${mensaje}</div>
+            <div class="message-time">Ahora</div>
+        </div>
+        <div class="message-avatar">👤</div>
+    `;
+    chatMessages.appendChild(userMessage);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // Simular procesamiento
+    setTimeout(() => {
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'chat-message ai-message typing';
+        typingIndicator.innerHTML = `
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+                <div class="message-text typing-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(typingIndicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Determinar respuesta
+        let respuesta = respuestasAI.default;
+        const mensajeLower = mensaje.toLowerCase();
+        
+        if (mensajeLower.includes('optimizar') || mensajeLower.includes('consumo')) {
+            respuesta = respuestasAI.optimizar;
+        } else if (mensajeLower.includes('sugiere') || mensajeLower.includes('menú') || mensajeLower.includes('menu')) {
+            respuesta = respuestasAI.sugiere;
+        } else if (mensajeLower.includes('analiza') || mensajeLower.includes('inventario')) {
+            respuesta = respuestasAI.analiza;
+        } else if (mensajeLower.includes('comprar') || mensajeLower.includes('compra') || mensajeLower.includes('productos')) {
+            respuesta = respuestasAI.comprar;
+        }
+        
+        // Remover indicador de escritura y mostrar respuesta
+        setTimeout(() => {
+            typingIndicator.remove();
+            const aiMessage = document.createElement('div');
+            aiMessage.className = 'chat-message ai-message';
+            aiMessage.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <div class="message-text">${respuesta.mensaje.replace(/\n/g, '<br>')}</div>
+                    <div class="message-time">Ahora</div>
+                </div>
+            `;
+            chatMessages.appendChild(aiMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, respuesta.tiempo);
+    }, 500);
 }
 
 // Inicialización

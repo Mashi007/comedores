@@ -103,7 +103,12 @@
             <a href="#" class="nav-item" onclick="navegar('notificaciones'); return false;" data-section="notificaciones">
                 <span class="nav-icon">🔔</span>
                 <span class="nav-text">Notificaciones</span>
-                <span class="nav-badge">3</span>
+                <span class="nav-badge">5</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('chat-ai'); return false;" data-section="chat-ai">
+                <span class="nav-icon">🤖</span>
+                <span class="nav-text">Chat AI</span>
+                <span class="nav-new">Nuevo</span>
             </a>
             <a href="#" class="nav-item" onclick="navegar('configuracion'); return false;" data-section="configuracion">
                 <span class="nav-icon">⚙️</span>
@@ -263,6 +268,150 @@
                 <h1>Notificaciones</h1>
             </div>
             <p>Módulo de notificaciones</p>
+        </div>
+    </div>
+
+    <!-- Notificaciones -->
+    <div id="notificaciones" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <h1>Notificaciones y Alertas</h1>
+                <button class="btn-primary" onclick="marcarTodasLeidas()">Marcar todas como leídas</button>
+            </div>
+            <div class="notificaciones-grid">
+                <div class="notificacion-card urgente">
+                    <div class="notificacion-header">
+                        <span class="notificacion-icon">⚠️</span>
+                        <span class="notificacion-titulo">Inventario Crítico</span>
+                        <span class="notificacion-badge">Urgente</span>
+                    </div>
+                    <div class="notificacion-body">
+                        <p>El inventario de <strong>Frijoles</strong> ha alcanzado el nivel mínimo. Stock actual: <strong>8 kg</strong> (Mínimo: 10 kg)</p>
+                        <div class="notificacion-acciones">
+                            <button class="btn-small" onclick="gestionarNotificacion('inventario-frijoles')">Gestionar Compra</button>
+                            <button class="btn-small btn-secondary" onclick="marcarLeida('notif-1')">Marcar Leída</button>
+                        </div>
+                    </div>
+                    <div class="notificacion-footer">
+                        <span class="notificacion-tiempo">Hace 15 minutos</span>
+                    </div>
+                </div>
+
+                <div class="notificacion-card importante">
+                    <div class="notificacion-header">
+                        <span class="notificacion-icon">📊</span>
+                        <span class="notificacion-titulo">Consumo Superior al Planificado</span>
+                        <span class="notificacion-badge">Importante</span>
+                    </div>
+                    <div class="notificacion-body">
+                        <p>Se ha consumido <strong>15% más de Arroz</strong> de lo planificado. Consumo: <strong>520 kg</strong> vs Planificado: <strong>450 kg</strong></p>
+                        <div class="notificacion-acciones">
+                            <button class="btn-small" onclick="gestionarNotificacion('consumo-arroz')">Ver Detalle</button>
+                            <button class="btn-small btn-secondary" onclick="marcarLeida('notif-2')">Marcar Leída</button>
+                        </div>
+                    </div>
+                    <div class="notificacion-footer">
+                        <span class="notificacion-tiempo">Hace 2 horas</span>
+                    </div>
+                </div>
+
+                <div class="notificacion-card informativa">
+                    <div class="notificacion-header">
+                        <span class="notificacion-icon">📅</span>
+                        <span class="notificacion-titulo">Menú del Día Pendiente</span>
+                        <span class="notificacion-badge">Informativa</span>
+                    </div>
+                    <div class="notificacion-body">
+                        <p>El menú para <strong>mañana</strong> aún no ha sido planificado. Se recomienda completar la planificación antes de las 18:00</p>
+                        <div class="notificacion-acciones">
+                            <button class="btn-small" onclick="gestionarNotificacion('menu-pendiente')">Planificar Menú</button>
+                            <button class="btn-small btn-secondary" onclick="marcarLeida('notif-3')">Marcar Leída</button>
+                        </div>
+                    </div>
+                    <div class="notificacion-footer">
+                        <span class="notificacion-tiempo">Hace 4 horas</span>
+                    </div>
+                </div>
+
+                <div class="notificacion-card importante">
+                    <div class="notificacion-header">
+                        <span class="notificacion-icon">📦</span>
+                        <span class="notificacion-titulo">Pedido de Compra Pendiente</span>
+                        <span class="notificacion-badge">Importante</span>
+                    </div>
+                    <div class="notificacion-body">
+                        <p>Hay <strong>3 pedidos de compra</strong> pendientes de aprobación. Total estimado: <strong>$12,450</strong></p>
+                        <div class="notificacion-acciones">
+                            <button class="btn-small" onclick="gestionarNotificacion('pedidos-pendientes')">Revisar Pedidos</button>
+                            <button class="btn-small btn-secondary" onclick="marcarLeida('notif-4')">Marcar Leída</button>
+                        </div>
+                    </div>
+                    <div class="notificacion-footer">
+                        <span class="notificacion-tiempo">Hace 6 horas</span>
+                    </div>
+                </div>
+
+                <div class="notificacion-card informativa">
+                    <div class="notificacion-header">
+                        <span class="notificacion-icon">⭐</span>
+                        <span class="notificacion-titulo">Nueva Encuesta de Satisfacción</span>
+                        <span class="notificacion-badge">Informativa</span>
+                    </div>
+                    <div class="notificacion-body">
+                        <p>Se han recibido <strong>12 nuevas respuestas</strong> a la encuesta de satisfacción. Calificación promedio: <strong>4.7/5</strong></p>
+                        <div class="notificacion-acciones">
+                            <button class="btn-small" onclick="gestionarNotificacion('encuestas-nuevas')">Ver Resultados</button>
+                            <button class="btn-small btn-secondary" onclick="marcarLeida('notif-5')">Marcar Leída</button>
+                        </div>
+                    </div>
+                    <div class="notificacion-footer">
+                        <span class="notificacion-tiempo">Hace 1 día</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat AI -->
+    <div id="chat-ai" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <h1>🤖 Asistente AI para Gestión de Comedores</h1>
+            </div>
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message ai-message">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <div class="message-text">¡Hola! Soy tu asistente AI para gestión de comedores. ¿En qué puedo ayudarte hoy?</div>
+                            <div class="message-time">Ahora</div>
+                        </div>
+                    </div>
+                    <div class="chat-message ai-message">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <div class="message-text">Puedo ayudarte con:<br>• Análisis de consumo e inventario<br>• Sugerencias de menús<br>• Optimización de compras<br>• Análisis de satisfacción<br>• Y mucho más...</div>
+                            <div class="message-time">Ahora</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-suggestions">
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('¿Cómo puedo optimizar el consumo de arroz?')">💡 Optimizar consumo</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('Sugiere un menú para mañana')">📅 Sugerir menú</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('Analiza el inventario actual')">📦 Analizar inventario</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('¿Qué productos debo comprar?')">🛒 Recomendaciones de compra</button>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Escribe tu pregunta..." onkeypress="if(event.key === 'Enter') enviarMensajeAI()">
+                    <button class="chat-send-btn" onclick="enviarMensajeAI()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
