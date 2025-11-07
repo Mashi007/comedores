@@ -38,26 +38,63 @@ const mockData = {
     notificaciones: []
 };
 
-// Navegación - Disponible inmediatamente
-function mostrarLogin() {
+// Navegación - Disponible inmediatamente (scope global)
+window.mostrarLogin = function() {
     try {
+        console.log('mostrarLogin llamado');
         cambiarPantalla('portada', 'login');
     } catch (error) {
         console.error('Error al mostrar login:', error);
         alert('Error al cargar la página de login. Por favor, recarga la página.');
     }
-}
+};
 
-function cambiarPantalla(ocultar, mostrar) {
-    const ocultarEl = document.getElementById(ocultar);
-    const mostrarEl = document.getElementById(mostrar);
-    if (ocultarEl && mostrarEl) {
-        ocultarEl.classList.remove('active');
-        mostrarEl.classList.add('active');
+window.validarLogin = function(event) {
+    event.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    console.log('Validando login:', email);
+    
+    if (email === mockData.usuario.email && password === mockData.usuario.password) {
+        document.getElementById('userName').textContent = mockData.usuario.nombre;
+        cambiarPantalla('login', 'menu');
+        return false;
     } else {
-        console.error('Elementos no encontrados:', { ocultar, mostrar });
+        alert('Credenciales incorrectas. Use: admin@comedor.com / demo-credential-2024');
+        return false;
     }
-}
+};
+
+window.cambiarPantalla = function(ocultar, mostrar) {
+    try {
+        const ocultarEl = document.getElementById(ocultar);
+        const mostrarEl = document.getElementById(mostrar);
+        
+        if (!ocultarEl) {
+            console.error('Elemento a ocultar no encontrado:', ocultar);
+            return;
+        }
+        
+        if (!mostrarEl) {
+            console.error('Elemento a mostrar no encontrado:', mostrar);
+            return;
+        }
+        
+        // Ocultar todas las pantallas primero
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        
+        // Mostrar la pantalla deseada
+        mostrarEl.classList.add('active');
+        
+        console.log('Pantalla cambiada de', ocultar, 'a', mostrar);
+    } catch (error) {
+        console.error('Error al cambiar pantalla:', error);
+        alert('Error al cambiar de pantalla. Por favor, recarga la página.');
+    }
+};
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
@@ -72,33 +109,22 @@ function inicializarApp() {
     try {
         // Solo cargar funciones que no requieren estar en una pantalla específica
         // Los gráficos se cargarán cuando se navegue al dashboard
+        console.log('Aplicación inicializada correctamente');
     } catch (error) {
         console.error('Error al inicializar app:', error);
     }
 }
 
-function validarLogin(event) {
-    event.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    
-    if (email === mockData.usuario.email && password === mockData.usuario.password) {
-        document.getElementById('userName').textContent = mockData.usuario.nombre;
-        cambiarPantalla('login', 'menu');
-        return false;
-    } else {
-        alert('Credenciales incorrectas. Use: admin@comedor.com / demo123');
-        return false;
-    }
-}
-
-function cerrarSesion() {
+window.cerrarSesion = function() {
     cambiarPantalla('menu', 'portada');
-    document.getElementById('loginForm').reset();
-}
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.reset();
+    }
+};
 
 
-function navegar(destino) {
+window.navegar = function(destino) {
     cambiarPantalla('menu', destino);
     
     // Recargar datos según la sección
@@ -118,7 +144,7 @@ function navegar(destino) {
     } else if (destino === 'notificaciones') {
         cargarNotificaciones();
     }
-}
+};
 
 // Dashboard - Gráficos
 function inicializarGraficos() {
