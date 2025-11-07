@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Comedores Industriales</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body>
+    <!-- Portada -->
+    <div id="portada" class="screen active">
+        <div class="portada-container">
+            <div class="logo">
+                <h1>🍽️ Sistema de Gestión</h1>
+                <h2>Comedores Industriales</h2>
+            </div>
+            <p class="subtitle">Gestión integral de inventarios, producción y servicio al cliente</p>
+            <button class="btn-primary" onclick="mostrarLogin()">Iniciar Sesión</button>
+        </div>
+    </div>
+
+    <!-- Login -->
+    <div id="login" class="screen">
+        <div class="login-container">
+            <div class="login-box">
+                <h2>Iniciar Sesión</h2>
+                <form id="loginForm" onsubmit="return validarLogin(event)">
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico</label>
+                        <input type="email" id="email" required placeholder="usuario@comedor.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" required placeholder="••••••••">
+                    </div>
+                    <div class="login-hint">
+                        <small>Demo: admin@comedor.com / demo123</small>
+                    </div>
+                    <button type="submit" class="btn-primary btn-block">Ingresar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menú Principal -->
+    <div id="menu" class="screen">
+        <div class="menu-container">
+            <header class="menu-header">
+                <h1>Menú Principal</h1>
+                <div class="user-info">
+                    <span id="userName">Usuario</span>
+                    <button class="btn-secondary" onclick="cerrarSesion()">Cerrar Sesión</button>
+                </div>
+            </header>
+            <div class="menu-grid">
+                <div class="menu-card" onclick="navegar('dashboard')">
+                    <div class="menu-icon">📊</div>
+                    <h3>Dashboard</h3>
+                    <p>Vista general y métricas</p>
+                </div>
+                <div class="menu-card" onclick="navegar('compras')">
+                    <div class="menu-icon">🛒</div>
+                    <h3>Ingreso de Compras</h3>
+                    <p>OCR y facturas por WhatsApp</p>
+                </div>
+                <div class="menu-card" onclick="navegar('inventario')">
+                    <div class="menu-icon">📦</div>
+                    <h3>Inventario</h3>
+                    <p>Entradas y salidas</p>
+                </div>
+                <div class="menu-card" onclick="navegar('planificacion')">
+                    <div class="menu-icon">📅</div>
+                    <h3>Planificación de Menús</h3>
+                    <p>Menús diarios y recetas</p>
+                </div>
+                <div class="menu-card" onclick="navegar('produccion')">
+                    <div class="menu-icon">👨‍🍳</div>
+                    <h3>Producción</h3>
+                    <p>Reportes y control</p>
+                </div>
+                <div class="menu-card" onclick="navegar('servicio')">
+                    <div class="menu-icon">⭐</div>
+                    <h3>Servicio al Cliente</h3>
+                    <p>Encuestas y QR</p>
+                </div>
+                <div class="menu-card" onclick="navegar('notificaciones')">
+                    <div class="menu-icon">🔔</div>
+                    <h3>Notificaciones</h3>
+                    <p>Alertas inteligentes</p>
+                </div>
+                <div class="menu-card" onclick="navegar('configuracion')">
+                    <div class="menu-icon">⚙️</div>
+                    <h3>Configuración</h3>
+                    <p>Ajustes del sistema</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="screen">
+        <div class="page-container">
+            <header class="page-header">
+                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <h1>Dashboard</h1>
+            </header>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <h3>Inventario Total</h3>
+                    <div class="kpi-value">1,245 kg</div>
+                    <div class="kpi-change positive">↑ 5.2%</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Comidas Servidas Hoy</h3>
+                    <div class="kpi-value">342</div>
+                    <div class="kpi-change positive">↑ 12%</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Compras del Mes</h3>
+                    <div class="kpi-value">$45,230</div>
+                    <div class="kpi-change neutral">→ 0%</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Satisfacción</h3>
+                    <div class="kpi-value">4.6/5</div>
+                    <div class="kpi-change positive">↑ 0.3</div>
+                </div>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Consumo de Inventario (Últimos 7 días)</h3>
+                    <canvas id="chart1"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Distribución de Compras por Categoría</h3>
+                    <canvas id="chart2"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Producción Diaria</h3>
+                    <canvas id="chart3"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Top 5 Productos Más Usados</h3>
+                    <canvas id="chart4"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Tendencias de Satisfacción</h3>
+                    <canvas id="chart5"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Merma vs Planificado</h3>
+                    <canvas id="chart6"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ingreso de Compras -->
+    <div id="compras" class="screen">
+        <div class="page-container">
+            <header class="page-header">
+                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <h1>Ingreso de Compras</h1>
+            </header>
+            <div class="compras-actions">
+                <button class="btn-whatsapp" onclick="simularOCRWhatsApp()">
+                    📱 Simular Ingreso por WhatsApp (OCR)
+                </button>
+            </div>
+            <div class="compras-filters">
+                <input type="date" id="fechaDesde" class="filter-input">
+                <input type="date" id="fechaHasta" class="filter-input">
+                <select id="filtroProveedor" class="filter-input">
+                    <option value="">Todos los proveedores</option>
+                    <option value="Proveedor A">Proveedor A</option>
+                    <option value="Proveedor B">Proveedor B</option>
+                    <option value="Proveedor C">Proveedor C</option>
+                </select>
+                <button class="btn-primary" onclick="filtrarCompras()">Filtrar</button>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <h3>Total Facturas</h3>
+                    <div class="kpi-value" id="totalFacturas">12</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Monto Total</h3>
+                    <div class="kpi-value" id="montoTotal">$45,230</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Promedio por Factura</h3>
+                    <div class="kpi-value" id="promedioFactura">$3,769</div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Proveedor</th>
+                            <th>N° Factura</th>
+                            <th>Productos</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaCompras">
+                        <!-- Datos mock se cargarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventario -->
+    <div id="inventario" class="screen">
+        <div class="page-container">
+            <header class="page-header">
+                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <h1>Inventario</h1>
+            </header>
+            <div class="inventario-actions">
+                <button class="btn-whatsapp" onclick="mostrarFormularioInventario()">
+                    📱 Registrar Movimiento por WhatsApp
+                </button>
+            </div>
+            <div id="formularioInventario" class="form-container" style="display: none;">
+                <h3>Registrar Movimiento de Inventario</h3>
+                <form onsubmit="return procesarMovimientoInventario(event)">
+                    <div class="form-group">
+                        <label for="productoInventario">Producto</label>
+                        <select id="productoInventario" required>
+                            <option value="">Seleccionar producto...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipoMovimiento">Tipo de Movimiento</label>
+                        <select id="tipoMovimiento" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="entrada">Entrada</option>
+                            <option value="salida">Salida</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cantidadInventario">Cantidad (kg)</label>
+                        <input type="number" id="cantidadInventario" step="0.01" required min="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="observacionesInventario">Observaciones</label>
+                        <textarea id="observacionesInventario" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Procesar Movimiento</button>
+                        <button type="button" class="btn-secondary" onclick="ocultarFormularioInventario()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Stock Actual</th>
+                            <th>Stock Mínimo</th>
+                            <th>Último Movimiento</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaInventario">
+                        <!-- Datos mock se cargarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Planificación de Menús -->
+    <div id="planificacion" class="screen">
+        <div class="page-container">
+            <header class="page-header">
+                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <h1>Planificación de Menús</h1>
+            </header>
+            <div class="planificacion-actions">
+                <input type="date" id="fechaMenu" class="filter-input" required>
+                <button class="btn-primary" onclick="nuevoMenu()">Nuevo Menú</button>
+                <button class="btn-success" onclick="generarCompras()">Generar Compras</button>
+            </div>
+            <div id="formularioMenu" class="form-container" style="display: none;">
+                <h3>Planificar Menú del Día</h3>
+                <form onsubmit="return guardarMenu(event)">
+                    <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" id="fechaMenuForm" required>
+                    </div>
+                    <div id="recetasContainer">
+                        <div class="receta-item">
+                            <h4>Receta 1</h4>
+                            <div class="form-group">
+                                <label>Nombre del Plato</label>
+                                <input type="text" class="nombre-receta" placeholder="Ej: Arroz con Frijoles" required>
+                            </div>
+                            <div class="materiales-receta">
+                                <h5>Materiales Estándar</h5>
+                                <div class="material-item">
+                                    <select class="material-select">
+                                        <option value="">Seleccionar material...</option>
+                                    </select>
+                                    <input type="number" class="cantidad-material" step="0.01" placeholder="Cantidad (kg)" min="0.01">
+                                    <button type="button" class="btn-small" onclick="agregarMaterial(this)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-secondary" onclick="agregarReceta()">+ Agregar Receta</button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Guardar Menú</button>
+                        <button type="button" class="btn-secondary" onclick="cancelarMenu()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="menus-list" id="menusList">
+                <!-- Menús planificados se mostrarán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Producción -->
+    <div id="produccion" class="screen">
+        <div class="page-container">
+            <header class="page-header">
+                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <h1>Producción</h1>
+            </header>
+            <div class="produccion-actions">
+                <select id="menuProduccion" class="filter-input">
+                    <option value="">Seleccionar menú del día...</option>
+                </select>
+                <button class="btn-whatsapp" onclick="mostrarFormularioProduccion()">
+                    📱 Reportar Producción por WhatsApp
+                </button>
+            </div>
+            <div id="formularioProduccion" class="form-container" style="display: none;">
+                <h3>Reporte de Producción</h3>
+                <form onsubmit="return reportarProduccion(event)">
+                    <div class="form-group">
+                        <label for="recetaProduccion">Receta</label>
+                        <select id="recetaProduccion" required>
+                            <option value="">Seleccionar receta...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cantidadReceta">Cantidad Producida (porciones)</label>
+                        <input type="number" id="cantidadReceta" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="charolas">Número de Charolas</label>
+                        <input type="number" id="charolas" required min="1" placeholder="Charolas servidas">
+                    </div>
+                    <div class="form-group">
+                        <label for="merma">Merma/Desperdicio (kg)</label>
+                        <input type="number" id="merma" step="0.01" required min="0" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="observacionesProduccion">Observaciones</label>
+                        <textarea id="observacionesProduccion" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Enviar Reporte</button>
+                        <button type="button" class="btn-secondary" onclick="ocultarFormularioProduccion()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Receta</th>
+                            <th>Cantidad Producida</th>
+                            <th>Charolas</th>
+                            <th>Merma (kg)</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaProduccion">
+                        <!-- Datos mock se cargarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Servicio al Cliente -->
+    <div id="servicio" class="screen">
+        <div class="page-container">
+            <header class="page-header">
+                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <h1>Servicio al Cliente</h1>
+            </header>
+            <div class="servicio-actions">
+                <button class="btn-primary" onclick="crearEncuesta()">Crear Nueva Encuesta</button>
+            </div>
+            <div id="formularioEncuesta" class="form-container" style="display: none;">
+                <h3>Crear Encuesta</h3>
+                <form onsubmit="return guardarEncuesta(event)">
+                    <div class="form-group">
+                        <label for="tituloEncuesta">Título de la Encuesta</label>
+                        <input type="text" id="tituloEncuesta" required placeholder="Ej: Satisfacción del Menú de Hoy">
+                    </div>
+                    <div class="form-group">
+                        <label for="preguntasEncuesta">Preguntas (una por línea)</label>
+                        <textarea id="preguntasEncuesta" rows="5" required placeholder="¿Cómo calificaría la calidad de la comida?&#10;¿El servicio fue rápido?&#10;¿Recomendaría nuestro comedor?"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Generar Encuesta y QR</button>
+                        <button type="button" class="btn-secondary" onclick="cancelarEncuesta()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="encuestas-list" id="encuestasList">
+                <!-- Encuestas se mostrarán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificaciones -->
+    <div id="notificaciones" class="screen">
+        <div class="page-container">
+            <header class="page-header">
+                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <h1>Notificaciones Inteligentes</h1>
+            </header>
+            <div class="notificaciones-container" id="notificacionesContainer">
+                <!-- Notificaciones se cargarán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuración -->
+    <div id="configuracion" class="screen">
+        <div class="page-container">
+            <header class="page-header">
+                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <h1>Configuración</h1>
+            </header>
+            <div class="config-container">
+                <div class="config-section">
+                    <h3>Parámetros del Sistema</h3>
+                    <div class="form-group">
+                        <label>Stock Mínimo Global (kg)</label>
+                        <input type="number" value="50" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Porciones por Charola</label>
+                        <input type="number" value="20" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Horario de Servicio</label>
+                        <input type="time" value="12:00">
+                    </div>
+                </div>
+                <div class="config-section">
+                    <h3>Integraciones</h3>
+                    <div class="form-group">
+                        <label>WhatsApp Business API</label>
+                        <input type="text" placeholder="Número de teléfono" value="+52 123 456 7890">
+                    </div>
+                    <div class="form-group">
+                        <label>OCR Service</label>
+                        <select>
+                            <option>Google Vision API</option>
+                            <option>Azure Computer Vision</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn-primary">Guardar Configuración</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
