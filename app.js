@@ -569,36 +569,91 @@ function crearGrafico3() {
     const ctx = document.getElementById('chart3');
     if (!ctx || typeof Chart === 'undefined') return;
     
+    if (chartInstances.chart3) {
+        chartInstances.chart3.destroy();
+    }
+    
     const charolas = [64, 69, 66, 72, 68];
     const labels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'];
     const merma = [12, 14, 13, 15, 14];
+    const promedio = (charolas.reduce((a, b) => a + b, 0) / charolas.length).toFixed(1);
+    const maxCharolas = Math.max(...charolas);
+    const minCharolas = Math.min(...charolas);
     
     chartInstances.chart3 = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Charolas',
-                data: charolas,
-                backgroundColor: '#10b981',
-                borderRadius: 8,
-                borderSkipped: false,
-                barThickness: 45
-            }]
+            datasets: [
+                {
+                    label: 'Producción (Charolas)',
+                    data: charolas,
+                    backgroundColor: charolas.map(c => {
+                        if (c >= promedio * 1.1) return 'rgba(16, 185, 129, 0.9)'; // Verde intenso - excelente
+                        if (c >= promedio) return 'rgba(34, 197, 94, 0.8)'; // Verde - bueno
+                        if (c >= promedio * 0.9) return 'rgba(245, 158, 11, 0.8)'; // Amarillo - atención
+                        return 'rgba(239, 68, 68, 0.8)'; // Rojo - bajo
+                    }),
+                    borderColor: charolas.map(c => {
+                        if (c >= promedio * 1.1) return '#059669';
+                        if (c >= promedio) return '#22c55e';
+                        if (c >= promedio * 0.9) return '#f59e0b';
+                        return '#dc2626';
+                    }),
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    barThickness: 50,
+                    maxBarThickness: 60
+                },
+                {
+                    label: 'Promedio Semanal',
+                    data: Array(5).fill(parseFloat(promedio)),
+                    type: 'line',
+                    borderColor: '#6366f1',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    fill: false,
+                    tension: 0
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 20,
+                    bottom: 10,
+                    left: 10,
+                    right: 10
+                }
+            },
             interaction: {
                 intersect: false,
                 mode: 'index'
             },
             plugins: {
                 legend: {
-                    display: false
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 12,
+                            weight: '600'
+                        },
+                        padding: 12,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.95)',
                     padding: 16,
                     titleFont: {
                         size: 16,
@@ -610,55 +665,122 @@ function crearGrafico3() {
                     borderColor: '#10b981',
                     borderWidth: 2,
                     cornerRadius: 12,
-                    displayColors: false,
+                    displayColors: true,
                     callbacks: {
                         title: function(context) {
-                            return labels[context[0].dataIndex];
+                            const index = context[0].dataIndex;
+                            const diasCompletos = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+                            return `${diasCompletos[index]} - ${labels[index]}`;
                         },
                         label: function(context) {
-                            const index = context.dataIndex;
-                            const promedio = (charolas.reduce((a, b) => a + b, 0) / charolas.length).toFixed(1);
-                            const diferencia = (charolas[index] - promedio).toFixed(1);
-                            return [
-                                `📦 Producción: ${charolas[index]} charolas`,
-                                `📊 Promedio semanal: ${promedio} charolas`,
-                                diferencia >= 0 ? `↑ +${diferencia} charolas` : `↓ ${diferencia} charolas`,
-                                `📉 Merma: ${merma[index]} kg`
-                            ];
+                            if (context.datasetIndex === 0) {
+                                const index = context.dataIndex;
+                                const diferencia = (charolas[index] - parseFloat(promedio)).toFixed(1);
+                                const porcentajeMerma = ((merma[index] / charolas[index]) * 100).toFixed(1);
+                                const eficiencia = ((charolas[index] / maxCharolas) * 100).toFixed(1);
+                                
+                                return [
+                                    `📦 Producción: ${charolas[index]} charolas`,
+                                    `📊 Promedio semanal: ${promedio} charolas`,
+                                    diferencia >= 0 
+                                        ? `✅ +${diferencia} charolas sobre el promedio` 
+                                        : `⚠️ ${diferencia} charolas bajo el promedio`,
+                                    `📉 Merma: ${merma[index]} kg (${porcentajeMerma}%)`,
+                                    `⚡ Eficiencia: ${eficiencia}%`,
+                                    charolas[index] === maxCharolas ? '🏆 Día de mayor producción' : '',
+                                    charolas[index] === minCharolas ? '📌 Día de menor producción' : ''
+                                ].filter(Boolean);
+                            } else {
+                                return `📊 Línea de promedio: ${promedio} charolas`;
+                            }
+                        },
+                        labelColor: function(context) {
+                            if (context.datasetIndex === 0) {
+                                const index = context.dataIndex;
+                                let color = '#10b981';
+                                if (charolas[index] >= promedio * 1.1) color = '#059669';
+                                else if (charolas[index] >= promedio) color = '#22c55e';
+                                else if (charolas[index] >= promedio * 0.9) color = '#f59e0b';
+                                else color = '#dc2626';
+                                return {
+                                    borderColor: color,
+                                    backgroundColor: color
+                                };
+                            }
+                            return {
+                                borderColor: '#6366f1',
+                                backgroundColor: '#6366f1'
+                            };
                         }
                     }
-                }
             },
             scales: {
                 y: {
                     beginAtZero: true,
+                    max: Math.ceil(maxCharolas * 1.2),
                     grid: {
                         color: 'rgba(0, 0, 0, 0.05)',
-                        drawBorder: false
+                        drawBorder: false,
+                        lineWidth: 1
                     },
                     ticks: {
                         font: {
-                            size: 12
+                            size: 11,
+                            weight: '500'
                         },
+                        stepSize: 10,
                         callback: function(value) {
-                            return value + ' charolas';
+                            return value + ' ch';
+                        },
+                        padding: 8
+                    },
+                    title: {
+                        display: true,
+                        text: 'Cantidad de Charolas',
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        },
+                        color: '#374151',
+                        padding: {
+                            top: 10,
+                            bottom: 5
                         }
                     }
                 },
                 x: {
                     grid: {
-                        display: false
+                        display: false,
+                        drawBorder: false
                     },
                     ticks: {
                         font: {
-                            size: 12
+                            size: 12,
+                            weight: '600'
+                        },
+                        padding: 10
+                    },
+                    title: {
+                        display: true,
+                        text: 'Días de la Semana',
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        },
+                        color: '#374151',
+                        padding: {
+                            top: 5,
+                            bottom: 10
                         }
                     }
                 }
             },
             animation: {
-                duration: 2000,
-                easing: 'easeInOutBounce'
+                duration: 1500,
+                easing: 'easeInOutQuart',
+                onComplete: function() {
+                    // Animación completada
+                }
             }
         }
     });
