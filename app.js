@@ -154,6 +154,15 @@ function cambiarPantalla(ocultar, mostrar) {
             }, 300);
         }
         
+        // Inicializar módulo de Configuración si es configuracion
+        if (mostrar === 'configuracion') {
+            setTimeout(() => {
+                if (typeof inicializarModuloConfiguracion === 'function') {
+                    inicializarModuloConfiguracion();
+                }
+            }, 300);
+        }
+        
         console.log('✅ Cambio de pantalla completado');
     } catch (error) {
         console.error('❌ Error al cambiar pantalla:', error);
@@ -7732,4 +7741,541 @@ if (typeof window !== 'undefined') {
     window.actualizarTotalesCalidad = actualizarTotalesCalidad;
     window.filtrarOrdenesCalidad = filtrarOrdenesCalidad;
     window.verDetalleVerificacion = verDetalleVerificacion;
+}
+
+// ============================================
+// MÓDULO DE CONFIGURACIÓN
+// ============================================
+
+// Datos mock de configuración
+const configuracionData = {
+    usuarios: [],
+    respaldos: [],
+    configuracion: {
+        general: {
+            nombreComedor: 'Comedor Industrial Central',
+            direccion: 'Av. Principal 123, Ciudad',
+            telefono: '+1 234 567 8900',
+            email: 'contacto@comedor.com',
+            zonaHoraria: 'America/Mexico_City',
+            idioma: 'es',
+            moneda: 'MXN',
+            formatoFecha: 'DD/MM/YYYY'
+        },
+        inventario: {
+            diasAlertaMinimo: 3,
+            porcentajeSeguridad: 20,
+            unidadPredeterminada: 'kg',
+            actualizacionAutomatica: true
+        },
+        produccion: {
+            mermaObjetivo: 5,
+            mermaCritica: 10,
+            charolasLote: 50,
+            reporteAutomatico: true
+        },
+        notificaciones: {
+            email: true,
+            push: true,
+            alertasInventario: true,
+            alertasCostos: true,
+            frecuenciaResumen: 'diario'
+        },
+        integraciones: {
+            whatsapp: {
+                enabled: true,
+                numero: '+1 234 567 8900',
+                token: '••••••••••••'
+            },
+            api: {
+                enabled: false,
+                url: '',
+                key: ''
+            },
+            email: {
+                enabled: true,
+                server: 'smtp.gmail.com',
+                port: 587,
+                user: '',
+                password: ''
+            }
+        }
+    }
+};
+
+// Generar datos mock de usuarios
+function generarDatosMockUsuarios() {
+    if (configuracionData.usuarios.length > 0) return;
+    
+    const roles = ['administrador', 'gerente', 'supervisor', 'operador', 'lectura'];
+    const nombres = [
+        { nombre: 'Juan Pérez', email: 'juan.perez@comedor.com', rol: 'administrador' },
+        { nombre: 'María González', email: 'maria.gonzalez@comedor.com', rol: 'gerente' },
+        { nombre: 'Carlos Rodríguez', email: 'carlos.rodriguez@comedor.com', rol: 'supervisor' },
+        { nombre: 'Ana Martínez', email: 'ana.martinez@comedor.com', rol: 'operador' },
+        { nombre: 'Luis Sánchez', email: 'luis.sanchez@comedor.com', rol: 'operador' }
+    ];
+    
+    configuracionData.usuarios = nombres.map((u, i) => {
+        const fecha = new Date();
+        fecha.setDate(fecha.getDate() - Math.floor(Math.random() * 7));
+        
+        return {
+            id: i + 1,
+            nombre: u.nombre,
+            email: u.email,
+            rol: u.rol,
+            estado: Math.random() > 0.2 ? 'activo' : 'inactivo',
+            ultimoAcceso: fecha.toISOString(),
+            fechaCreacion: new Date(Date.now() - (30 + Math.random() * 60) * 24 * 60 * 60 * 1000).toISOString()
+        };
+    });
+}
+
+// Generar datos mock de respaldos
+function generarDatosMockRespaldos() {
+    if (configuracionData.respaldos.length > 0) return;
+    
+    const tipos = ['completo', 'incremental', 'diferencial'];
+    const estados = ['completado', 'completado', 'completado', 'error'];
+    
+    for (let i = 0; i < 10; i++) {
+        const fecha = new Date();
+        fecha.setDate(fecha.getDate() - i * 2);
+        fecha.setHours(14, 30, 0, 0);
+        
+        const tipo = tipos[Math.floor(Math.random() * tipos.length)];
+        const estado = estados[Math.floor(Math.random() * estados.length)];
+        const tamano = (1.5 + Math.random() * 2).toFixed(1);
+        
+        configuracionData.respaldos.push({
+            id: i + 1,
+            fecha: fecha.toISOString(),
+            tamano: `${tamano} MB`,
+            tipo: tipo,
+            estado: estado,
+            descripcion: `Respaldo ${tipo} del sistema`
+        });
+    }
+    
+    // Ordenar por fecha descendente
+    configuracionData.respaldos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+}
+
+// Mostrar sección de configuración
+function mostrarSeccionConfig(seccion) {
+    // Ocultar todas las secciones
+    document.querySelectorAll('.config-seccion').forEach(sec => {
+        sec.classList.remove('active');
+    });
+    
+    // Ocultar todos los botones de navegación
+    document.querySelectorAll('.config-nav-item').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Mostrar sección seleccionada
+    const seccionElement = document.getElementById(`seccion${seccion.charAt(0).toUpperCase() + seccion.slice(1)}`);
+    if (seccionElement) {
+        seccionElement.classList.add('active');
+    }
+    
+    // Activar botón de navegación
+    const navBtn = document.querySelector(`[data-section="${seccion}"]`);
+    if (navBtn) {
+        navBtn.classList.add('active');
+    }
+    
+    // Cargar datos específicos de la sección
+    if (seccion === 'usuarios') {
+        cargarUsuarios();
+    } else if (seccion === 'backup') {
+        cargarHistorialBackup();
+    }
+}
+
+// Cargar usuarios en tabla
+function cargarUsuarios() {
+    generarDatosMockUsuarios();
+    const tbody = document.getElementById('tablaUsuariosBody');
+    if (!tbody) return;
+    
+    if (configuracionData.usuarios.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                    No hay usuarios registrados
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = configuracionData.usuarios.map(usuario => {
+        const fecha = new Date(usuario.ultimoAcceso);
+        const fechaFormateada = fecha.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const rolLabels = {
+            'administrador': 'Administrador',
+            'gerente': 'Gerente',
+            'supervisor': 'Supervisor',
+            'operador': 'Operador',
+            'lectura': 'Solo Lectura'
+        };
+        
+        return `
+            <tr>
+                <td><strong>${usuario.nombre}</strong></td>
+                <td>${usuario.email}</td>
+                <td><span class="badge-rol">${rolLabels[usuario.rol] || usuario.rol}</span></td>
+                <td><span class="badge-estado ${usuario.estado}">${usuario.estado === 'activo' ? 'Activo' : 'Inactivo'}</span></td>
+                <td>${fechaFormateada}</td>
+                <td>
+                    <button class="btn-icon-small" onclick="editarUsuario(${usuario.id})" title="Editar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18.5 2.5C18.8978 2.10218 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10218 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10218 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button class="btn-icon-small" onclick="eliminarUsuario(${usuario.id})" title="Eliminar" style="margin-left: 8px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Cargar historial de respaldos
+function cargarHistorialBackup() {
+    generarDatosMockRespaldos();
+    const tbody = document.getElementById('historialBackupBody');
+    if (!tbody) return;
+    
+    if (configuracionData.respaldos.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                    No hay respaldos registrados
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = configuracionData.respaldos.map(backup => {
+        const fecha = new Date(backup.fecha);
+        const fechaFormateada = fecha.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const tipoLabels = {
+            'completo': 'Completo',
+            'incremental': 'Incremental',
+            'diferencial': 'Diferencial'
+        };
+        
+        return `
+            <tr>
+                <td>${fechaFormateada}</td>
+                <td>${backup.tamano}</td>
+                <td><span class="badge-tipo">${tipoLabels[backup.tipo] || backup.tipo}</span></td>
+                <td><span class="badge-estado ${backup.estado}">${backup.estado === 'completado' ? 'Completado' : 'Error'}</span></td>
+                <td>
+                    <button class="btn-icon-small" onclick="descargarBackup(${backup.id})" title="Descargar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Guardar configuración
+function guardarConfiguracion(seccion) {
+    const config = configuracionData.configuracion[seccion];
+    if (!config) return;
+    
+    // Guardar valores según la sección
+    if (seccion === 'general') {
+        config.nombreComedor = document.getElementById('nombreComedor')?.value || config.nombreComedor;
+        config.direccion = document.getElementById('direccionComedor')?.value || config.direccion;
+        config.telefono = document.getElementById('telefonoComedor')?.value || config.telefono;
+        config.email = document.getElementById('emailComedor')?.value || config.email;
+        config.zonaHoraria = document.getElementById('zonaHoraria')?.value || config.zonaHoraria;
+        config.idioma = document.getElementById('idiomaSistema')?.value || config.idioma;
+        config.moneda = document.getElementById('monedaSistema')?.value || config.moneda;
+        config.formatoFecha = document.getElementById('formatoFecha')?.value || config.formatoFecha;
+    } else if (seccion === 'inventario') {
+        config.diasAlertaMinimo = parseInt(document.getElementById('diasAlertaMinimo')?.value) || config.diasAlertaMinimo;
+        config.porcentajeSeguridad = parseInt(document.getElementById('porcentajeSeguridad')?.value) || config.porcentajeSeguridad;
+        config.unidadPredeterminada = document.getElementById('unidadPredeterminada')?.value || config.unidadPredeterminada;
+        config.actualizacionAutomatica = document.getElementById('actualizacionAutomatica')?.checked || config.actualizacionAutomatica;
+    } else if (seccion === 'produccion') {
+        config.mermaObjetivo = parseFloat(document.getElementById('mermaObjetivo')?.value) || config.mermaObjetivo;
+        config.mermaCritica = parseFloat(document.getElementById('mermaCritica')?.value) || config.mermaCritica;
+        config.charolasLote = parseInt(document.getElementById('charolasLote')?.value) || config.charolasLote;
+        config.reporteAutomatico = document.getElementById('reporteAutomatico')?.checked || config.reporteAutomatico;
+    } else if (seccion === 'notificaciones') {
+        config.email = document.getElementById('notificacionesEmail')?.checked || config.email;
+        config.push = document.getElementById('notificacionesPush')?.checked || config.push;
+        config.alertasInventario = document.getElementById('alertasInventario')?.checked || config.alertasInventario;
+        config.alertasCostos = document.getElementById('alertasCostos')?.checked || config.alertasCostos;
+        config.frecuenciaResumen = document.getElementById('frecuenciaResumen')?.value || config.frecuenciaResumen;
+    } else if (seccion === 'integraciones') {
+        config.whatsapp.enabled = document.getElementById('whatsappEnabled')?.checked || config.whatsapp.enabled;
+        config.whatsapp.numero = document.getElementById('whatsappNumber')?.value || config.whatsapp.numero;
+        config.api.enabled = document.getElementById('apiEnabled')?.checked || config.api.enabled;
+        config.api.url = document.getElementById('apiUrl')?.value || config.api.url;
+        config.email.enabled = document.getElementById('emailEnabled')?.checked || config.email.enabled;
+        config.email.server = document.getElementById('smtpServer')?.value || config.email.server;
+        config.email.port = parseInt(document.getElementById('smtpPort')?.value) || config.email.port;
+    }
+    
+    // Guardar en memoria
+    if (typeof MEMORIA_TEMPORAL !== 'undefined') {
+        MEMORIA_TEMPORAL.guardar('configuracion', configuracionData, 15);
+    }
+    
+    ToastNotification.show('Configuración guardada exitosamente', 'success', 2000);
+}
+
+// Abrir modal de usuario
+function abrirModalUsuario(usuarioId = null) {
+    const modal = document.getElementById('modalUsuario');
+    const titulo = document.getElementById('modalUsuarioTitulo');
+    const form = document.getElementById('formUsuario');
+    
+    if (!modal || !titulo || !form) return;
+    
+    if (usuarioId) {
+        const usuario = configuracionData.usuarios.find(u => u.id === usuarioId);
+        if (usuario) {
+            titulo.textContent = 'Editar Usuario';
+            document.getElementById('usuarioNombre').value = usuario.nombre;
+            document.getElementById('usuarioEmail').value = usuario.email;
+            document.getElementById('usuarioRol').value = usuario.rol;
+            document.getElementById('usuarioActivo').checked = usuario.estado === 'activo';
+            window.usuarioEditando = usuarioId;
+        }
+    } else {
+        titulo.textContent = 'Nuevo Usuario';
+        form.reset();
+        window.usuarioEditando = null;
+    }
+    
+    modal.style.display = 'flex';
+}
+
+// Cerrar modal de usuario
+function cerrarModalUsuario() {
+    const modal = document.getElementById('modalUsuario');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    window.usuarioEditando = null;
+}
+
+// Guardar usuario
+function guardarUsuario(event) {
+    event.preventDefault();
+    
+    const nombre = document.getElementById('usuarioNombre')?.value;
+    const email = document.getElementById('usuarioEmail')?.value;
+    const rol = document.getElementById('usuarioRol')?.value;
+    const password = document.getElementById('usuarioPassword')?.value;
+    const activo = document.getElementById('usuarioActivo')?.checked;
+    
+    if (!nombre || !email || !rol) {
+        ToastNotification.show('Por favor complete todos los campos requeridos', 'error', 2000);
+        return;
+    }
+    
+    if (window.usuarioEditando) {
+        // Editar usuario existente
+        const usuario = configuracionData.usuarios.find(u => u.id === window.usuarioEditando);
+        if (usuario) {
+            usuario.nombre = nombre;
+            usuario.email = email;
+            usuario.rol = rol;
+            usuario.estado = activo ? 'activo' : 'inactivo';
+            if (password) {
+                // En producción, aquí se hashearía la contraseña
+                console.log('Contraseña actualizada para usuario:', email);
+            }
+        }
+        ToastNotification.show('Usuario actualizado exitosamente', 'success', 2000);
+    } else {
+        // Crear nuevo usuario
+        const nuevoUsuario = {
+            id: configuracionData.usuarios.length > 0 
+                ? Math.max(...configuracionData.usuarios.map(u => u.id)) + 1 
+                : 1,
+            nombre: nombre,
+            email: email,
+            rol: rol,
+            estado: activo ? 'activo' : 'inactivo',
+            ultimoAcceso: new Date().toISOString(),
+            fechaCreacion: new Date().toISOString()
+        };
+        configuracionData.usuarios.push(nuevoUsuario);
+        ToastNotification.show('Usuario creado exitosamente', 'success', 2000);
+    }
+    
+    cargarUsuarios();
+    cerrarModalUsuario();
+}
+
+// Editar usuario
+function editarUsuario(usuarioId) {
+    abrirModalUsuario(usuarioId);
+}
+
+// Eliminar usuario
+function eliminarUsuario(usuarioId) {
+    if (!confirm('¿Está seguro de eliminar este usuario?')) return;
+    
+    const index = configuracionData.usuarios.findIndex(u => u.id === usuarioId);
+    if (index > -1) {
+        configuracionData.usuarios.splice(index, 1);
+        cargarUsuarios();
+        ToastNotification.show('Usuario eliminado exitosamente', 'success', 2000);
+    }
+}
+
+// Crear respaldo
+function crearRespaldo() {
+    ToastNotification.show('Creando respaldo...', 'info', 2000);
+    
+    setTimeout(() => {
+        const fecha = new Date();
+        const tamano = (1.5 + Math.random() * 2).toFixed(1);
+        
+        const nuevoBackup = {
+            id: configuracionData.respaldos.length > 0 
+                ? Math.max(...configuracionData.respaldos.map(b => b.id)) + 1 
+                : 1,
+            fecha: fecha.toISOString(),
+            tamano: `${tamano} MB`,
+            tipo: 'completo',
+            estado: 'completado',
+            descripcion: 'Respaldo completo del sistema'
+        };
+        
+        configuracionData.respaldos.unshift(nuevoBackup);
+        
+        // Actualizar info de último respaldo
+        document.getElementById('ultimoBackup').textContent = fecha.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        document.getElementById('tamanoBackup').textContent = `${tamano} MB`;
+        
+        cargarHistorialBackup();
+        ToastNotification.show('Respaldo creado exitosamente', 'success', 2000);
+    }, 1500);
+}
+
+// Restaurar respaldo
+function restaurarRespaldo() {
+    if (!confirm('¿Está seguro de restaurar el último respaldo? Esta acción no se puede deshacer.')) return;
+    
+    ToastNotification.show('Restaurando respaldo...', 'info', 2000);
+    
+    setTimeout(() => {
+        ToastNotification.show('Respaldo restaurado exitosamente', 'success', 2000);
+    }, 2000);
+}
+
+// Descargar backup
+function descargarBackup(backupId) {
+    const backup = configuracionData.respaldos.find(b => b.id === backupId);
+    if (backup) {
+        ToastNotification.show(`Descargando respaldo del ${new Date(backup.fecha).toLocaleDateString('es-ES')}...`, 'info', 2000);
+    }
+}
+
+// Toggle password visibility
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    
+    const button = input.nextElementSibling;
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (button) button.textContent = 'Ocultar';
+    } else {
+        input.type = 'password';
+        if (button) button.textContent = 'Mostrar';
+    }
+}
+
+// Inicializar módulo de configuración
+function inicializarModuloConfiguracion() {
+    console.log('⚙️ Inicializando módulo de configuración...');
+    
+    // Generar datos mock
+    generarDatosMockUsuarios();
+    generarDatosMockRespaldos();
+    
+    // Cargar última sección activa o mostrar General
+    const seccionActiva = document.querySelector('.config-seccion.active');
+    if (seccionActiva) {
+        const seccionId = seccionActiva.id.replace('seccion', '');
+        const seccion = seccionId.charAt(0).toLowerCase() + seccionId.slice(1);
+        if (seccion === 'general') {
+            cargarUsuarios();
+        } else if (seccion === 'backup') {
+            cargarHistorialBackup();
+        }
+    }
+}
+
+// Exponer funciones globalmente
+if (typeof window !== 'undefined') {
+    window.mostrarSeccionConfig = mostrarSeccionConfig;
+    window.guardarConfiguracion = guardarConfiguracion;
+    window.abrirModalUsuario = abrirModalUsuario;
+    window.cerrarModalUsuario = cerrarModalUsuario;
+    window.guardarUsuario = guardarUsuario;
+    window.editarUsuario = editarUsuario;
+    window.eliminarUsuario = eliminarUsuario;
+    window.crearRespaldo = crearRespaldo;
+    window.restaurarRespaldo = restaurarRespaldo;
+    window.descargarBackup = descargarBackup;
+    window.togglePassword = togglePassword;
+    window.inicializarModuloConfiguracion = inicializarModuloConfiguracion;
+}
+
+// Inicializar cuando se navega a configuración
+if (typeof cambiarPantalla !== 'undefined') {
+    const cambiarPantallaOriginal = cambiarPantalla;
+    cambiarPantalla = function(ocultar, mostrar) {
+        cambiarPantallaOriginal(ocultar, mostrar);
+        if (mostrar === 'configuracion') {
+            setTimeout(() => {
+                inicializarModuloConfiguracion();
+            }, 300);
+        }
+    };
 }

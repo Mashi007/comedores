@@ -112,7 +112,6 @@
                     </svg>
                 </span>
                 <span class="nav-text">Dashboard</span>
-                <span class="nav-badge">6</span>
             </a>
             <a href="#" class="nav-item" onclick="navegar('compras'); return false;" data-section="compras">
                 <span class="nav-icon">
@@ -123,7 +122,6 @@
                     </svg>
                 </span>
                 <span class="nav-text">Compras</span>
-                <span class="nav-new">Nuevo</span>
             </a>
             <a href="#" class="nav-item" onclick="navegar('inventario'); return false;" data-section="inventario">
                 <span class="nav-icon">
@@ -169,7 +167,6 @@
                     </svg>
                 </span>
                 <span class="nav-text">Notificaciones</span>
-                <span class="nav-badge">5</span>
             </a>
             <a href="#" class="nav-item" onclick="navegar('chat-ai'); return false;" data-section="chat-ai">
                 <span class="nav-icon">
@@ -180,7 +177,6 @@
                     </svg>
                 </span>
                 <span class="nav-text">Chat AI</span>
-                <span class="nav-new">Nuevo</span>
             </a>
             <a href="#" class="nav-item" onclick="navegar('costos'); return false;" data-section="costos">
                 <span class="nav-icon">
@@ -189,7 +185,6 @@
                     </svg>
                 </span>
                 <span class="nav-text">Costos Variables</span>
-                <span class="nav-new">Nuevo</span>
             </a>
             <a href="#" class="nav-item" onclick="navegar('calidad'); return false;" data-section="calidad">
                 <span class="nav-icon">
@@ -198,7 +193,6 @@
                     </svg>
                 </span>
                 <span class="nav-text">Control de Calidad</span>
-                <span class="nav-badge" id="badgeCalidadPendiente" style="display: none;">0</span>
             </a>
             <a href="#" class="nav-item" onclick="navegar('configuracion'); return false;" data-section="configuracion">
                 <span class="nav-icon">
@@ -2341,12 +2335,533 @@
         </div>
     </div>
 
+    <!-- Configuración -->
     <div id="configuracion" class="screen">
         <div class="page-container">
             <div class="page-header">
-                <h1>Configuración</h1>
+                <h1>Configuración del Sistema</h1>
+                <p class="header-subtitle">Gestión de parámetros, usuarios y preferencias</p>
             </div>
-            <p>Módulo de configuración</p>
+
+            <!-- Secciones de Configuración -->
+            <div class="configuracion-container">
+                <!-- Panel de Navegación -->
+                <div class="configuracion-sidebar">
+                    <div class="config-nav">
+                        <button class="config-nav-item active" onclick="mostrarSeccionConfig('general')" data-section="general">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 1V3M12 21V23M23 12H21M3 12H1M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M19.07 19.07L17.66 17.66M6.34 6.34L4.93 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span>General</span>
+                        </button>
+                        <button class="config-nav-item" onclick="mostrarSeccionConfig('usuarios')" data-section="usuarios">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <span>Usuarios</span>
+                        </button>
+                        <button class="config-nav-item" onclick="mostrarSeccionConfig('inventario')" data-section="inventario">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <path d="M9 9H15M9 12H15M9 15H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span>Inventario</span>
+                        </button>
+                        <button class="config-nav-item" onclick="mostrarSeccionConfig('produccion')" data-section="produccion">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Producción</span>
+                        </button>
+                        <button class="config-nav-item" onclick="mostrarSeccionConfig('notificaciones')" data-section="notificaciones">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Notificaciones</span>
+                        </button>
+                        <button class="config-nav-item" onclick="mostrarSeccionConfig('integraciones')" data-section="integraciones">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 3H6C4.89543 3 4 3.89543 4 5V19C4 20.1046 4.89543 21 6 21H18C19.1046 21 20 20.1046 20 19V5C20 3.89543 19.1046 3 18 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 17V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 11L12 7L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Integraciones</span>
+                        </button>
+                        <button class="config-nav-item" onclick="mostrarSeccionConfig('backup')" data-section="backup">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 16V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 8L12 3L17 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Respaldo</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Contenido de Configuración -->
+                <div class="configuracion-content">
+                    <!-- Sección General -->
+                    <div id="seccionGeneral" class="config-seccion active">
+                        <div class="config-section-header">
+                            <h2>Configuración General</h2>
+                            <p>Parámetros básicos del sistema</p>
+                        </div>
+                        <div class="config-form-grid">
+                            <div class="config-form-group">
+                                <label>Nombre del Comedor</label>
+                                <input type="text" id="nombreComedor" value="Comedor Industrial Central" placeholder="Nombre del establecimiento">
+                            </div>
+                            <div class="config-form-group">
+                                <label>Dirección</label>
+                                <input type="text" id="direccionComedor" value="Av. Principal 123, Ciudad" placeholder="Dirección completa">
+                            </div>
+                            <div class="config-form-group">
+                                <label>Teléfono</label>
+                                <input type="tel" id="telefonoComedor" value="+1 234 567 8900" placeholder="Teléfono de contacto">
+                            </div>
+                            <div class="config-form-group">
+                                <label>Email</label>
+                                <input type="email" id="emailComedor" value="contacto@comedor.com" placeholder="Email de contacto">
+                            </div>
+                            <div class="config-form-group">
+                                <label>Zona Horaria</label>
+                                <select id="zonaHoraria">
+                                    <option value="America/Mexico_City" selected>América/México (GMT-6)</option>
+                                    <option value="America/New_York">América/Nueva York (GMT-5)</option>
+                                    <option value="America/Los_Angeles">América/Los Ángeles (GMT-8)</option>
+                                    <option value="America/Bogota">América/Bogotá (GMT-5)</option>
+                                </select>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Idioma</label>
+                                <select id="idiomaSistema">
+                                    <option value="es" selected>Español</option>
+                                    <option value="en">English</option>
+                                    <option value="pt">Português</option>
+                                </select>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Moneda</label>
+                                <select id="monedaSistema">
+                                    <option value="USD">USD ($)</option>
+                                    <option value="MXN" selected>MXN ($)</option>
+                                    <option value="COP">COP ($)</option>
+                                    <option value="EUR">EUR (€)</option>
+                                </select>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Formato de Fecha</label>
+                                <select id="formatoFecha">
+                                    <option value="DD/MM/YYYY" selected>DD/MM/YYYY</option>
+                                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                                    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn-primary" onclick="guardarConfiguracion('general')">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                    <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M17 21V13H7V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M7 3V8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sección Usuarios -->
+                    <div id="seccionUsuarios" class="config-seccion">
+                        <div class="config-section-header">
+                            <h2>Gestión de Usuarios</h2>
+                            <p>Administración de usuarios y permisos</p>
+                        </div>
+                        <div class="config-table-container">
+                            <div class="table-header">
+                                <h3>Usuarios del Sistema</h3>
+                                <button class="btn-primary" onclick="abrirModalUsuario()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    Nuevo Usuario
+                                </button>
+                            </div>
+                            <div class="table-wrapper">
+                                <table class="config-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Usuario</th>
+                                            <th>Email</th>
+                                            <th>Rol</th>
+                                            <th>Estado</th>
+                                            <th>Último Acceso</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaUsuariosBody">
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección Inventario -->
+                    <div id="seccionInventario" class="config-seccion">
+                        <div class="config-section-header">
+                            <h2>Configuración de Inventario</h2>
+                            <p>Parámetros de control de inventario</p>
+                        </div>
+                        <div class="config-form-grid">
+                            <div class="config-form-group">
+                                <label>Días de Alerta de Inventario Mínimo</label>
+                                <input type="number" id="diasAlertaMinimo" value="3" min="1" max="30">
+                                <small>Días antes de alcanzar el mínimo para enviar alerta</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Porcentaje de Inventario de Seguridad</label>
+                                <input type="number" id="porcentajeSeguridad" value="20" min="0" max="100" step="5">
+                                <small>Porcentaje adicional sobre el mínimo para inventario de seguridad</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Unidad de Medida Predeterminada</label>
+                                <select id="unidadPredeterminada">
+                                    <option value="kg" selected>Kilogramos (kg)</option>
+                                    <option value="g">Gramos (g)</option>
+                                    <option value="L">Litros (L)</option>
+                                    <option value="unidad">Unidades</option>
+                                </select>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Actualización Automática de Stock</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="actualizacionAutomatica" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <small>Actualizar stock automáticamente al aprobar compras</small>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn-primary" onclick="guardarConfiguracion('inventario')">Guardar Cambios</button>
+                        </div>
+                    </div>
+
+                    <!-- Sección Producción -->
+                    <div id="seccionProduccion" class="config-seccion">
+                        <div class="config-section-header">
+                            <h2>Configuración de Producción</h2>
+                            <p>Parámetros de producción y merma</p>
+                        </div>
+                        <div class="config-form-grid">
+                            <div class="config-form-group">
+                                <label>Merma Objetivo (%)</label>
+                                <input type="number" id="mermaObjetivo" value="5" min="0" max="20" step="0.5">
+                                <small>Porcentaje objetivo de merma por receta</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Alertas de Merma Crítica (%)</label>
+                                <input type="number" id="mermaCritica" value="10" min="0" max="30" step="0.5">
+                                <small>Porcentaje de merma que activa alerta crítica</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Charolas por Lote Estándar</label>
+                                <input type="number" id="charolasLote" value="50" min="1" max="200">
+                                <small>Cantidad estándar de charolas por lote de producción</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Reporte Automático de Producción</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="reporteAutomatico" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <small>Generar reportes automáticos al finalizar el día</small>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn-primary" onclick="guardarConfiguracion('produccion')">Guardar Cambios</button>
+                        </div>
+                    </div>
+
+                    <!-- Sección Notificaciones -->
+                    <div id="seccionNotificaciones" class="config-seccion">
+                        <div class="config-section-header">
+                            <h2>Configuración de Notificaciones</h2>
+                            <p>Gestión de alertas y notificaciones del sistema</p>
+                        </div>
+                        <div class="config-form-grid">
+                            <div class="config-form-group">
+                                <label>Notificaciones por Email</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="notificacionesEmail" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <small>Enviar notificaciones importantes por email</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Notificaciones Push</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="notificacionesPush" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <small>Mostrar notificaciones en tiempo real</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Alertas de Inventario Crítico</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="alertasInventario" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <small>Activar alertas cuando el inventario esté crítico</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Alertas de Desviación de Costos</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="alertasCostos" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <small>Alertar cuando los costos se desvíen más del 10%</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Frecuencia de Resumen</label>
+                                <select id="frecuenciaResumen">
+                                    <option value="diario" selected>Diario</option>
+                                    <option value="semanal">Semanal</option>
+                                    <option value="mensual">Mensual</option>
+                                </select>
+                                <small>Frecuencia de resumen de notificaciones</small>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn-primary" onclick="guardarConfiguracion('notificaciones')">Guardar Cambios</button>
+                        </div>
+                    </div>
+
+                    <!-- Sección Integraciones -->
+                    <div id="seccionIntegraciones" class="config-seccion">
+                        <div class="config-section-header">
+                            <h2>Integraciones</h2>
+                            <p>Configuración de servicios externos</p>
+                        </div>
+                        <div class="integraciones-grid">
+                            <div class="integracion-card">
+                                <div class="integracion-header">
+                                    <div class="integracion-icon">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M17.472 14.382C17.882 14.382 18.118 14.146 18.118 13.736C18.118 13.326 17.882 13.09 17.472 13.09H15.29V11.236H17.472C17.882 11.236 18.118 11 18.118 10.59C18.118 10.18 17.882 9.944 17.472 9.944H15.29V8.09H17.472C17.882 8.09 18.118 7.854 18.118 7.444C18.118 7.034 17.882 6.798 17.472 6.798H13.59C13.18 6.798 12.944 7.034 12.944 7.444V16.556C12.944 16.966 13.18 17.202 13.59 17.202H17.472C17.882 17.202 18.118 16.966 18.118 16.556C18.118 16.146 17.882 15.91 17.472 15.91H15.29V14.382H17.472Z" fill="currentColor"/>
+                                            <path d="M11.118 17.202H7.236C6.826 17.202 6.59 16.966 6.59 16.556V7.444C6.59 7.034 6.826 6.798 7.236 6.798H11.118C11.528 6.798 11.764 7.034 11.764 7.444V16.556C11.764 16.966 11.528 17.202 11.118 17.202ZM10.472 8.09H7.882V15.91H10.472V8.09Z" fill="currentColor"/>
+                                        </svg>
+                                    </div>
+                                    <div class="integracion-info">
+                                        <h3>WhatsApp Business</h3>
+                                        <p>Integración para recepción de facturas y reportes</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="whatsappEnabled" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="integracion-details">
+                                    <div class="config-form-group">
+                                        <label>Número de WhatsApp</label>
+                                        <input type="tel" id="whatsappNumber" value="+1 234 567 8900" placeholder="+1234567890">
+                                    </div>
+                                    <div class="config-form-group">
+                                        <label>Token de API</label>
+                                        <input type="password" id="whatsappToken" value="••••••••••••" placeholder="Token de acceso">
+                                        <button class="btn-text" onclick="togglePassword('whatsappToken')">Mostrar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="integracion-card">
+                                <div class="integracion-header">
+                                    <div class="integracion-icon">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M21 16V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M18 8L12 2L6 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M12 2V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <div class="integracion-info">
+                                        <h3>API Externa</h3>
+                                        <p>Conexión con sistemas de contabilidad</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="apiEnabled">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="integracion-details">
+                                    <div class="config-form-group">
+                                        <label>URL del API</label>
+                                        <input type="url" id="apiUrl" placeholder="https://api.ejemplo.com">
+                                    </div>
+                                    <div class="config-form-group">
+                                        <label>API Key</label>
+                                        <input type="password" id="apiKey" placeholder="Clave de API">
+                                        <button class="btn-text" onclick="togglePassword('apiKey')">Mostrar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="integracion-card">
+                                <div class="integracion-header">
+                                    <div class="integracion-icon">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M4 7C4 6.46957 4.21071 5.96086 4.58579 5.58579C4.96086 5.21071 5.46957 5 6 5H18C18.5304 5 19.0391 5.21071 19.4142 5.58579C19.7893 5.96086 20 6.46957 20 7V19C20 19.5304 19.7893 20.0391 19.4142 20.4142C19.0391 20.7893 18.5304 21 18 21H6C5.46957 21 4.96086 20.7893 4.58579 20.4142C4.21071 20.0391 4 19.5304 4 19V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M9 9H15M9 13H15M9 17H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                    </div>
+                                    <div class="integracion-info">
+                                        <h3>Email SMTP</h3>
+                                        <p>Configuración de servidor de correo</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="emailEnabled" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="integracion-details">
+                                    <div class="config-form-group">
+                                        <label>Servidor SMTP</label>
+                                        <input type="text" id="smtpServer" value="smtp.gmail.com" placeholder="smtp.ejemplo.com">
+                                    </div>
+                                    <div class="config-form-group">
+                                        <label>Puerto</label>
+                                        <input type="number" id="smtpPort" value="587" placeholder="587">
+                                    </div>
+                                    <div class="config-form-group">
+                                        <label>Usuario</label>
+                                        <input type="email" id="smtpUser" placeholder="usuario@ejemplo.com">
+                                    </div>
+                                    <div class="config-form-group">
+                                        <label>Contraseña</label>
+                                        <input type="password" id="smtpPassword" placeholder="Contraseña">
+                                        <button class="btn-text" onclick="togglePassword('smtpPassword')">Mostrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn-primary" onclick="guardarConfiguracion('integraciones')">Guardar Cambios</button>
+                        </div>
+                    </div>
+
+                    <!-- Sección Respaldo -->
+                    <div id="seccionBackup" class="config-seccion">
+                        <div class="config-section-header">
+                            <h2>Respaldo y Restauración</h2>
+                            <p>Gestión de respaldos del sistema</p>
+                        </div>
+                        <div class="backup-section">
+                            <div class="backup-info-card">
+                                <div class="backup-info-item">
+                                    <span class="backup-label">Último Respaldo:</span>
+                                    <span class="backup-value" id="ultimoBackup">15/01/2025 14:30</span>
+                                </div>
+                                <div class="backup-info-item">
+                                    <span class="backup-label">Tamaño del Respaldo:</span>
+                                    <span class="backup-value" id="tamanoBackup">2.5 MB</span>
+                                </div>
+                                <div class="backup-info-item">
+                                    <span class="backup-label">Estado:</span>
+                                    <span class="backup-badge success">Completado</span>
+                                </div>
+                            </div>
+                            <div class="backup-actions">
+                                <button class="btn-primary" onclick="crearRespaldo()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                        <path d="M21 16V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7 8L12 3L17 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Crear Respaldo
+                                </button>
+                                <button class="btn-secondary" onclick="restaurarRespaldo()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                        <path d="M3 8V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M18 16L12 22L6 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 22V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Restaurar Respaldo
+                                </button>
+                            </div>
+                            <div class="backup-history">
+                                <h3>Historial de Respaldos</h3>
+                                <div class="table-wrapper">
+                                    <table class="config-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Tamaño</th>
+                                                <th>Tipo</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="historialBackupBody">
+                                            <!-- Se llenará dinámicamente -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Usuario -->
+    <div id="modalUsuario" class="modal-exec" style="display: none;">
+        <div class="modal-exec-content" style="max-width: 600px;">
+            <div class="modal-exec-header">
+                <h2 id="modalUsuarioTitulo">Nuevo Usuario</h2>
+                <button class="btn-close-exec" onclick="cerrarModalUsuario()">×</button>
+            </div>
+            <form id="formUsuario" onsubmit="guardarUsuario(event)">
+                <div class="form-exec-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="usuarioNombre" required placeholder="Nombre del usuario">
+                </div>
+                <div class="form-exec-group">
+                    <label>Email</label>
+                    <input type="email" id="usuarioEmail" required placeholder="email@ejemplo.com">
+                </div>
+                <div class="form-exec-group">
+                    <label>Rol</label>
+                    <select id="usuarioRol" required>
+                        <option value="">Seleccionar rol...</option>
+                        <option value="administrador">Administrador</option>
+                        <option value="gerente">Gerente</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="operador">Operador</option>
+                        <option value="lectura">Solo Lectura</option>
+                    </select>
+                </div>
+                <div class="form-exec-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="usuarioPassword" placeholder="Dejar vacío para no cambiar">
+                </div>
+                <div class="form-exec-group">
+                    <label>Estado</label>
+                    <label class="switch">
+                        <input type="checkbox" id="usuarioActivo" checked>
+                        <span class="slider"></span>
+                        <span class="switch-label">Usuario Activo</span>
+                    </label>
+                </div>
+                <div class="form-exec-actions">
+                    <button type="button" class="btn-exec-secondary" onclick="cerrarModalUsuario()">Cancelar</button>
+                    <button type="submit" class="btn-exec-primary">Guardar Usuario</button>
+                </div>
+            </form>
         </div>
     </div>
 
