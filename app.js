@@ -149,25 +149,28 @@ function crearGrafico1() {
     if (typeof Chart === 'undefined') return;
     try {
         new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-            datasets: [{
-                label: 'Consumo (kg)',
-                data: [45, 52, 48, 61, 55, 42, 38],
-                borderColor: '#2563eb',
-                backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { display: false }
+            type: 'line',
+            data: {
+                labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                datasets: [{
+                    label: 'Consumo (kg)',
+                    data: [45, 52, 48, 61, 55, 42, 38],
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false }
+                }
             }
-        }
-    });
+        });
+    } catch (error) {
+        console.error('Error al crear gráfico 1:', error);
+    }
 }
 
 function crearGrafico2() {
