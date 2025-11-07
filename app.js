@@ -245,99 +245,79 @@ function inicializarBotonInicio() {
     console.log('Botón encontrado:', btnInicio);
     console.log('Botón visible:', btnInicio.offsetWidth > 0 && btnInicio.offsetHeight > 0);
     console.log('Botón disabled:', btnInicio.disabled);
+    console.log('Botón parent:', btnInicio.parentElement);
     
-    // Remover cualquier listener previo
-    const nuevoBtn = btnInicio.cloneNode(true);
-    btnInicio.parentNode.replaceChild(nuevoBtn, btnInicio);
-    btnInicio = nuevoBtn;
+    // Asegurar que el botón no esté deshabilitado
+    btnInicio.disabled = false;
+    btnInicio.style.pointerEvents = 'auto';
+    btnInicio.style.cursor = 'pointer';
     
-    // Función para manejar el click
+    // Función para manejar el click - SIMPLIFICADA Y DIRECTA
     function manejarClick(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        console.log('=== BOTÓN CLICKEADO ===');
-        console.log('Event type:', e.type);
-        console.log('Event target:', e.target);
-        console.log('mostrarLogin disponible:', typeof window.mostrarLogin);
-        console.log('cambiarPantalla disponible:', typeof window.cambiarPantalla);
+        console.log('=== BOTÓN CLICKEADO ===', e.type);
         
-        // Intentar múltiples métodos
-        let navegacionExitosa = false;
+        // Prevenir cualquier comportamiento por defecto
+        if (e && e.preventDefault) e.preventDefault();
+        if (e && e.stopPropagation) e.stopPropagation();
+        if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
         
-        // Método 1: usar mostrarLogin
-        if (typeof window.mostrarLogin === 'function') {
-            try {
-                console.log('Llamando mostrarLogin()...');
-                window.mostrarLogin();
-                navegacionExitosa = true;
-            } catch (err) {
-                console.error('Error al llamar mostrarLogin:', err);
+        // Navegación directa e inmediata
+        const portada = document.getElementById('portada');
+        const login = document.getElementById('login');
+        
+        if (portada && login) {
+            console.log('Navegando directamente...');
+            portada.classList.remove('active');
+            login.classList.add('active');
+            
+            // Asegurar que el sidebar esté oculto
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.style.display = 'none';
+                sidebar.classList.remove('open');
             }
-        }
-        
-        // Método 2: usar cambiarPantalla directamente
-        if (!navegacionExitosa && typeof window.cambiarPantalla === 'function') {
-            try {
-                console.log('Llamando cambiarPantalla()...');
-                window.cambiarPantalla('portada', 'login');
-                navegacionExitosa = true;
-            } catch (err) {
-                console.error('Error al llamar cambiarPantalla:', err);
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            if (sidebarOverlay) {
+                sidebarOverlay.classList.remove('active');
             }
-        }
-        
-        // Método 3: Fallback directo manipulando DOM
-        if (!navegacionExitosa) {
-            console.log('Usando fallback directo...');
-            const portada = document.getElementById('portada');
-            const login = document.getElementById('login');
-            if (portada && login) {
-                portada.classList.remove('active');
-                login.classList.add('active');
-                console.log('✅ Navegación directa ejecutada');
-            } else {
-                console.error('No se encontraron las pantallas portada o login');
-            }
+            document.body.classList.remove('sidebar-open');
+            
+            console.log('✅ Navegación a login completada');
+        } else {
+            console.error('ERROR: No se encontraron portada o login');
         }
         
         return false;
     }
     
-    // Agregar múltiples event listeners con diferentes estrategias
-    // 1. Click normal
+    // Deshabilitar pointer-events en elementos hijos para que no intercepten clicks
+    const span = btnInicio.querySelector('span');
+    if (span) {
+        span.style.pointerEvents = 'none';
+    }
+    const svg = btnInicio.querySelector('svg');
+    if (svg) {
+        svg.style.pointerEvents = 'none';
+    }
+    
+    // Agregar listeners de forma simple y directa
+    // 1. Click principal (bubbling phase)
     btnInicio.addEventListener('click', manejarClick, false);
     
-    // 2. Click en capture phase (se ejecuta primero)
+    // 2. Click en capture phase (se ejecuta primero, por si hay otros listeners)
     btnInicio.addEventListener('click', manejarClick, true);
     
-    // 3. Mousedown (se ejecuta antes que click)
-    btnInicio.addEventListener('mousedown', function(e) {
-        if (e.button === 0) { // Solo botón izquierdo
-            manejarClick(e);
-        }
-    }, true);
+    // 3. onclick como respaldo absoluto (más compatible)
+    btnInicio.onclick = manejarClick;
     
     // 4. Touchstart para móviles
     btnInicio.addEventListener('touchstart', function(e) {
         e.preventDefault();
-        e.stopPropagation();
-        console.log('=== BOTÓN TOCADO (TOUCH) ===');
         manejarClick(e);
-        return false;
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
-    // 5. onclick como respaldo absoluto
-    btnInicio.onclick = function(e) {
-        console.log('onclick handler ejecutado');
-        return manejarClick(e);
-    };
-    
-    // 6. Agregar también al span dentro del botón por si acaso
-    const span = btnInicio.querySelector('span');
-    if (span) {
-        span.style.pointerEvents = 'none'; // El span no debe interceptar clicks
-    }
+    // Verificar que los listeners se agregaron
+    console.log('Listeners agregados. onclick:', typeof btnInicio.onclick);
     
     console.log('✅ Botón de inicio inicializado correctamente con múltiples listeners');
 }
