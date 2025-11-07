@@ -356,12 +356,24 @@ function actualizarKPIsDashboard() {
     // Calcular satisfacción promedio
     let satisfaccionPromedio = 4.3; // Valor por defecto
     if (typeof satisfaccionData !== 'undefined' && satisfaccionData.respuestas && satisfaccionData.respuestas.length > 0) {
-        const promedio = satisfaccionData.respuestas.reduce((sum, r) => sum + r.calificacionGeneral, 0) / satisfaccionData.respuestas.length;
-        satisfaccionPromedio = promedio;
+        // Usar 'promedio' o 'calificacionGeneral' según lo que tenga la respuesta
+        const respuestasValidas = satisfaccionData.respuestas.filter(r => r && (
+            (typeof r.promedio === 'number' && !isNaN(r.promedio)) || 
+            (typeof r.calificacionGeneral === 'number' && !isNaN(r.calificacionGeneral))
+        ));
+        if (respuestasValidas.length > 0) {
+            const suma = respuestasValidas.reduce((sum, r) => {
+                const valor = r.promedio || r.calificacionGeneral || 0;
+                return sum + (typeof valor === 'number' && !isNaN(valor) ? valor : 0);
+            }, 0);
+            const promedio = suma / respuestasValidas.length;
+            satisfaccionPromedio = isNaN(promedio) ? 4.3 : Math.max(0, Math.min(5, promedio)); // Asegurar rango 0-5
+        }
     }
     const kpiSatisfaccion = document.getElementById('kpiSatisfaccionPromedio');
     if (kpiSatisfaccion) {
-        kpiSatisfaccion.textContent = satisfaccionPromedio.toFixed(1);
+        const valorFinal = isNaN(satisfaccionPromedio) ? 4.3 : satisfaccionPromedio;
+        kpiSatisfaccion.textContent = valorFinal.toFixed(1);
     }
 }
 
