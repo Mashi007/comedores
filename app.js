@@ -158,6 +158,7 @@ function inicializarGraficos() {
     crearGrafico5();
     crearGrafico6();
     crearGrafico7();
+    crearGrafico8();
 }
 
 function crearGrafico1() {
@@ -884,6 +885,191 @@ function crearGrafico7() {
                         },
                         maxRotation: 45,
                         minRotation: 45
+                    }
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+}
+
+function crearGrafico8() {
+    const ctx = document.getElementById('chart8');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    const productos = [
+        { name: 'Arroz', stock: 450, reorder: 150, usage: 85, category: 'Granos', color: '#3b82f6' },
+        { name: 'Frijoles', stock: 80, reorder: 50, usage: 45, category: 'Granos', color: '#8b5cf6' },
+        { name: 'Pollo', stock: 280, reorder: 100, usage: 120, category: 'Carnes', color: '#ef4444' },
+        { name: 'Carne Res', stock: 180, reorder: 80, usage: 95, category: 'Carnes', color: '#f59e0b' },
+        { name: 'Tomates', stock: 120, reorder: 60, usage: 35, category: 'Vegetales', color: '#10b981' },
+        { name: 'Lechuga', stock: 45, reorder: 30, usage: 25, category: 'Vegetales', color: '#06b6d4' },
+        { name: 'Aceite', stock: 200, reorder: 80, usage: 40, category: 'Condimentos', color: '#f97316' },
+        { name: 'Sal', stock: 350, reorder: 100, usage: 15, category: 'Condimentos', color: '#64748b' },
+        { name: 'Pasta', stock: 220, reorder: 90, usage: 65, category: 'Granos', color: '#ec4899' },
+        { name: 'Cebolla', stock: 95, reorder: 50, usage: 55, category: 'Vegetales', color: '#84cc16' }
+    ];
+    
+    const data = productos.map(p => ({
+        x: p.stock,
+        y: p.reorder,
+        r: Math.max(p.usage * 1.2, 15) // Radio basado en uso, mínimo 15 para visibilidad
+    }));
+    
+    chartInstances.chart8 = new Chart(ctx, {
+        type: 'bubble',
+        data: {
+            datasets: productos.map((p, index) => ({
+                label: p.name,
+                data: [{
+                    x: p.stock,
+                    y: p.reorder,
+                    r: Math.max(p.usage * 1.2, 15)
+                }],
+                backgroundColor: function(context) {
+                    const stock = p.stock;
+                    const reorder = p.reorder;
+                    if (stock <= reorder * 1.2) return 'rgba(239, 68, 68, 0.6)'; // Rojo si crítico
+                    if (stock <= reorder * 2) return 'rgba(245, 158, 11, 0.6)'; // Naranja si bajo
+                    return p.color + '80'; // Color del producto con transparencia
+                },
+                borderColor: function(context) {
+                    const stock = p.stock;
+                    const reorder = p.reorder;
+                    if (stock <= reorder * 1.2) return '#dc2626';
+                    if (stock <= reorder * 2) return '#d97706';
+                    return p.color;
+                },
+                borderWidth: 2,
+                hoverBackgroundColor: function(context) {
+                    const stock = p.stock;
+                    const reorder = p.reorder;
+                    if (stock <= reorder * 1.2) return 'rgba(239, 68, 68, 0.9)';
+                    if (stock <= reorder * 2) return 'rgba(245, 158, 11, 0.9)';
+                    return p.color + 'CC';
+                },
+                hoverBorderColor: function(context) {
+                    const stock = p.stock;
+                    const reorder = p.reorder;
+                    if (stock <= reorder * 1.2) return '#b91c1c';
+                    if (stock <= reorder * 2) return '#b45309';
+                    return p.color;
+                },
+                hoverBorderWidth: 3
+            }))
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'point'
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    padding: 16,
+                    titleFont: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 14
+                    },
+                    borderWidth: 2,
+                    cornerRadius: 12,
+                    displayColors: true,
+                    callbacks: {
+                        title: function(context) {
+                            const datasetIndex = context[0].datasetIndex;
+                            return productos[datasetIndex].name;
+                        },
+                        label: function(context) {
+                            const datasetIndex = context[0].datasetIndex;
+                            const p = productos[datasetIndex];
+                            const stock = p.stock;
+                            const reorder = p.reorder;
+                            const porcentaje = ((stock / reorder) * 100).toFixed(1);
+                            
+                            let estado = '';
+                            let estadoIcon = '';
+                            if (stock <= reorder * 1.2) {
+                                estado = '🔴 Crítico';
+                                estadoIcon = '🔴';
+                            } else if (stock <= reorder * 2) {
+                                estado = '🟡 Atención';
+                                estadoIcon = '🟡';
+                            } else {
+                                estado = '🟢 Óptimo';
+                                estadoIcon = '🟢';
+                            }
+                            
+                            return [
+                                `📦 Stock actual: ${stock} kg`,
+                                `📋 Punto de reorden: ${reorder} kg`,
+                                `📊 Stock vs Reorden: ${porcentaje}%`,
+                                `📈 Uso semanal: ${p.usage} kg`,
+                                `🏷️ Categoría: ${p.category}`,
+                                `🎯 Estado: ${estado}`,
+                                stock <= reorder * 1.2 ? '⚠️ COMPRA URGENTE REQUERIDA' : ''
+                            ].filter(Boolean);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Stock Actual (kg)',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        color: '#64748b'
+                    },
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        callback: function(value) {
+                            return value + ' kg';
+                        }
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Punto de Reorden (kg)',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        color: '#64748b'
+                    },
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        callback: function(value) {
+                            return value + ' kg';
+                        }
                     }
                 }
             },
