@@ -164,8 +164,6 @@ function cambiarPantalla(ocultar, mostrar) {
         }
         
         console.log('✅ Cambio de pantalla completado');
-        
-        console.log('✅ Cambio de pantalla completado');
     } catch (error) {
         console.error('❌ Error al cambiar pantalla:', error);
     }
