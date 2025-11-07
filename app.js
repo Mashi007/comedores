@@ -639,25 +639,57 @@ let chartInstances = {};
 
 // Dashboard - Gráficos
 function inicializarGraficos() {
+    console.log('=== INICIALIZANDO GRÁFICOS ===');
+    
     // Verificar que Chart.js esté disponible
     if (typeof Chart === 'undefined') {
-        console.warn('Chart.js no está cargado aún');
+        console.warn('Chart.js no está cargado aún, reintentando...');
         setTimeout(inicializarGraficos, 200);
         return;
     }
     
+    console.log('Chart.js disponible, creando gráficos...');
+    
+    // Verificar que el dashboard esté visible
+    const dashboard = document.getElementById('dashboard');
+    if (!dashboard || !dashboard.classList.contains('active')) {
+        console.warn('Dashboard no está activo, esperando...');
+        setTimeout(inicializarGraficos, 200);
+        return;
+    }
+    
+    // Destruir gráficos existentes antes de crear nuevos
+    Object.keys(chartInstances).forEach(key => {
+        if (chartInstances[key]) {
+            try {
+                chartInstances[key].destroy();
+            } catch (e) {
+                console.warn(`Error al destruir gráfico ${key}:`, e);
+            }
+        }
+    });
+    chartInstances = {};
+    
     setTimeout(() => {
         try {
+            console.log('Creando gráfico 1...');
             crearGrafico1();
+            console.log('Creando gráfico 2...');
             crearGrafico2();
+            console.log('Creando gráfico 3...');
             crearGrafico3();
+            console.log('Creando gráfico 4...');
             crearGrafico4();
+            console.log('Creando gráfico 5...');
             crearGrafico5();
+            console.log('Creando gráfico 6...');
             crearGrafico6();
+            console.log('✅ Todos los gráficos creados correctamente');
         } catch (error) {
-            console.error('Error al crear gráficos:', error);
+            console.error('❌ Error al crear gráficos:', error);
+            ToastNotification.show('Error al cargar gráficos. Por favor, recarga la página.', 'error');
         }
-    }, 100);
+    }, 300);
 }
 
 function aplicarFiltros() {
