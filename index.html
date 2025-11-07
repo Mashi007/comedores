@@ -218,14 +218,190 @@
         </div>
     </div>
 
-    <!-- Otras pantallas básicas -->
+    <!-- Compras -->
     <div id="compras" class="screen">
         <div class="page-container">
             <div class="page-header">
                 <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-                <h1>Compras</h1>
+                <h1>Gestión de Compras</h1>
+                <button class="btn-primary" onclick="mostrarSimuladorOCR()">📷 Simular OCR WhatsApp</button>
             </div>
-            <p>Módulo de compras</p>
+            
+            <!-- Simulador OCR -->
+            <div id="simuladorOCR" class="ocr-simulator" style="display: none;">
+                <div class="ocr-container">
+                    <div class="ocr-header">
+                        <h2>📷 Simulador de OCR - Captura de Factura</h2>
+                        <button class="btn-close" onclick="cerrarSimuladorOCR()">×</button>
+                    </div>
+                    <div class="ocr-preview">
+                        <div class="factura-mock">
+                            <div class="factura-header">
+                                <h3>FACTURA DE COMPRA</h3>
+                                <p>Proveedor: <strong>Distribuidora Alimentos S.A.</strong></p>
+                                <p>Fecha: <strong id="fechaFactura">15/01/2025</strong></p>
+                                <p>N° Factura: <strong>FAC-2025-001234</strong></p>
+                            </div>
+                            <div class="factura-items">
+                                <table class="factura-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Unidad</th>
+                                            <th>Precio Unit.</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="facturaItems">
+                                        <tr>
+                                            <td>Arroz Premium</td>
+                                            <td>200</td>
+                                            <td>kg</td>
+                                            <td>$15.00</td>
+                                            <td>$3,000.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Frijoles Negros</td>
+                                            <td>50</td>
+                                            <td>kg</td>
+                                            <td>$25.00</td>
+                                            <td>$1,250.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Pollo Entero</td>
+                                            <td>150</td>
+                                            <td>kg</td>
+                                            <td>$30.00</td>
+                                            <td>$4,500.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="factura-total">
+                                <p><strong>TOTAL: $8,750.00</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ocr-actions">
+                        <button class="btn-secondary" onclick="cerrarSimuladorOCR()">Cancelar</button>
+                        <button class="btn-primary" onclick="procesarFacturaOCR()">✅ Procesar Factura</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Digitalización -->
+            <div id="formularioDigitalizacion" class="digitalizacion-form" style="display: none;">
+                <div class="form-container">
+                    <div class="form-header">
+                        <h2>📝 Digitalización de Factura</h2>
+                        <button class="btn-close" onclick="cerrarFormularioDigitalizacion()">×</button>
+                    </div>
+                    <form id="facturaForm" onsubmit="guardarFactura(event)">
+                        <div class="form-group">
+                            <label>Proveedor</label>
+                            <input type="text" id="proveedor" value="Distribuidora Alimentos S.A." required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Fecha de Factura</label>
+                                <input type="date" id="fechaFacturaInput" required>
+                            </div>
+                            <div class="form-group">
+                                <label>N° Factura</label>
+                                <input type="text" id="numeroFactura" value="FAC-2025-001234" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Productos</label>
+                            <div id="productosList">
+                                <div class="producto-item">
+                                    <input type="text" placeholder="Producto" value="Arroz Premium" required>
+                                    <input type="number" placeholder="Cantidad" value="200" step="0.01" required>
+                                    <select required>
+                                        <option value="kg" selected>kg</option>
+                                        <option value="g">g</option>
+                                        <option value="L">L</option>
+                                        <option value="unidad">unidad</option>
+                                    </select>
+                                    <input type="number" placeholder="Precio Unit." value="15.00" step="0.01" required>
+                                    <button type="button" class="btn-remove" onclick="this.parentElement.remove()">×</button>
+                                </div>
+                                <div class="producto-item">
+                                    <input type="text" placeholder="Producto" value="Frijoles Negros" required>
+                                    <input type="number" placeholder="Cantidad" value="50" step="0.01" required>
+                                    <select required>
+                                        <option value="kg" selected>kg</option>
+                                        <option value="g">g</option>
+                                        <option value="L">L</option>
+                                        <option value="unidad">unidad</option>
+                                    </select>
+                                    <input type="number" placeholder="Precio Unit." value="25.00" step="0.01" required>
+                                    <button type="button" class="btn-remove" onclick="this.parentElement.remove()">×</button>
+                                </div>
+                                <div class="producto-item">
+                                    <input type="text" placeholder="Producto" value="Pollo Entero" required>
+                                    <input type="number" placeholder="Cantidad" value="150" step="0.01" required>
+                                    <select required>
+                                        <option value="kg" selected>kg</option>
+                                        <option value="g">g</option>
+                                        <option value="L">L</option>
+                                        <option value="unidad">unidad</option>
+                                    </select>
+                                    <input type="number" placeholder="Precio Unit." value="30.00" step="0.01" required>
+                                    <button type="button" class="btn-remove" onclick="this.parentElement.remove()">×</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-add" onclick="agregarProducto()">+ Agregar Producto</button>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="cerrarFormularioDigitalizacion()">Cancelar</button>
+                            <button type="submit" class="btn-primary">💾 Guardar y Ver KARDEX</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Dashboard KARDEX -->
+            <div id="dashboardKardex" class="kardex-dashboard" style="display: none;">
+                <div class="kardex-header">
+                    <h2>📊 KARDEX de Inventario</h2>
+                    <div class="kardex-filters">
+                        <select id="filtroProducto" onchange="filtrarKardex()">
+                            <option value="">Todos los productos</option>
+                        </select>
+                        <button class="btn-secondary" onclick="cerrarDashboardKardex()">Cerrar</button>
+                    </div>
+                </div>
+                <div class="kardex-table-container">
+                    <table class="kardex-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Saldo Inicial</th>
+                                <th>Ingreso (Compra)</th>
+                                <th>Salida (Consumo)</th>
+                                <th>Saldo Final</th>
+                                <th>Consumo Promedio/día</th>
+                                <th>Días Estimados</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kardexBody">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Lista de compras -->
+            <div class="compras-list">
+                <h2>Historial de Compras</h2>
+                <div id="listaCompras">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
         </div>
     </div>
 

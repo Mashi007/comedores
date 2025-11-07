@@ -102,6 +102,15 @@ window.marcarLeida = marcarLeida;
 window.marcarTodasLeidas = marcarTodasLeidas;
 window.gestionarNotificacion = gestionarNotificacion;
 window.enviarMensajeAI = enviarMensajeAI;
+window.mostrarSimuladorOCR = mostrarSimuladorOCR;
+window.cerrarSimuladorOCR = cerrarSimuladorOCR;
+window.procesarFacturaOCR = procesarFacturaOCR;
+window.cerrarFormularioDigitalizacion = cerrarFormularioDigitalizacion;
+window.agregarProducto = agregarProducto;
+window.guardarFactura = guardarFactura;
+window.mostrarDashboardKardex = mostrarDashboardKardex;
+window.cerrarDashboardKardex = cerrarDashboardKardex;
+window.filtrarKardex = filtrarKardex;
 
 // Sidebar
 function toggleSidebar() {
@@ -1083,6 +1092,255 @@ function crearGrafico8() {
         }
     });
 }
+
+// Compras - OCR y KARDEX
+const comprasData = {
+    facturas: [],
+    kardex: []
+};
+
+const consumosPromedio = {
+    'Arroz Premium': 85,
+    'Frijoles Negros': 45,
+    'Pollo Entero': 120,
+    'Carne Res': 95,
+    'Tomates': 35,
+    'Lechuga': 25,
+    'Aceite': 40,
+    'Sal': 15,
+    'Pasta': 65,
+    'Cebolla': 55
+};
+
+function mostrarSimuladorOCR() {
+    document.getElementById('simuladorOCR').style.display = 'flex';
+    // Generar fecha aleatoria reciente
+    const fecha = new Date();
+    fecha.setDate(fecha.getDate() - Math.floor(Math.random() * 7));
+    document.getElementById('fechaFactura').textContent = fecha.toLocaleDateString('es-ES');
+}
+
+function cerrarSimuladorOCR() {
+    document.getElementById('simuladorOCR').style.display = 'none';
+}
+
+function procesarFacturaOCR() {
+    ToastNotification.show('Procesando factura con OCR...', 'info', 2000);
+    setTimeout(() => {
+        cerrarSimuladorOCR();
+        document.getElementById('formularioDigitalizacion').style.display = 'flex';
+        // Pre-llenar formulario con datos de la factura mock
+        const fecha = new Date();
+        fecha.setDate(fecha.getDate() - Math.floor(Math.random() * 7));
+        document.getElementById('fechaFacturaInput').value = fecha.toISOString().split('T')[0];
+        ToastNotification.show('Factura procesada. Verifica y completa los datos.', 'success', 3000);
+    }, 1500);
+}
+
+function cerrarFormularioDigitalizacion() {
+    document.getElementById('formularioDigitalizacion').style.display = 'none';
+}
+
+function agregarProducto() {
+    const productosList = document.getElementById('productosList');
+    const nuevoProducto = document.createElement('div');
+    nuevoProducto.className = 'producto-item';
+    nuevoProducto.innerHTML = `
+        <input type="text" placeholder="Producto" required>
+        <input type="number" placeholder="Cantidad" step="0.01" required>
+        <select required>
+            <option value="kg">kg</option>
+            <option value="g">g</option>
+            <option value="L">L</option>
+            <option value="unidad">unidad</option>
+        </select>
+        <input type="number" placeholder="Precio Unit." step="0.01" required>
+        <button type="button" class="btn-remove" onclick="this.parentElement.remove()">×</button>
+    `;
+    productosList.appendChild(nuevoProducto);
+}
+
+function guardarFactura(event) {
+    event.preventDefault();
+    
+    const proveedor = document.getElementById('proveedor').value;
+    const fechaFactura = document.getElementById('fechaFacturaInput').value;
+    const numeroFactura = document.getElementById('numeroFactura').value;
+    
+    const productos = [];
+    const productosItems = document.querySelectorAll('#productosList .producto-item');
+    let total = 0;
+    
+    productosItems.forEach(item => {
+        const inputs = item.querySelectorAll('input, select');
+        const producto = inputs[0].value;
+        const cantidad = parseFloat(inputs[1].value);
+        const unidad = inputs[2].value;
+        const precioUnit = parseFloat(inputs[3].value);
+        const subtotal = cantidad * precioUnit;
+        total += subtotal;
+        
+        productos.push({
+            producto,
+            cantidad,
+            unidad,
+            precioUnit,
+            subtotal
+        });
+    });
+    
+    const factura = {
+        id: Date.now(),
+        proveedor,
+        fechaFactura,
+        numeroFactura,
+        productos,
+        total,
+        fechaRegistro: new Date().toISOString()
+    };
+    
+    comprasData.facturas.push(factura);
+    
+    // Actualizar KARDEX
+    productos.forEach(prod => {
+        actualizarKardex(prod.producto, prod.cantidad, fechaFactura);
+    });
+    
+    ToastNotification.show('Factura guardada correctamente', 'success', 2000);
+    cerrarFormularioDigitalizacion();
+    
+    setTimeout(() => {
+        mostrarDashboardKardex();
+    }, 500);
+    
+    cargarListaCompras();
+}
+
+function actualizarKardex(producto, cantidadIngreso, fecha) {
+    // Buscar último saldo del producto
+    const movimientosProducto = comprasData.kardex.filter(k => k.producto === producto);
+    const ultimoMovimiento = movimientosProducto.length > 0 
+        ? movimientosProducto[movimientosProducto.length - 1] 
+        : null;
+    
+    const saldoInicial = ultimoMovimiento ? ultimoMovimiento.saldoFinal : 0;
+    const saldoFinal = saldoInicial + cantidadIngreso;
+    
+    // Calcular consumo promedio diario
+    const consumoPromedio = consumosPromedio[producto] || 50;
+    
+    // Calcular días estimados
+    const diasEstimados = Math.floor(saldoFinal / consumoPromedio);
+    
+    const movimiento = {
+        id: Date.now() + Math.random(),
+        fecha,
+        producto,
+        saldoInicial,
+        ingreso: cantidadIngreso,
+        salida: 0,
+        saldoFinal,
+        consumoPromedio,
+        diasEstimados,
+        estado: diasEstimados > 30 ? '🟢 Óptimo' : (diasEstimados > 15 ? '🟡 Atención' : '🔴 Crítico')
+    };
+    
+    comprasData.kardex.push(movimiento);
+}
+
+function mostrarDashboardKardex() {
+    document.getElementById('dashboardKardex').style.display = 'block';
+    cargarKardex();
+    cargarProductosEnFiltro();
+}
+
+function cerrarDashboardKardex() {
+    document.getElementById('dashboardKardex').style.display = 'none';
+}
+
+function cargarKardex() {
+    const tbody = document.getElementById('kardexBody');
+    const filtro = document.getElementById('filtroProducto').value;
+    
+    let kardexFiltrado = comprasData.kardex;
+    if (filtro) {
+        kardexFiltrado = comprasData.kardex.filter(k => k.producto === filtro);
+    }
+    
+    // Ordenar por fecha descendente
+    kardexFiltrado.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    
+    if (kardexFiltrado.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 2rem;">No hay movimientos registrados</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = kardexFiltrado.map(mov => `
+        <tr>
+            <td>${new Date(mov.fecha).toLocaleDateString('es-ES')}</td>
+            <td><strong>${mov.producto}</strong></td>
+            <td>${mov.saldoInicial.toFixed(2)} kg</td>
+            <td class="ingreso">+${mov.ingreso.toFixed(2)} kg</td>
+            <td class="salida">${mov.salida > 0 ? '-' + mov.salida.toFixed(2) : '0.00'} kg</td>
+            <td class="saldo-final"><strong>${mov.saldoFinal.toFixed(2)} kg</strong></td>
+            <td>${mov.consumoPromedio.toFixed(2)} kg/día</td>
+            <td class="${mov.diasEstimados > 30 ? 'dias-optimo' : (mov.diasEstimados > 15 ? 'dias-atencion' : 'dias-critico')}">
+                <strong>${mov.diasEstimados} días</strong>
+            </td>
+            <td>${mov.estado}</td>
+        </tr>
+    `).join('');
+}
+
+function cargarProductosEnFiltro() {
+    const select = document.getElementById('filtroProducto');
+    const productos = [...new Set(comprasData.kardex.map(k => k.producto))];
+    
+    select.innerHTML = '<option value="">Todos los productos</option>' +
+        productos.map(p => `<option value="${p}">${p}</option>`).join('');
+}
+
+function filtrarKardex() {
+    cargarKardex();
+}
+
+function cargarListaCompras() {
+    const lista = document.getElementById('listaCompras');
+    
+    if (comprasData.facturas.length === 0) {
+        lista.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--text-secondary);">No hay compras registradas. Usa el simulador OCR para agregar una factura.</p>';
+        return;
+    }
+    
+    lista.innerHTML = comprasData.facturas.map(factura => `
+        <div class="compra-card">
+            <div class="compra-header">
+                <div>
+                    <h3>${factura.proveedor}</h3>
+                    <p>Factura: ${factura.numeroFactura} | ${new Date(factura.fechaFactura).toLocaleDateString('es-ES')}</p>
+                </div>
+                <div class="compra-total">
+                    <strong>$${factura.total.toLocaleString('es-ES', {minimumFractionDigits: 2})}</strong>
+                </div>
+            </div>
+            <div class="compra-productos">
+                <strong>Productos:</strong>
+                <ul>
+                    ${factura.productos.map(p => `
+                        <li>${p.producto}: ${p.cantidad} ${p.unidad} × $${p.precioUnit.toFixed(2)} = $${p.subtotal.toFixed(2)}</li>
+                    `).join('')}
+                </ul>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Inicializar lista de compras al cargar
+window.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('compras')) {
+        cargarListaCompras();
+    }
+});
 
 // Notificaciones
 function marcarLeida(id) {
