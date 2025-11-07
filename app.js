@@ -141,11 +141,13 @@ window.cambiarPantalla = function(ocultar, mostrar) {
             }
         } else if (pantallasConSidebar.includes(mostrar)) {
             // Mostrar sidebar solo en pantallas del sistema (después del login)
-            sidebar.style.display = 'flex';
+            if (sidebar) sidebar.style.display = 'flex';
         } else {
             // Por defecto, ocultar
-            sidebar.style.display = 'none';
-            sidebar.classList.remove('open');
+            if (sidebar) {
+                sidebar.style.display = 'none';
+                sidebar.classList.remove('open');
+            }
             if (sidebarOverlay) sidebarOverlay.classList.remove('active');
             document.body.classList.remove('sidebar-open');
         }
@@ -482,15 +484,18 @@ window.cerrarSesion = function() {
 
 
 window.navegar = function(destino) {
-    // Cerrar sidebar en móvil después de navegar
-    if (window.innerWidth <= 768) {
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar.classList.contains('open')) {
-            toggleSidebar();
+    try {
+        console.log('Navegando a:', destino);
+        
+        // Cerrar sidebar en móvil después de navegar
+        if (window.innerWidth <= 768) {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
         }
-    }
-    
-    cambiarPantalla('menu', destino);
+        
+        cambiarPantalla('menu', destino);
     
     // Actualizar item activo en sidebar
     document.querySelectorAll('.nav-item').forEach(item => {
