@@ -730,13 +730,18 @@ function generarQR(encuesta) {
     qrContainer.appendChild(qrCodeDiv);
     qrContainer.appendChild(infoDiv);
     
-    QRCode.toCanvas(canvas, encuesta.url, { width: 200 }, (error) => {
-        if (error) {
-            console.error(error);
-            qrCodeDiv.innerHTML = '<p>Error al generar QR</p>';
-            return;
-        }
-    });
+    // Intentar generar QR con la librería
+    if (typeof QRCode !== 'undefined') {
+        QRCode.toCanvas(canvas, encuesta.url, { width: 200 }, (error) => {
+            if (error) {
+                console.error(error);
+                mostrarQRAlternativo(qrCodeDiv, encuesta);
+            }
+        });
+    } else {
+        // Si la librería no está cargada, mostrar alternativa
+        mostrarQRAlternativo(qrCodeDiv, encuesta);
+    }
     
     // Agregar al contenedor de encuestas
     setTimeout(() => {
@@ -748,6 +753,20 @@ function generarQR(encuesta) {
             }
         }
     }, 100);
+}
+
+function mostrarQRAlternativo(qrDiv, encuesta) {
+    // Alternativa si QRCode no está disponible: mostrar URL y botón para generar QR online
+    qrDiv.innerHTML = `
+        <div style="padding: 1rem; text-align: center; background: #f0f0f0; border-radius: 0.5rem;">
+            <p style="margin-bottom: 0.5rem;">Código QR</p>
+            <a href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(encuesta.url)}" 
+               target="_blank" 
+               style="display: inline-block; padding: 0.5rem 1rem; background: #2563eb; color: white; text-decoration: none; border-radius: 0.25rem;">
+                Ver QR
+            </a>
+        </div>
+    `;
 }
 
 function copiarURL(url) {
