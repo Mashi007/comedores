@@ -2143,70 +2143,83 @@ if (typeof window !== 'undefined') {
 }
 
 // Generar datos mock iniciales del KARDEX con diferentes estados
-function generarDatosMockKardex() {
-    // Si ya hay datos en el KARDEX, no generar más
-    if (comprasData.kardex.length > 0) {
+function generarDatosMockKardex(forzarRegeneracion = false) {
+    // Si ya hay datos y no se fuerza regeneración, no generar más
+    if (!forzarRegeneracion && comprasData.kardex.length > 0) {
         return;
+    }
+    
+    // Limpiar datos existentes si se fuerza regeneración
+    if (forzarRegeneracion) {
+        comprasData.kardex = [];
     }
     
     const productos = ['Arroz Premium', 'Frijoles Negros', 'Pollo Entero', 'Carne Res', 'Tomates', 'Lechuga', 'Aceite', 'Sal', 'Pasta', 'Cebolla'];
     const hoy = new Date();
     
+    // Definir configuración de estados para distribución equilibrada y garantizada
+    const estadosConfig = [
+        { dias: 75, variacion: 15, nombre: 'sobrestock', emoji: '🔵', texto: 'Sobre Stock' },      // 60-90 días
+        { dias: 45, variacion: 10, nombre: 'optimo', emoji: '🟢', texto: 'Óptimo' },              // 35-55 días
+        { dias: 25, variacion: 5, nombre: 'adecuado', emoji: '🟢', texto: 'Adecuado' },            // 20-30 días
+        { dias: 17, variacion: 2, nombre: 'minimo', emoji: '🟡', texto: 'Inventario Mínimo' },     // 15-19 días
+        { dias: 12, variacion: 3, nombre: 'atencion', emoji: '🟡', texto: 'Atención' },            // 9-15 días
+        { dias: 5, variacion: 3, nombre: 'critico', emoji: '🔴', texto: 'Crítico' }               // 2-8 días
+    ];
+    
     // Generar movimientos para los últimos 10 días con diferentes estados
     productos.forEach((producto, index) => {
         const consumoPromedio = consumosPromedio[producto] || (50 + index * 10);
         
-        // Generar 2-3 movimientos por producto con diferentes estados
-        const numMovimientos = Math.floor(Math.random() * 2) + 2;
+        // Generar 2 movimientos por producto, cada uno con un estado diferente
+        const numMovimientos = 2;
         
         let saldoInicial = 0;
         
         for (let i = 0; i < numMovimientos; i++) {
             const fecha = new Date(hoy);
-            fecha.setDate(fecha.getDate() - (Math.floor(Math.random() * 10) + i * 2));
+            fecha.setDate(fecha.getDate() - (i * 3 + Math.floor(Math.random() * 2))); // Fechas más espaciadas
             
-            // Variar las cantidades para generar diferentes estados
-            let cantidadIngreso = 0;
-            let cantidadSalida = 0;
-            
-            // Asignar estado de forma cíclica para asegurar variedad equilibrada
-            // Cada producto tendrá un estado diferente de forma predecible
-            const estadoIndex = (index * numMovimientos + i) % 6; // 0-5 para diferentes estados
-            
-            // Definir configuración de estados para distribución equilibrada
-            const estadosConfig = [
-                { dias: 75, variacion: 15, nombre: 'sobrestock' },    // 60-90 días
-                { dias: 45, variacion: 10, nombre: 'optimo' },        // 35-55 días
-                { dias: 25, variacion: 5, nombre: 'adecuado' },        // 20-30 días
-                { dias: 17, variacion: 2, nombre: 'minimo' },         // 15-19 días
-                { dias: 12, variacion: 3, nombre: 'atencion' },       // 9-15 días
-                { dias: 5, variacion: 3, nombre: 'critico' }          // 2-8 días
-            ];
-            
+            // Asignar estado de forma cíclica para garantizar variedad
+            // Cada producto tendrá estados diferentes: primero uno, luego otro
+            const estadoIndex = (index * 2 + i) % estadosConfig.length;
             const estadoConfig = estadosConfig[estadoIndex];
             
             // Calcular cantidad de ingreso basada en el estado objetivo
-            const variacionDias = (Math.random() - 0.5) * estadoConfig.variacion;
-            let diasObjetivo = estadoConfig.dias + variacionDias;
-            
-            // Asegurar que los días objetivo estén en el rango correcto del estado
-            if (estadoConfig.nombre === 'sobrestock' && diasObjetivo < 60) diasObjetivo = 65 + Math.random() * 25;
-            if (estadoConfig.nombre === 'optimo' && (diasObjetivo < 30 || diasObjetivo > 60)) diasObjetivo = 35 + Math.random() * 20;
-            if (estadoConfig.nombre === 'adecuado' && (diasObjetivo < 20 || diasObjetivo > 30)) diasObjetivo = 22 + Math.random() * 8;
-            if (estadoConfig.nombre === 'minimo' && (diasObjetivo < 15 || diasObjetivo > 20)) diasObjetivo = 16 + Math.random() * 4;
-            if (estadoConfig.nombre === 'atencion' && (diasObjetivo < 10 || diasObjetivo > 15)) diasObjetivo = 11 + Math.random() * 4;
-            if (estadoConfig.nombre === 'critico' && diasObjetivo > 10) diasObjetivo = 3 + Math.random() * 5;
+            // Asegurar que el rango de días sea correcto para el estado
+            let diasObjetivo;
+            switch(estadoConfig.nombre) {
+                case 'sobrestock':
+                    diasObjetivo = 65 + Math.random() * 25; // 65-90 días
+                    break;
+                case 'optimo':
+                    diasObjetivo = 35 + Math.random() * 20; // 35-55 días
+                    break;
+                case 'adecuado':
+                    diasObjetivo = 20 + Math.random() * 10; // 20-30 días
+                    break;
+                case 'minimo':
+                    diasObjetivo = 15 + Math.random() * 4; // 15-19 días
+                    break;
+                case 'atencion':
+                    diasObjetivo = 10 + Math.random() * 5; // 10-15 días
+                    break;
+                case 'critico':
+                    diasObjetivo = 2 + Math.random() * 6; // 2-8 días
+                    break;
+                default:
+                    diasObjetivo = 25;
+            }
             
             // Calcular cantidad de ingreso para alcanzar el objetivo de días
-            cantidadIngreso = consumoPromedio * diasObjetivo;
-            cantidadSalida = consumoPromedio * (2 + Math.random() * 4); // Consumo de 2-6 días
+            const cantidadIngreso = consumoPromedio * diasObjetivo;
+            const cantidadSalida = consumoPromedio * (1 + Math.random() * 3); // Consumo de 1-4 días
             
             const saldoFinal = saldoInicial + cantidadIngreso - cantidadSalida;
-            const diasEstimados = Math.floor(saldoFinal / consumoPromedio);
+            const diasEstimados = Math.max(1, Math.floor(saldoFinal / consumoPromedio));
             
-            // Determinar estado basado en días estimados con más variedad
-            let estado;
-            let estadoClase;
+            // Determinar estado basado en días estimados (usar el estado objetivo)
+            let estado, estadoClase;
             if (diasEstimados > 60) {
                 estado = '🔵 Sobre Stock';
                 estadoClase = 'estado-sobrestock';
@@ -2262,8 +2275,13 @@ function inicializarModuloCompras() {
     // Recuperar datos desde memoria
     recuperarComprasDeMemoria();
     
-    // Generar datos mock del KARDEX si no hay datos
-    generarDatosMockKardex();
+    // Generar datos mock del KARDEX si no hay datos o si hay muy pocos
+    // Si hay menos de 5 movimientos, regenerar para asegurar variedad
+    if (comprasData.kardex.length < 5) {
+        generarDatosMockKardex(true); // Forzar regeneración
+    } else {
+        generarDatosMockKardex(false); // Solo generar si no hay datos
+    }
     
     // Cargar lista de compras
     cargarListaCompras();
