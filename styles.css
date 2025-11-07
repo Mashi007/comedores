@@ -91,6 +91,11 @@ body.sidebar-open {
     height: 100vh;
     overflow: hidden;
     z-index: 10;
+    pointer-events: auto !important;
+}
+
+#portada * {
+    pointer-events: auto !important;
 }
 
 .portada-background {
