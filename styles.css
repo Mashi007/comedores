@@ -5623,8 +5623,8 @@ body.sidebar-open .page-container {
 }
 
 .charts-grid-exec .chart-card-exec.chart-wide canvas {
-    height: 400px !important;
-    max-height: 400px;
+    height: 600px !important;
+    max-height: 600px;
 }
 
 @media (max-width: 1400px) {
