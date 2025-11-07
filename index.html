@@ -478,8 +478,9 @@
                 </div>
             </div>
 
-            <!-- Grid de Gráficos Secundarios -->
+            <!-- Grid de Gráficos Secundarios - Reorganizado -->
             <div class="charts-grid-exec">
+                <!-- Primera fila: 3 gráficos estándar -->
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
                         <h3>Consumo de Inventario</h3>
@@ -510,6 +511,8 @@
                         <canvas id="chart3"></canvas>
                     </div>
                 </div>
+                
+                <!-- Segunda fila: 3 gráficos estándar -->
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
                         <h3>Top Productos</h3>
@@ -534,6 +537,8 @@
                         <canvas id="chart6"></canvas>
                     </div>
                 </div>
+                
+                <!-- Tercera fila: 2 gráficos estándar + 1 gráfico ampliado -->
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
                         <h3>Merma por Receta</h3>
@@ -544,18 +549,19 @@
                 </div>
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
-                        <h3>Inventario por Producto</h3>
-                    </div>
-                    <div style="position: relative; height: 250px; width: 100%;">
-                        <canvas id="chart8"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card-exec">
-                    <div class="chart-header-exec">
                         <h3>Costos por Tipo de Comida</h3>
                     </div>
                     <div style="position: relative; height: 250px; width: 100%;">
                         <canvas id="chart9"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card-exec chart-wide">
+                    <div class="chart-header-exec">
+                        <h3>Inventario por Producto</h3>
+                        <p class="chart-subtitle">Análisis de stock y puntos de reorden</p>
+                    </div>
+                    <div style="position: relative; height: 400px; width: 100%;">
+                        <canvas id="chart8"></canvas>
                     </div>
                 </div>
             </div>

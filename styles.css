@@ -5565,14 +5565,47 @@ body.sidebar-open .page-container {
 
 .charts-grid-exec {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-bottom: 2rem;
+}
+
+.charts-grid-exec .chart-card-exec {
+    grid-column: span 1;
+}
+
+.charts-grid-exec .chart-card-exec.chart-wide {
+    grid-column: span 1;
 }
 
 .charts-grid-exec .chart-card-exec canvas {
     height: 250px !important;
     max-height: 250px;
+}
+
+.charts-grid-exec .chart-card-exec.chart-wide canvas {
+    height: 400px !important;
+    max-height: 400px;
+}
+
+@media (max-width: 1400px) {
+    .charts-grid-exec {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .charts-grid-exec .chart-card-exec.chart-wide {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .charts-grid-exec {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-grid-exec .chart-card-exec.chart-wide {
+        grid-column: span 1;
+    }
 }
 
 .dashboard-innovative-charts {
