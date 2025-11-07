@@ -1873,6 +1873,11 @@ function enviarMensajeAI(mensajeTexto) {
     }, 500);
 }
 
+// Exponer enviarMensajeAI después de su declaración
+if (typeof window !== 'undefined') {
+    window.enviarMensajeAI = enviarMensajeAI;
+}
+
 // ============================================
 // SISTEMA DE MEMORIA TEMPORAL (15 DÍAS)
 // ============================================
