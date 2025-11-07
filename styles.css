@@ -687,6 +687,13 @@ body.sidebar-open .page-container {
 
 .chart-card:has(#chart8) {
     grid-column: 1 / -1; /* Ocupa todo el ancho disponible */
+    width: 100%;
+}
+
+.chart-card:has(#chart8) canvas {
+    width: 100% !important;
+    height: 300px !important;
+    min-height: 300px !important;
 }
 
 .chart-card canvas {
