@@ -4145,6 +4145,17 @@ body.sidebar-open .page-container {
     font-weight: 700;
 }
 
+/* Estilos para tabla de historial de calidad */
+.calidad-historial-table .text-danger {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.calidad-historial-table .text-warning {
+    color: #d97706;
+    font-weight: 600;
+}
+
 /* Lista de Compras */
 .compras-list {
     margin-top: 2rem;

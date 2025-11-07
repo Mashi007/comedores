@@ -7338,6 +7338,55 @@ function generarDatosMockOrdenesCompra() {
 }
 
 // Inicializar módulo de calidad
+// Generar datos mock del historial de verificaciones
+function generarDatosMockHistorialCalidad() {
+    // Si ya hay verificaciones, no generar más
+    if (calidadData.verificaciones.length > 0) {
+        return;
+    }
+    
+    // Obtener órdenes aprobadas y rechazadas
+    const ordenesVerificadas = (comprasData.ordenesCompra || []).filter(oc => 
+        oc.estado === 'aprobada' || oc.estado === 'rechazada'
+    );
+    
+    // Crear verificaciones basadas en las órdenes verificadas
+    ordenesVerificadas.forEach((orden, index) => {
+        if (orden.verificacionCalidad) {
+            const totalDevoluciones = orden.verificacionCalidad.productosVerificados.reduce((sum, p) => 
+                sum + (p.devolucion * p.precioUnit), 0
+            );
+            
+            const totalAjustes = orden.verificacionCalidad.productosVerificados.reduce((sum, p) => {
+                const ajuste = (p.cantidadRecibida - p.cantidad) * p.precioUnit;
+                return sum + (ajuste > 0 ? ajuste : 0);
+            }, 0);
+            
+            const verificacion = {
+                id: Date.now() + index,
+                ordenId: orden.id,
+                numeroOrden: orden.numeroOrden,
+                proveedor: orden.proveedor,
+                fechaRecepcion: orden.fechaFactura,
+                fechaVerificacion: orden.verificacionCalidad.fechaVerificacion,
+                estado: orden.estado,
+                productos: orden.productos.length,
+                devoluciones: parseFloat(totalDevoluciones.toFixed(2)),
+                ajustes: parseFloat(totalAjustes.toFixed(2)),
+                verificador: orden.verificacionCalidad.verificador,
+                observaciones: orden.verificacionCalidad.observaciones
+            };
+            
+            calidadData.verificaciones.push(verificacion);
+        }
+    });
+    
+    // Guardar en memoria
+    guardarCalidadEnMemoria();
+    
+    console.log(`📋 Generadas ${calidadData.verificaciones.length} verificaciones mock para el historial`);
+}
+
 function inicializarModuloCalidad() {
     console.log('✅ Inicializando módulo de control de calidad...');
     
@@ -7346,6 +7395,9 @@ function inicializarModuloCalidad() {
     
     // Cargar datos desde memoria
     recuperarCalidadDeMemoria();
+    
+    // Generar datos mock del historial de verificaciones si no hay datos
+    generarDatosMockHistorialCalidad();
     
     // Actualizar UI
     cargarOrdenesPendientes();
@@ -7868,28 +7920,33 @@ function cargarHistorialCalidad() {
     }
     
     tbody.innerHTML = verificaciones.map(ver => {
-        const fecha = new Date(ver.fechaVerificacion);
+        const fecha = new Date(ver.fechaRecepcion || ver.fechaVerificacion);
         const fechaFormateada = fecha.toLocaleDateString('es-ES', { 
             day: '2-digit', 
             month: '2-digit', 
             year: 'numeric' 
         });
         
-        const totalDevoluciones = ver.productos.reduce((sum, p) => sum + (p.devolucion * p.precioUnit), 0);
-        const totalAjustes = ver.productos.reduce((sum, p) => sum + Math.abs(p.ajuste * p.precioUnit), 0);
+        // Determinar estado y badge
+        let estadoTexto = 'Aprobada';
+        let estadoClase = 'aprobada';
+        if (ver.estado === 'rechazada') {
+            estadoTexto = 'Rechazada';
+            estadoClase = 'rechazada';
+        }
         
         return `
             <tr>
                 <td><strong>${ver.numeroOrden}</strong></td>
                 <td>${ver.proveedor}</td>
                 <td>${fechaFormateada}</td>
-                <td><span class="badge-estado ${ver.estado}">${ver.estado === 'aprobada' ? 'Aprobada' : 'Rechazada'}</span></td>
-                <td>${ver.productos.length} productos</td>
-                <td>$${totalDevoluciones.toLocaleString('es-ES', {minimumFractionDigits: 2})}</td>
-                <td>$${totalAjustes.toLocaleString('es-ES', {minimumFractionDigits: 2})}</td>
-                <td>${ver.verificador}</td>
+                <td><span class="badge-estado ${estadoClase}">${estadoTexto}</span></td>
+                <td>${ver.productos || 0} productos</td>
+                <td class="${ver.devoluciones > 0 ? 'text-danger' : ''}">$${ver.devoluciones.toLocaleString('es-ES', {minimumFractionDigits: 2})}</td>
+                <td class="${ver.ajustes > 0 ? 'text-warning' : ''}">$${ver.ajustes.toLocaleString('es-ES', {minimumFractionDigits: 2})}</td>
+                <td>${ver.verificador || 'N/A'}</td>
                 <td>
-                    <button class="btn-icon-small" onclick="verDetalleVerificacion('${ver.id}')" title="Ver Detalle">
+                    <button class="btn-icon-small" onclick="verDetalleVerificacion('${ver.ordenId || ver.id}')" title="Ver Detalle">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
@@ -7907,20 +7964,32 @@ function filtrarOrdenesCalidad() {
 }
 
 // Ver detalle de verificación
-function verDetalleVerificacion(verificacionId) {
-    const verificacion = calidadData.verificaciones.find(v => v.id == verificacionId);
-    if (verificacion) {
-        const orden = (comprasData.ordenesCompra || []).find(oc => oc.id == verificacion.ordenCompraId);
-        if (orden) {
-            window.ordenCalidadActual = orden;
-            abrirVerificacionCalidad(orden.id);
-            // Deshabilitar edición (solo lectura)
-            document.querySelectorAll('#formVerificacionCalidad input, #formVerificacionCalidad select, #formVerificacionCalidad textarea').forEach(el => {
-                el.disabled = true;
-            });
-            document.querySelectorAll('.form-exec-actions button').forEach(btn => {
-                btn.style.display = 'none';
-            });
+function verDetalleVerificacion(ordenId) {
+    const orden = (comprasData.ordenesCompra || []).find(oc => oc.id == ordenId);
+    if (orden) {
+        window.ordenCalidadActual = orden;
+        abrirVerificacionCalidad(orden.id);
+        
+        // Si la orden ya está verificada, deshabilitar edición (solo lectura)
+        if (orden.estado === 'aprobada' || orden.estado === 'rechazada') {
+            setTimeout(() => {
+                document.querySelectorAll('#formVerificacionCalidad input, #formVerificacionCalidad select, #formVerificacionCalidad textarea').forEach(el => {
+                    el.disabled = true;
+                });
+                document.querySelectorAll('.form-exec-actions button').forEach(btn => {
+                    btn.style.display = 'none';
+                });
+                
+                // Agregar mensaje de solo lectura
+                const form = document.getElementById('formVerificacionCalidad');
+                if (form && !form.querySelector('.readonly-notice')) {
+                    const notice = document.createElement('div');
+                    notice.className = 'readonly-notice';
+                    notice.style.cssText = 'padding: 1rem; background: #fef3c7; border-radius: 0.5rem; margin-bottom: 1rem; color: #92400e; font-weight: 600;';
+                    notice.textContent = '📋 Esta verificación ya fue procesada. Solo lectura.';
+                    form.insertBefore(notice, form.firstChild);
+                }
+            }, 100);
         }
     }
 }
