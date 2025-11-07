@@ -1151,7 +1151,7 @@ function crearGrafico8() {
     }, 500);
 }
 
-function agregarEtiquetasCuadrantes(chart, maxStock, maxReorder) {
+function agregarEtiquetasCuadrantes(chart, maxStock, maxReorder, reordenNormalizado) {
     if (!chart || !chart.canvas) return;
     
     const canvas = chart.canvas;
@@ -1177,34 +1177,36 @@ function agregarEtiquetasCuadrantes(chart, maxStock, maxReorder) {
         canvas.parentElement.appendChild(labelContainer);
     }
     
+    // Calcular posiciones de cuadrantes para una sola fila horizontal
+    // Los cuadrantes se dividen solo por el eje X (stock), ya que Y está normalizado
     const labels = [
         {
             text: '1. Stock menor al inventario de seguridad',
-            x: maxStock * 0.25,
-            y: maxReorder * 0.25,
+            x: maxStock * 0.15,
+            y: reordenNormalizado,
             color: '#ef4444',
-            bg: 'rgba(239, 68, 68, 0.1)'
+            bg: 'rgba(239, 68, 68, 0.2)'
         },
         {
             text: '2. Dentro de inventario de seguridad',
-            x: maxStock * 0.75,
-            y: maxReorder * 0.25,
+            x: maxStock * 0.4,
+            y: reordenNormalizado,
             color: '#f59e0b',
-            bg: 'rgba(245, 158, 11, 0.1)'
+            bg: 'rgba(245, 158, 11, 0.2)'
         },
         {
             text: '3. Inventario según menús planificados',
-            x: maxStock * 0.25,
-            y: maxReorder * 0.75,
+            x: maxStock * 0.65,
+            y: reordenNormalizado,
             color: '#10b981',
-            bg: 'rgba(16, 185, 129, 0.1)'
+            bg: 'rgba(16, 185, 129, 0.2)'
         },
         {
             text: '4. Sobre stock',
-            x: maxStock * 0.75,
-            y: maxReorder * 0.75,
+            x: maxStock * 0.9,
+            y: reordenNormalizado,
             color: '#3b82f6',
-            bg: 'rgba(59, 130, 246, 0.1)'
+            bg: 'rgba(59, 130, 246, 0.2)'
         }
     ];
     
