@@ -802,26 +802,59 @@ function inicializarGraficos() {
     });
     chartInstances = {};
     
-    setTimeout(() => {
+    // Esperar a que el dashboard esté visible y los canvas tengan dimensiones
+    const crearGraficosConRetry = (intentos = 0) => {
+        const dashboard = document.getElementById('dashboard');
+        const chart1 = document.getElementById('chart1');
+        
+        if (!dashboard || !dashboard.classList.contains('active')) {
+            console.warn('⚠️ [GRAFICOS] Dashboard no está activo, reintentando...');
+            if (intentos < 10) {
+                setTimeout(() => crearGraficosConRetry(intentos + 1), 200);
+            } else {
+                console.error('❌ [GRAFICOS] Timeout: Dashboard no se activó');
+            }
+            return;
+        }
+        
+        if (!chart1) {
+            console.warn('⚠️ [GRAFICOS] Canvas no encontrado, reintentando...');
+            if (intentos < 10) {
+                setTimeout(() => crearGraficosConRetry(intentos + 1), 200);
+            } else {
+                console.error('❌ [GRAFICOS] Timeout: Canvas no encontrado');
+            }
+            return;
+        }
+        
+        // Verificar que el canvas tenga dimensiones
+        if (chart1.offsetWidth === 0 || chart1.offsetHeight === 0) {
+            console.warn('⚠️ [GRAFICOS] Canvas sin dimensiones, reintentando...', chart1.offsetWidth, chart1.offsetHeight);
+            if (intentos < 10) {
+                setTimeout(() => crearGraficosConRetry(intentos + 1), 200);
+            } else {
+                console.error('❌ [GRAFICOS] Timeout: Canvas sin dimensiones');
+            }
+            return;
+        }
+        
         try {
-            console.log('Creando gráfico 1...');
+            console.log('📊 [GRAFICOS] Creando gráficos...');
             crearGrafico1();
-            console.log('Creando gráfico 2...');
             crearGrafico2();
-            console.log('Creando gráfico 3...');
             crearGrafico3();
-            console.log('Creando gráfico 4...');
             crearGrafico4();
-            console.log('Creando gráfico 5...');
             crearGrafico5();
-            console.log('Creando gráfico 6...');
             crearGrafico6();
-            console.log('✅ Todos los gráficos creados correctamente');
+            console.log('✅ [GRAFICOS] Todos los gráficos creados correctamente');
         } catch (error) {
-            console.error('❌ Error al crear gráficos:', error);
+            console.error('❌ [GRAFICOS] Error al crear gráficos:', error);
             ToastNotification.show('Error al cargar gráficos. Por favor, recarga la página.', 'error');
         }
-    }, 300);
+    };
+    
+    // Iniciar con un pequeño delay para asegurar que el DOM esté listo
+    setTimeout(() => crearGraficosConRetry(), 100);
 }
 
 function aplicarFiltros() {
@@ -914,9 +947,19 @@ window.buscarEnTabla = function(tablaId, busqueda) {
 };
 
 function crearGrafico1(periodo = '7') {
+    console.log('📊 [CHART1] Iniciando creación...');
     const ctx = document.getElementById('chart1');
-    if (!ctx) return;
-    if (typeof Chart === 'undefined') return;
+    console.log('📊 [CHART1] Canvas encontrado:', !!ctx);
+    if (!ctx) {
+        console.error('❌ [CHART1] Canvas chart1 no encontrado');
+        return;
+    }
+    if (typeof Chart === 'undefined') {
+        console.error('❌ [CHART1] Chart.js no está disponible');
+        return;
+    }
+    console.log('📊 [CHART1] Dimensiones canvas:', ctx.offsetWidth, 'x', ctx.offsetHeight);
+    console.log('📊 [CHART1] Canvas visible:', ctx.offsetParent !== null);
     
     const data = dashboardData.consumoInventario[periodo] || dashboardData.consumoInventario['7'];
     
@@ -1014,9 +1057,19 @@ function crearGrafico1(periodo = '7') {
 }
 
 function crearGrafico2(categoria = 'all') {
+    console.log('📊 [CHART2] Iniciando creación...');
     const ctx = document.getElementById('chart2');
-    if (!ctx) return;
-    if (typeof Chart === 'undefined') return;
+    console.log('📊 [CHART2] Canvas encontrado:', !!ctx);
+    if (!ctx) {
+        console.error('❌ [CHART2] Canvas chart2 no encontrado');
+        return;
+    }
+    if (typeof Chart === 'undefined') {
+        console.error('❌ [CHART2] Chart.js no está disponible');
+        return;
+    }
+    console.log('📊 [CHART2] Dimensiones canvas:', ctx.offsetWidth, 'x', ctx.offsetHeight);
+    console.log('📊 [CHART2] Canvas visible:', ctx.offsetParent !== null);
     
     let labels, data, colors;
     
@@ -1106,8 +1159,19 @@ function crearGrafico2(categoria = 'all') {
 }
 
 function crearGrafico3(periodo = '7') {
+    console.log('📊 [CHART3] Iniciando creación...');
     const ctx = document.getElementById('chart3');
-    if (!ctx) return;
+    console.log('📊 [CHART3] Canvas encontrado:', !!ctx);
+    if (!ctx) {
+        console.error('❌ [CHART3] Canvas chart3 no encontrado');
+        return;
+    }
+    if (typeof Chart === 'undefined') {
+        console.error('❌ [CHART3] Chart.js no está disponible');
+        return;
+    }
+    console.log('📊 [CHART3] Dimensiones canvas:', ctx.offsetWidth, 'x', ctx.offsetHeight);
+    console.log('📊 [CHART3] Canvas visible:', ctx.offsetParent !== null);
     
     const data = dashboardData.produccionDiaria[periodo] || dashboardData.produccionDiaria['7'];
     
@@ -1376,8 +1440,19 @@ function crearGrafico5() {
 }
 
 function crearGrafico6() {
+    console.log('📊 [CHART6] Iniciando creación...');
     const ctx = document.getElementById('chart6');
-    if (!ctx) return;
+    console.log('📊 [CHART6] Canvas encontrado:', !!ctx);
+    if (!ctx) {
+        console.error('❌ [CHART6] Canvas chart6 no encontrado');
+        return;
+    }
+    if (typeof Chart === 'undefined') {
+        console.error('❌ [CHART6] Chart.js no está disponible');
+        return;
+    }
+    console.log('📊 [CHART6] Dimensiones canvas:', ctx.offsetWidth, 'x', ctx.offsetHeight);
+    console.log('📊 [CHART6] Canvas visible:', ctx.offsetParent !== null);
     
     const data = dashboardData.mermaVsPlanificado;
     
