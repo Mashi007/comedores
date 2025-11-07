@@ -559,6 +559,8 @@ body.sidebar-open {
     padding: 2rem;
     max-width: 1400px;
     margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .menu-header {
@@ -619,6 +621,8 @@ body.sidebar-open {
     padding: 2rem;
     max-width: 1400px;
     margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .page-header {
@@ -2076,15 +2080,33 @@ body.sidebar-open {
 
 /* Page Container con Sidebar */
 .page-container {
-    transition: margin-left 0.3s ease;
+    transition: margin-left 0.3s ease, padding 0.3s ease;
 }
 
+.menu-container {
+    transition: margin-left 0.3s ease, padding 0.3s ease;
+}
+
+/* Cuando el sidebar está abierto, ajustar el contenido */
 body.sidebar-open .page-container {
     margin-left: 300px;
+    padding-left: calc(2rem + 10px); /* Ajuste para centrar mejor */
+}
+
+body.sidebar-open .menu-container {
+    margin-left: 300px;
+    padding-left: calc(2rem + 10px); /* Ajuste para centrar mejor */
 }
 
 body.sidebar-open .screen.active:not(#portada):not(#login) {
     margin-left: 300px;
+}
+
+/* Asegurar que el contenido esté centrado */
+body.sidebar-open .page-container,
+body.sidebar-open .menu-container {
+    max-width: calc(1400px - 300px);
+    margin-right: auto;
 }
 
 @media (max-width: 768px) {
