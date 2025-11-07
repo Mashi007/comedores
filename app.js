@@ -37,7 +37,7 @@ function cambiarPantalla(ocultar, mostrar) {
         console.log('✅ Clase active agregada y display: block forzado');
     
     // Mostrar sidebar en pantallas del sistema
-    const pantallasSistema = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'chat-ai', 'configuracion'];
+    const pantallasSistema = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'chat-ai', 'costos', 'configuracion'];
     const sidebar = document.getElementById('sidebar');
     
     if (pantallasSistema.includes(mostrar)) {
@@ -109,6 +109,13 @@ function cambiarPantalla(ocultar, mostrar) {
         if (mostrar === 'inventario') {
             setTimeout(() => {
                 inicializarModuloInventario();
+            }, 300);
+        }
+        
+        // Inicializar módulo de Costos si es costos
+        if (mostrar === 'costos') {
+            setTimeout(() => {
+                inicializarModuloCostos();
             }, 300);
         }
         
@@ -3302,4 +3309,666 @@ if (typeof window !== 'undefined') {
     window.procesarMovimientoInventario = procesarMovimientoInventario;
     window.filtrarInventario = filtrarInventario;
     window.inicializarModuloInventario = inicializarModuloInventario;
+}
+
+// ============================================
+// MÓDULO DE COSTOS VARIABLES DE PRODUCCIÓN
+// ============================================
+
+// Estructura de datos de costos
+const costosData = {
+    costosDiarios: [],
+    recetas: [],
+    promedioIdeal: 0,
+    categorias: {}
+};
+
+// Recetas con ingredientes y costos estándar (mock data)
+const recetasMock = [
+    {
+        id: 1,
+        nombre: 'Arroz con Frijoles',
+        categoria: 'Plato Principal',
+        ingredientes: [
+            { producto: 'Arroz Premium', cantidad: 0.2, unidad: 'kg' },
+            { producto: 'Frijoles Negros', cantidad: 0.15, unidad: 'kg' },
+            { producto: 'Aceite', cantidad: 0.05, unidad: 'L' },
+            { producto: 'Sal', cantidad: 0.01, unidad: 'kg' }
+        ],
+        costoIdeal: 8.50,
+        rendimiento: 10 // porciones
+    },
+    {
+        id: 2,
+        nombre: 'Pollo Asado',
+        categoria: 'Plato Principal',
+        ingredientes: [
+            { producto: 'Pollo', cantidad: 0.3, unidad: 'kg' },
+            { producto: 'Aceite', cantidad: 0.03, unidad: 'L' },
+            { producto: 'Sal', cantidad: 0.01, unidad: 'kg' },
+            { producto: 'Cebolla', cantidad: 0.1, unidad: 'kg' }
+        ],
+        costoIdeal: 12.00,
+        rendimiento: 8
+    },
+    {
+        id: 3,
+        nombre: 'Carne a la Plancha',
+        categoria: 'Plato Principal',
+        ingredientes: [
+            { producto: 'Carne Res', cantidad: 0.25, unidad: 'kg' },
+            { producto: 'Aceite', cantidad: 0.02, unidad: 'L' },
+            { producto: 'Sal', cantidad: 0.01, unidad: 'kg' }
+        ],
+        costoIdeal: 15.50,
+        rendimiento: 6
+    },
+    {
+        id: 4,
+        nombre: 'Ensalada Mixta',
+        categoria: 'Acompañamiento',
+        ingredientes: [
+            { producto: 'Lechuga', cantidad: 0.1, unidad: 'kg' },
+            { producto: 'Tomates', cantidad: 0.08, unidad: 'kg' },
+            { producto: 'Cebolla', cantidad: 0.05, unidad: 'kg' },
+            { producto: 'Aceite', cantidad: 0.02, unidad: 'L' }
+        ],
+        costoIdeal: 3.50,
+        rendimiento: 12
+    },
+    {
+        id: 5,
+        nombre: 'Sopa de Verduras',
+        categoria: 'Sopa',
+        ingredientes: [
+            { producto: 'Papa', cantidad: 0.2, unidad: 'kg' },
+            { producto: 'Cebolla', cantidad: 0.1, unidad: 'kg' },
+            { producto: 'Zanahoria', cantidad: 0.1, unidad: 'kg' },
+            { producto: 'Sal', cantidad: 0.01, unidad: 'kg' }
+        ],
+        costoIdeal: 4.00,
+        rendimiento: 15
+    }
+];
+
+// Generar datos mock de costos
+function generarDatosMockCostos() {
+    const hoy = new Date();
+    const ultimos7Dias = [];
+    
+    // Generar costos para los últimos 7 días
+    for (let i = 6; i >= 0; i--) {
+        const fecha = new Date(hoy);
+        fecha.setDate(fecha.getDate() - i);
+        
+        const costosDelDia = [];
+        let costoTotalDia = 0;
+        
+        // Generar costos para cada receta del día
+        recetasMock.forEach(receta => {
+            const cantidad = Math.floor(Math.random() * 20) + 10; // 10-30 porciones
+            const costoUnitario = receta.costoIdeal * (0.85 + Math.random() * 0.3); // Variación ±15%
+            const costoTotal = costoUnitario * cantidad;
+            const desviacion = ((costoUnitario - receta.costoIdeal) / receta.costoIdeal) * 100;
+            
+            costosDelDia.push({
+                fecha: new Date(fecha),
+                receta: receta.nombre,
+                categoria: receta.categoria,
+                cantidad: cantidad,
+                costoUnitario: parseFloat(costoUnitario.toFixed(2)),
+                costoTotal: parseFloat(costoTotal.toFixed(2)),
+                costoIdeal: receta.costoIdeal,
+                desviacion: parseFloat(desviacion.toFixed(2)),
+                estado: desviacion > 10 ? 'alto' : desviacion < -10 ? 'bajo' : 'normal'
+            });
+            
+            costoTotalDia += costoTotal;
+        });
+        
+        costosData.costosDiarios.push({
+            fecha: new Date(fecha),
+            costoTotal: parseFloat(costoTotalDia.toFixed(2)),
+            detalle: costosDelDia
+        });
+    }
+    
+    // Calcular promedio ideal
+    const promedioIdeal = costosData.costosDiarios.reduce((sum, dia) => sum + dia.costoTotal, 0) / costosData.costosDiarios.length;
+    costosData.promedioIdeal = parseFloat(promedioIdeal.toFixed(2));
+    
+    // Calcular costos por categoría
+    costosData.categorias = {};
+    costosData.costosDiarios.forEach(dia => {
+        dia.detalle.forEach(costo => {
+            if (!costosData.categorias[costo.categoria]) {
+                costosData.categorias[costo.categoria] = 0;
+            }
+            costosData.categorias[costo.categoria] += costo.costoTotal;
+        });
+    });
+    
+    // Calcular promedios por categoría
+    Object.keys(costosData.categorias).forEach(cat => {
+        costosData.categorias[cat] = parseFloat((costosData.categorias[cat] / costosData.costosDiarios.length).toFixed(2));
+    });
+}
+
+// Calcular costos basados en facturas y recetas
+function calcularCostosDesdeFacturas() {
+    // Obtener precios promedio de facturas
+    const preciosProductos = {};
+    
+    if (typeof comprasData !== 'undefined' && comprasData.facturas) {
+        comprasData.facturas.forEach(factura => {
+            if (factura.productos) {
+                factura.productos.forEach(prod => {
+                    if (!preciosProductos[prod.producto]) {
+                        preciosProductos[prod.producto] = [];
+                    }
+                    preciosProductos[prod.producto].push(prod.precioUnitario);
+                });
+            }
+        });
+    }
+    
+    // Calcular precio promedio por producto
+    const preciosPromedio = {};
+    Object.keys(preciosProductos).forEach(producto => {
+        const precios = preciosProductos[producto];
+        const promedio = precios.reduce((a, b) => a + b, 0) / precios.length;
+        preciosPromedio[producto] = parseFloat(promedio.toFixed(2));
+    });
+    
+    // Actualizar costos de recetas basados en precios reales
+    recetasMock.forEach(receta => {
+        let costoCalculado = 0;
+        receta.ingredientes.forEach(ing => {
+            const precio = preciosPromedio[ing.producto] || 0;
+            costoCalculado += precio * ing.cantidad;
+        });
+        if (costoCalculado > 0) {
+            receta.costoIdeal = parseFloat((costoCalculado / receta.rendimiento).toFixed(2));
+        }
+    });
+}
+
+// Inicializar módulo de costos
+function inicializarModuloCostos() {
+    console.log('💰 Inicializando módulo de costos variables...');
+    
+    // Calcular costos desde facturas
+    calcularCostosDesdeFacturas();
+    
+    // Generar datos mock si no existen
+    if (costosData.costosDiarios.length === 0) {
+        generarDatosMockCostos();
+    }
+    
+    // Actualizar KPIs
+    actualizarKPIsCostos();
+    
+    // Cargar tabla de costos
+    cargarTablaCostos();
+    
+    // Cargar categorías
+    cargarCostosPorCategoria();
+    
+    // Crear gráficos
+    crearGraficosCostos();
+}
+
+// Actualizar KPIs de costos
+function actualizarKPIsCostos() {
+    const hoy = new Date();
+    const hoyStr = hoy.toISOString().split('T')[0];
+    
+    const costoHoy = costosData.costosDiarios.find(d => 
+        d.fecha.toISOString().split('T')[0] === hoyStr
+    );
+    
+    const costoTotalHoy = costoHoy ? costoHoy.costoTotal : 0;
+    const promedioIdeal = costosData.promedioIdeal;
+    const desviacion = costoTotalHoy > 0 ? ((costoTotalHoy - promedioIdeal) / promedioIdeal) * 100 : 0;
+    const eficiencia = costoTotalHoy > 0 ? ((promedioIdeal / costoTotalHoy) * 100) : 0;
+    
+    // Actualizar valores
+    document.getElementById('kpiCostoTotal').textContent = `$${costoTotalHoy.toFixed(2)}`;
+    document.getElementById('kpiPromedioIdeal').textContent = `$${promedioIdeal.toFixed(2)}`;
+    document.getElementById('kpiDesviacion').textContent = `${desviacion >= 0 ? '+' : ''}${desviacion.toFixed(1)}%`;
+    document.getElementById('kpiEficiencia').textContent = `${eficiencia.toFixed(1)}%`;
+    
+    // Actualizar tendencias
+    const costoTotalTrend = document.getElementById('kpiCostoTotalTrend');
+    const desviacionTrend = document.getElementById('kpiDesviacionTrend');
+    const eficienciaTrend = document.getElementById('kpiEficienciaTrend');
+    
+    if (costoTotalTrend) {
+        costoTotalTrend.className = 'kpi-trend ' + (desviacion > 0 ? 'negative' : 'positive');
+        costoTotalTrend.textContent = desviacion > 0 ? `↑ +${desviacion.toFixed(1)}%` : `↓ ${desviacion.toFixed(1)}%`;
+    }
+    
+    if (desviacionTrend) {
+        desviacionTrend.className = 'kpi-trend ' + (Math.abs(desviacion) > 10 ? 'negative' : 'positive');
+        desviacionTrend.textContent = Math.abs(desviacion) > 10 ? '⚠️ Atención' : '✅ Normal';
+    }
+    
+    if (eficienciaTrend) {
+        eficienciaTrend.className = 'kpi-trend ' + (eficiencia >= 90 ? 'positive' : eficiencia >= 80 ? 'neutral' : 'negative');
+        eficienciaTrend.textContent = eficiencia >= 90 ? '✅ Óptimo' : eficiencia >= 80 ? '⚠️ Regular' : '❌ Bajo';
+    }
+}
+
+// Cargar tabla de costos
+function cargarTablaCostos() {
+    const tbody = document.getElementById('tablaCostosBody');
+    if (!tbody) return;
+    
+    const filtroFecha = document.getElementById('filtroFechaCostos')?.value || 'hoy';
+    const busqueda = document.getElementById('buscarReceta')?.value.toLowerCase() || '';
+    
+    const hoy = new Date();
+    let fechaInicio = new Date(hoy);
+    
+    if (filtroFecha === 'semana') {
+        fechaInicio.setDate(fechaInicio.getDate() - 7);
+    } else if (filtroFecha === 'mes') {
+        fechaInicio.setMonth(fechaInicio.getMonth() - 1);
+    } else {
+        fechaInicio = new Date(hoy);
+        fechaInicio.setHours(0, 0, 0, 0);
+    }
+    
+    let costosFiltrados = [];
+    costosData.costosDiarios.forEach(dia => {
+        if (dia.fecha >= fechaInicio) {
+            dia.detalle.forEach(costo => {
+                if (!busqueda || costo.receta.toLowerCase().includes(busqueda)) {
+                    costosFiltrados.push({ ...costo, fecha: dia.fecha });
+                }
+            });
+        }
+    });
+    
+    // Ordenar por fecha (más reciente primero)
+    costosFiltrados.sort((a, b) => b.fecha - a.fecha);
+    
+    tbody.innerHTML = costosFiltrados.map(c => {
+        const estadoClass = {
+            'alto': 'estado-alto',
+            'bajo': 'estado-bajo',
+            'normal': 'estado-normal'
+        }[c.estado] || '';
+        
+        const estadoLabel = {
+            'alto': '🔴 Alto',
+            'bajo': '🟢 Bajo',
+            'normal': '🟡 Normal'
+        }[c.estado] || '';
+        
+        const desviacionClass = Math.abs(c.desviacion) > 10 ? 'desviacion-alta' : Math.abs(c.desviacion) > 5 ? 'desviacion-media' : 'desviacion-baja';
+        
+        return `
+            <tr>
+                <td>${c.fecha.toLocaleDateString('es-ES')}</td>
+                <td><strong>${c.receta}</strong><br><small>${c.categoria}</small></td>
+                <td>${c.cantidad} porciones</td>
+                <td>$${c.costoUnitario.toFixed(2)}</td>
+                <td><strong>$${c.costoTotal.toFixed(2)}</strong></td>
+                <td>
+                    <span class="desviacion-badge ${desviacionClass}">
+                        ${c.desviacion >= 0 ? '+' : ''}${c.desviacion.toFixed(1)}%
+                    </span>
+                </td>
+                <td><span class="badge ${estadoClass}">${estadoLabel}</span></td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Cargar costos por categoría
+function cargarCostosPorCategoria() {
+    const grid = document.getElementById('categoriasGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = Object.keys(costosData.categorias).map(categoria => {
+        const costo = costosData.categorias[categoria];
+        const porcentaje = (costo / costosData.promedioIdeal) * 100;
+        
+        return `
+            <div class="categoria-card">
+                <div class="categoria-header">
+                    <h3>${categoria}</h3>
+                    <span class="categoria-costo">$${costo.toFixed(2)}</span>
+                </div>
+                <div class="categoria-bar">
+                    <div class="categoria-bar-fill" style="width: ${Math.min(porcentaje, 100)}%;"></div>
+                </div>
+                <p class="categoria-porcentaje">${porcentaje.toFixed(1)}% del total</p>
+            </div>
+        `;
+    }).join('');
+}
+
+// Crear gráficos de costos
+function crearGraficosCostos() {
+    crearGraficoCostoDiario();
+    crearGraficoDesviacionPromedio();
+    crearGraficoCostosReceta();
+    crearGraficoTendenciaCostos();
+}
+
+// Gráfico 1: Costo Variable Total del Día
+function crearGraficoCostoDiario() {
+    const ctx = document.getElementById('chartCostoDiario');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chartCostoDiario) {
+        chartInstances.chartCostoDiario.destroy();
+    }
+    
+    const ultimos7Dias = costosData.costosDiarios.slice(-7);
+    const labels = ultimos7Dias.map(d => d.fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }));
+    const costos = ultimos7Dias.map(d => d.costoTotal);
+    const promedioIdeal = costosData.promedioIdeal;
+    
+    chartInstances.chartCostoDiario = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Costo Total del Día',
+                data: costos,
+                backgroundColor: costos.map(c => {
+                    const desv = ((c - promedioIdeal) / promedioIdeal) * 100;
+                    if (desv > 10) return '#ef4444';
+                    if (desv < -10) return '#22c55e';
+                    return '#3b82f6';
+                }),
+                borderColor: costos.map(c => {
+                    const desv = ((c - promedioIdeal) / promedioIdeal) * 100;
+                    if (desv > 10) return '#dc2626';
+                    if (desv < -10) return '#16a34a';
+                    return '#2563eb';
+                }),
+                borderWidth: 2
+            }, {
+                label: 'Promedio Ideal',
+                data: Array(7).fill(promedioIdeal),
+                type: 'line',
+                borderColor: '#f59e0b',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            if (context.datasetIndex === 0) {
+                                const desv = ((context.parsed.y - promedioIdeal) / promedioIdeal) * 100;
+                                return `Costo: $${context.parsed.y.toFixed(2)} (${desv >= 0 ? '+' : ''}${desv.toFixed(1)}%)`;
+                            }
+                            return `Promedio Ideal: $${context.parsed.y.toFixed(2)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: (value) => '$' + value.toFixed(0)
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico 2: Desviación del Promedio Ideal
+function crearGraficoDesviacionPromedio() {
+    const ctx = document.getElementById('chartDesviacionPromedio');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chartDesviacionPromedio) {
+        chartInstances.chartDesviacionPromedio.destroy();
+    }
+    
+    const ultimos7Dias = costosData.costosDiarios.slice(-7);
+    const labels = ultimos7Dias.map(d => d.fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }));
+    const desviaciones = ultimos7Dias.map(d => ((d.costoTotal - costosData.promedioIdeal) / costosData.promedioIdeal) * 100);
+    
+    chartInstances.chartDesviacionPromedio = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Desviación (%)',
+                data: desviaciones,
+                borderColor: '#8b5cf6',
+                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: '#8b5cf6',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }, {
+                label: 'Límite Superior (+10%)',
+                data: Array(7).fill(10),
+                type: 'line',
+                borderColor: '#ef4444',
+                borderWidth: 1,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0
+            }, {
+                label: 'Límite Inferior (-10%)',
+                data: Array(7).fill(-10),
+                type: 'line',
+                borderColor: '#ef4444',
+                borderWidth: 1,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            if (context.datasetIndex === 0) {
+                                return `Desviación: ${context.parsed.y >= 0 ? '+' : ''}${context.parsed.y.toFixed(1)}%`;
+                            }
+                            return context.dataset.label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: (value) => value + '%'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico 3: Costos por Receta
+function crearGraficoCostosReceta() {
+    const ctx = document.getElementById('chartCostosReceta');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chartCostosReceta) {
+        chartInstances.chartCostosReceta.destroy();
+    }
+    
+    // Agrupar costos por receta (últimos 7 días)
+    const costosPorReceta = {};
+    costosData.costosDiarios.slice(-7).forEach(dia => {
+        dia.detalle.forEach(costo => {
+            if (!costosPorReceta[costo.receta]) {
+                costosPorReceta[costo.receta] = { total: 0, cantidad: 0, ideal: costo.costoIdeal };
+            }
+            costosPorReceta[costo.receta].total += costo.costoTotal;
+            costosPorReceta[costo.receta].cantidad += costo.cantidad;
+        });
+    });
+    
+    const recetas = Object.keys(costosPorReceta);
+    const costosPromedio = recetas.map(r => costosPorReceta[r].total / 7);
+    const costosIdeales = recetas.map(r => costosPorReceta[r].ideal * (costosPorReceta[r].cantidad / 7));
+    
+    chartInstances.chartCostosReceta = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: recetas,
+            datasets: [{
+                label: 'Costo Real Promedio',
+                data: costosPromedio,
+                backgroundColor: '#3b82f6',
+                borderColor: '#2563eb',
+                borderWidth: 2
+            }, {
+                label: 'Costo Ideal',
+                data: costosIdeales,
+                backgroundColor: '#22c55e',
+                borderColor: '#16a34a',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            return `${context.dataset.label}: $${context.parsed.x.toFixed(2)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: (value) => '$' + value.toFixed(0)
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico 4: Tendencia de Costos (7 días)
+function crearGraficoTendenciaCostos() {
+    const ctx = document.getElementById('chartTendenciaCostos');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chartTendenciaCostos) {
+        chartInstances.chartTendenciaCostos.destroy();
+    }
+    
+    const ultimos7Dias = costosData.costosDiarios.slice(-7);
+    const labels = ultimos7Dias.map(d => d.fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }));
+    const costos = ultimos7Dias.map(d => d.costoTotal);
+    
+    // Calcular media móvil
+    const mediaMovil = [];
+    for (let i = 0; i < costos.length; i++) {
+        const inicio = Math.max(0, i - 2);
+        const fin = i + 1;
+        const promedio = costos.slice(inicio, fin).reduce((a, b) => a + b, 0) / (fin - inicio);
+        mediaMovil.push(promedio);
+    }
+    
+    chartInstances.chartTendenciaCostos = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Costo Total',
+                data: costos,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }, {
+                label: 'Media Móvil (3 días)',
+                data: mediaMovil,
+                borderColor: '#f59e0b',
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            return `${context.dataset.label}: $${context.parsed.y.toFixed(2)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: (value) => '$' + value.toFixed(0)
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Actualizar costos
+function actualizarCostos() {
+    calcularCostosDesdeFacturas();
+    generarDatosMockCostos();
+    actualizarKPIsCostos();
+    cargarTablaCostos();
+    cargarCostosPorCategoria();
+    crearGraficosCostos();
+    ToastNotification.show('Costos actualizados correctamente', 'success', 2000);
+}
+
+// Filtrar costos
+function filtrarCostos() {
+    cargarTablaCostos();
+}
+
+// Exponer funciones globalmente
+if (typeof window !== 'undefined') {
+    window.inicializarModuloCostos = inicializarModuloCostos;
+    window.actualizarCostos = actualizarCostos;
+    window.filtrarCostos = filtrarCostos;
 }

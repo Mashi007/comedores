@@ -2134,3 +2134,234 @@ body.sidebar-open .page-container {
         max-height: 95vh;
     }
 }
+
+/* ============================================
+   MÓDULO DE COSTOS VARIABLES DE PRODUCCIÓN
+   ============================================ */
+
+/* KPIs de Costos */
+.costos-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.costos-kpis .kpi-card {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.costos-kpis .kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.costos-kpis .kpi-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.costo-total .kpi-icon {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.costo-promedio .kpi-icon {
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.costo-desviacion .kpi-icon {
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.costo-eficiencia .kpi-icon {
+    background: rgba(34, 197, 94, 0.1);
+}
+
+/* Gráficos de Costos */
+.costos-charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Tabla de Costos */
+.costos-table-container {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.costos-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.costos-table th {
+    background: var(--bg-color);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.costos-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.costos-table tbody tr:hover {
+    background: var(--bg-color);
+}
+
+/* Estados de Costos */
+.estado-alto {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.estado-bajo {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+}
+
+.estado-normal {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+/* Badges de Desviación */
+.desviacion-alta {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.desviacion-media {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.desviacion-baja {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+}
+
+/* Costos por Categoría */
+.costos-categorias {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.costos-categorias h2 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.categorias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.categoria-card {
+    background: var(--bg-color);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.categoria-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.categoria-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.categoria-header h3 {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.categoria-costo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.categoria-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.categoria-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.categoria-porcentaje {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Responsive para Costos */
+@media (max-width: 768px) {
+    .costos-kpis {
+        grid-template-columns: 1fr;
+    }
+    
+    .costos-charts {
+        grid-template-columns: 1fr;
+    }
+    
+    .categorias-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .costos-table {
+        font-size: 0.8rem;
+    }
+    
+    .costos-table th,
+    .costos-table td {
+        padding: 0.5rem;
+    }
+}

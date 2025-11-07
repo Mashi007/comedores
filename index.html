@@ -105,6 +105,11 @@
                 <span class="nav-text">Chat AI</span>
                 <span class="nav-new">Nuevo</span>
             </a>
+            <a href="#" class="nav-item" onclick="navegar('costos'); return false;" data-section="costos">
+                <span class="nav-icon">💰</span>
+                <span class="nav-text">Costos Variables</span>
+                <span class="nav-new">Nuevo</span>
+            </a>
             <a href="#" class="nav-item" onclick="navegar('configuracion'); return false;" data-section="configuracion">
                 <span class="nav-icon">⚙️</span>
                 <span class="nav-text">Configuración</span>
@@ -862,6 +867,114 @@
                             <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Costos Variables de Producción -->
+    <div id="costos" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <h1>💰 Costos Variables de Producción</h1>
+                <button class="btn-primary" onclick="actualizarCostos()">🔄 Actualizar Costos</button>
+            </div>
+
+            <!-- KPIs de Costos -->
+            <div class="costos-kpis">
+                <div class="kpi-card costo-total">
+                    <div class="kpi-icon">💰</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiCostoTotal">$0.00</h3>
+                        <p>Costo Total del Día</p>
+                        <span class="kpi-trend" id="kpiCostoTotalTrend">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card costo-promedio">
+                    <div class="kpi-icon">📊</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiPromedioIdeal">$0.00</h3>
+                        <p>Promedio Ideal</p>
+                        <span class="kpi-trend neutral">Referencia</span>
+                    </div>
+                </div>
+                <div class="kpi-card costo-desviacion">
+                    <div class="kpi-icon">📈</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiDesviacion">0.0%</h3>
+                        <p>Desviación</p>
+                        <span class="kpi-trend" id="kpiDesviacionTrend">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card costo-eficiencia">
+                    <div class="kpi-icon">⚡</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiEficiencia">0.0%</h3>
+                        <p>Eficiencia</p>
+                        <span class="kpi-trend" id="kpiEficienciaTrend">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos de Costos -->
+            <div class="costos-charts">
+                <div class="chart-card">
+                    <h3>📊 Costo Variable Total del Día</h3>
+                    <canvas id="chartCostoDiario" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>📈 Desviación del Promedio Ideal</h3>
+                    <canvas id="chartDesviacionPromedio" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>🎯 Costos por Receta</h3>
+                    <canvas id="chartCostosReceta" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>📉 Tendencia de Costos (7 días)</h3>
+                    <canvas id="chartTendenciaCostos" width="400" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Tabla de Costos Detallados -->
+            <div class="costos-table-container">
+                <div class="table-header">
+                    <h2>📋 Desglose de Costos por Receta/Menú</h2>
+                    <div class="table-filters">
+                        <select id="filtroFechaCostos" onchange="filtrarCostos()">
+                            <option value="hoy">Hoy</option>
+                            <option value="semana">Esta Semana</option>
+                            <option value="mes">Este Mes</option>
+                        </select>
+                        <input type="text" id="buscarReceta" placeholder="🔍 Buscar receta..." onkeyup="filtrarCostos()">
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="costos-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Receta/Menú</th>
+                                <th>Cantidad</th>
+                                <th>Costo Unitario</th>
+                                <th>Costo Total</th>
+                                <th>Desviación</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaCostosBody">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Resumen de Costos por Categoría -->
+            <div class="costos-categorias">
+                <h2>📊 Costos por Categoría de Producto</h2>
+                <div class="categorias-grid" id="categoriasGrid">
+                    <!-- Se llenará dinámicamente -->
                 </div>
             </div>
         </div>
