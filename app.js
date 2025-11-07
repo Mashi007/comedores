@@ -441,18 +441,27 @@ function inicializarValidaciones() {
 }
 
 window.toggleSidebar = function() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    const body = document.body;
-    
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('active');
-    body.classList.toggle('sidebar-open');
-    
-    // Actualizar estado de botones hamburguesa
-    document.querySelectorAll('.hamburger-btn').forEach(btn => {
-        btn.classList.toggle('active');
-    });
+    try {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const body = document.body;
+        
+        if (!sidebar) {
+            console.error('Sidebar no encontrado');
+            return;
+        }
+        
+        sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('active');
+        body.classList.toggle('sidebar-open');
+        
+        // Actualizar estado de botones hamburguesa
+        document.querySelectorAll('.hamburger-btn').forEach(btn => {
+            btn.classList.toggle('active');
+        });
+    } catch (error) {
+        console.error('Error en toggleSidebar:', error);
+    }
 };
 
 window.cerrarSesion = function() {
@@ -527,7 +536,17 @@ window.navegar = function(destino) {
     
     // Cargar productos en selects cuando sea necesario
     if (destino === 'inventario' || destino === 'planificacion') {
-        setTimeout(() => cargarProductosEnSelects(), 100);
+        setTimeout(() => {
+            if (typeof cargarProductosEnSelects === 'function') {
+                cargarProductosEnSelects();
+            }
+        }, 100);
+    }
+    } catch (error) {
+        console.error('Error en navegar:', error);
+        if (typeof ToastNotification !== 'undefined') {
+            ToastNotification.show('Error al navegar. Por favor, recarga la página.', 'error');
+        }
     }
 };
 
