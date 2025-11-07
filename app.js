@@ -102,6 +102,7 @@ window.marcarLeida = marcarLeida;
 window.marcarTodasLeidas = marcarTodasLeidas;
 window.gestionarNotificacion = gestionarNotificacion;
 window.enviarMensajeAI = enviarMensajeAI;
+window.MEMORIA_TEMPORAL = MEMORIA_TEMPORAL; // Exponer para debugging
 window.mostrarSimuladorOCR = mostrarSimuladorOCR;
 window.cerrarSimuladorOCR = cerrarSimuladorOCR;
 window.procesarFacturaOCR = procesarFacturaOCR;
@@ -1681,6 +1682,14 @@ function enviarMensajeAI(mensajeTexto) {
     chatMessages.appendChild(userMessage);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     
+    // Guardar historial en memoria temporal
+    const historialActual = Array.from(chatMessages.querySelectorAll('.chat-message')).map(msg => ({
+        tipo: msg.classList.contains('user-message') ? 'user' : 'ai',
+        texto: msg.querySelector('.message-text')?.textContent || msg.querySelector('.message-text')?.innerHTML || '',
+        tiempo: msg.querySelector('.message-time')?.textContent || 'Ahora'
+    }));
+    guardarHistorialChat(historialActual);
+    
     // Simular procesamiento
     setTimeout(() => {
         const typingIndicator = document.createElement('div');
@@ -1998,6 +2007,11 @@ document.addEventListener('DOMContentLoaded', function() {
             expirados: infoMemoria.expirados
         });
     }
+    
+    // Programar limpieza automática cada hora
+    setInterval(() => {
+        MEMORIA_TEMPORAL.limpiarExpirados();
+    }, 60 * 60 * 1000); // Cada hora
     
     const btnIniciar = document.getElementById('btnIniciar');
     console.log('🔘 Botón encontrado:', !!btnIniciar);
