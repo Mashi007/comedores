@@ -771,6 +771,17 @@ let chartInstances = {};
 
 // Dashboard - Gráficos
 function inicializarGraficos() {
+    if (typeof Chart === 'undefined') {
+        setTimeout(inicializarGraficos, 100);
+        return;
+    }
+    
+    const dashboard = document.getElementById('dashboard');
+    if (!dashboard || !dashboard.classList.contains('active')) {
+        setTimeout(inicializarGraficos, 100);
+        return;
+    }
+    
     // Destruir gráficos existentes
     Object.keys(chartInstances).forEach(key => {
         if (chartInstances[key]) {
@@ -781,48 +792,13 @@ function inicializarGraficos() {
     });
     chartInstances = {};
     
-    // Esperar a que Chart.js esté cargado y el dashboard visible
-    const init = () => {
-        if (typeof Chart === 'undefined') {
-            setTimeout(init, 100);
-            return;
-        }
-        
-        const dashboard = document.getElementById('dashboard');
-        if (!dashboard || !dashboard.classList.contains('active')) {
-            setTimeout(init, 100);
-            return;
-        }
-        
-        // Forzar dimensiones de todos los canvas
-        for (let i = 1; i <= 6; i++) {
-            const canvas = document.getElementById('chart' + i);
-            if (canvas) {
-                canvas.style.width = '100%';
-                canvas.style.height = '250px';
-                if (canvas.offsetWidth === 0) {
-                    canvas.width = canvas.parentElement.offsetWidth || 400;
-                }
-                if (canvas.offsetHeight === 0) {
-                    canvas.height = 250;
-                }
-            }
-        }
-        
-        // Crear gráficos
-        try {
-            crearGrafico1();
-            crearGrafico2();
-            crearGrafico3();
-            crearGrafico4();
-            crearGrafico5();
-            crearGrafico6();
-        } catch (error) {
-            console.error('Error al crear gráficos:', error);
-        }
-    };
-    
-    setTimeout(init, 500);
+    // Crear gráficos directamente
+    crearGrafico1();
+    crearGrafico2();
+    crearGrafico3();
+    crearGrafico4();
+    crearGrafico5();
+    crearGrafico6();
 }
 
 function aplicarFiltros() {
