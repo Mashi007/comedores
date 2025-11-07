@@ -324,16 +324,26 @@ function inicializarBotonInicio() {
 
 function inicializarApp() {
     try {
+        console.log('=== INICIALIZANDO APLICACIÓN ===');
+        
         // Asegurar que solo la portada esté activa al inicio
         const todasLasPantallas = document.querySelectorAll('.screen');
-        todasLasPantallas.forEach(screen => {
+        console.log('Pantallas encontradas:', todasLasPantallas.length);
+        
+        todasLasPantallas.forEach((screen, index) => {
+            const wasActive = screen.classList.contains('active');
             screen.classList.remove('active');
+            if (wasActive) {
+                console.log(`Pantalla ${screen.id || index} tenía 'active', removida`);
+            }
         });
         
         const portada = document.getElementById('portada');
         if (portada) {
             portada.classList.add('active');
-            console.log('Portada activada al inicio');
+            console.log('✅ Portada activada al inicio');
+        } else {
+            console.error('❌ ERROR: No se encontró la pantalla portada');
         }
         
         // Asegurar que el sidebar esté oculto al inicio
@@ -341,6 +351,7 @@ function inicializarApp() {
         if (sidebar) {
             sidebar.style.display = 'none';
             sidebar.classList.remove('open');
+            console.log('Sidebar oculto');
         }
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         if (sidebarOverlay) {
@@ -350,9 +361,9 @@ function inicializarApp() {
         
         // Solo cargar funciones que no requieren estar en una pantalla específica
         // Los gráficos se cargarán cuando se navegue al dashboard
-        console.log('Aplicación inicializada correctamente');
+        console.log('✅ Aplicación inicializada correctamente');
     } catch (error) {
-        console.error('Error al inicializar app:', error);
+        console.error('❌ Error al inicializar app:', error);
     }
 }
 
