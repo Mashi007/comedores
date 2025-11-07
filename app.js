@@ -38,24 +38,43 @@ const mockData = {
     notificaciones: []
 };
 
+// Navegación - Disponible inmediatamente
+function mostrarLogin() {
+    try {
+        cambiarPantalla('portada', 'login');
+    } catch (error) {
+        console.error('Error al mostrar login:', error);
+        alert('Error al cargar la página de login. Por favor, recarga la página.');
+    }
+}
+
+function cambiarPantalla(ocultar, mostrar) {
+    const ocultarEl = document.getElementById(ocultar);
+    const mostrarEl = document.getElementById(mostrar);
+    if (ocultarEl && mostrarEl) {
+        ocultarEl.classList.remove('active');
+        mostrarEl.classList.add('active');
+    } else {
+        console.error('Elementos no encontrados:', { ocultar, mostrar });
+    }
+}
+
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
-    inicializarApp();
+    try {
+        inicializarApp();
+    } catch (error) {
+        console.error('Error en inicialización:', error);
+    }
 });
 
 function inicializarApp() {
-    cargarProductosEnSelects();
-    cargarCompras();
-    cargarInventario();
-    cargarProduccion();
-    cargarEncuestas();
-    cargarNotificaciones();
-    inicializarGraficos();
-}
-
-// Navegación
-function mostrarLogin() {
-    cambiarPantalla('portada', 'login');
+    try {
+        // Solo cargar funciones que no requieren estar en una pantalla específica
+        // Los gráficos se cargarán cuando se navegue al dashboard
+    } catch (error) {
+        console.error('Error al inicializar app:', error);
+    }
 }
 
 function validarLogin(event) {
@@ -78,10 +97,6 @@ function cerrarSesion() {
     document.getElementById('loginForm').reset();
 }
 
-function cambiarPantalla(ocultar, mostrar) {
-    document.getElementById(ocultar).classList.remove('active');
-    document.getElementById(mostrar).classList.add('active');
-}
 
 function navegar(destino) {
     cambiarPantalla('menu', destino);
@@ -107,20 +122,33 @@ function navegar(destino) {
 
 // Dashboard - Gráficos
 function inicializarGraficos() {
+    // Verificar que Chart.js esté disponible
+    if (typeof Chart === 'undefined') {
+        console.warn('Chart.js no está cargado aún');
+        setTimeout(inicializarGraficos, 200);
+        return;
+    }
+    
     setTimeout(() => {
-        crearGrafico1();
-        crearGrafico2();
-        crearGrafico3();
-        crearGrafico4();
-        crearGrafico5();
-        crearGrafico6();
+        try {
+            crearGrafico1();
+            crearGrafico2();
+            crearGrafico3();
+            crearGrafico4();
+            crearGrafico5();
+            crearGrafico6();
+        } catch (error) {
+            console.error('Error al crear gráficos:', error);
+        }
     }, 100);
 }
 
 function crearGrafico1() {
     const ctx = document.getElementById('chart1');
     if (!ctx) return;
-    new Chart(ctx, {
+    if (typeof Chart === 'undefined') return;
+    try {
+        new Chart(ctx, {
         type: 'line',
         data: {
             labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
