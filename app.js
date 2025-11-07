@@ -215,10 +215,46 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
         inicializarApp();
         inicializarValidaciones();
+        inicializarBotonInicio();
     } catch (error) {
         console.error('Error en inicialización:', error);
     }
 });
+
+function inicializarBotonInicio() {
+    const btnInicio = document.getElementById('btnIniciarSesion');
+    if (btnInicio) {
+        // Agregar múltiples event listeners para asegurar que funcione
+        btnInicio.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Botón de inicio clickeado');
+            if (typeof mostrarLogin === 'function') {
+                mostrarLogin();
+            } else {
+                console.error('mostrarLogin no está definido');
+                cambiarPantalla('portada', 'login');
+            }
+            return false;
+        });
+        
+        btnInicio.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Botón de inicio tocado (touch)');
+            if (typeof mostrarLogin === 'function') {
+                mostrarLogin();
+            } else {
+                cambiarPantalla('portada', 'login');
+            }
+            return false;
+        });
+        
+        console.log('Botón de inicio inicializado correctamente');
+    } else {
+        console.error('Botón de inicio no encontrado');
+    }
+}
 
 function inicializarApp() {
     try {
