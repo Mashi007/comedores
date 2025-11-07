@@ -3327,6 +3327,7 @@ body.sidebar-open .page-container {
     border-radius: 0.75rem;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    min-width: 1200px;
 }
 
 .calidad-productos-table thead {
@@ -3341,16 +3342,62 @@ body.sidebar-open .page-container {
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 .calidad-productos-table td {
     padding: 0.75rem;
     border-bottom: 1px solid var(--border-color);
     color: var(--text-primary);
+    vertical-align: middle;
 }
 
 .calidad-productos-table tbody tr:hover {
     background: rgba(37, 99, 235, 0.05);
+}
+
+.estado-producto-select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 120px;
+    width: 100%;
+}
+
+.estado-producto-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.estado-producto-select option[value="aprobado"] {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.estado-producto-select option[value="rechazado"] {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.estado-producto-select option[value="pendiente"] {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.modal-exec-content {
+    max-width: 95vw !important;
+    width: 1400px !important;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    max-width: 100%;
 }
 
 .cantidad-recibida-input,
