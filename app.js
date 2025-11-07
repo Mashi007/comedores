@@ -204,6 +204,37 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        // Listener global para detectar clicks en botones
+        console.log('🔍 [INIT] Agregando listener global para clicks');
+        document.addEventListener('click', function(e) {
+            const target = e.target;
+            const button = target.closest('button') || target.closest('.menu-card') || target.closest('.nav-item');
+            
+            if (button) {
+                const onclick = button.getAttribute('onclick');
+                const buttonText = button.textContent?.trim() || button.innerText?.trim() || 'Sin texto';
+                const buttonId = button.id || 'Sin ID';
+                const buttonClass = button.className || 'Sin clase';
+                
+                console.log('🖱️ [CLICK] Botón clickeado:', {
+                    id: buttonId,
+                    clase: buttonClass,
+                    texto: buttonText.substring(0, 50),
+                    onclick: onclick ? onclick.substring(0, 100) : 'Sin onclick',
+                    elemento: button.tagName
+                });
+                
+                // Verificar si tiene onclick pero no se ejecutó
+                if (onclick && onclick.includes('navegar')) {
+                    console.log('🖱️ [CLICK] Botón tiene navegar(), verificando...');
+                    const match = onclick.match(/navegar\(['"]([^'"]+)['"]\)/);
+                    if (match) {
+                        console.log('🖱️ [CLICK] Destino detectado:', match[1]);
+                    }
+                }
+            }
+        }, true); // Capture phase para detectar antes que otros listeners
+        
     } catch (error) {
         console.error('❌ [ERROR] Error en inicialización:', error);
         console.error('❌ [ERROR] Stack trace:', error.stack);
