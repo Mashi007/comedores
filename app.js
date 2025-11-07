@@ -94,8 +94,12 @@ function cambiarPantalla(ocultar, mostrar) {
         // Inicializar módulo de Compras si es compras
         if (mostrar === 'compras') {
             setTimeout(() => {
-                inicializarModuloCompras();
-                verificarListaComprasPendiente();
+                if (typeof inicializarModuloCompras === 'function') {
+                    inicializarModuloCompras();
+                }
+                if (typeof verificarListaComprasPendiente === 'function') {
+                    verificarListaComprasPendiente();
+                }
             }, 300);
         }
         
@@ -137,7 +141,9 @@ function cambiarPantalla(ocultar, mostrar) {
         // Inicializar módulo de Producción si es produccion
         if (mostrar === 'produccion') {
             setTimeout(() => {
-                inicializarModuloProduccion();
+                if (typeof inicializarModuloProduccion === 'function') {
+                    inicializarModuloProduccion();
+                }
             }, 300);
         }
         
