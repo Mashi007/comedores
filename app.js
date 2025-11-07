@@ -94,68 +94,7 @@ const mockData = {
 };
 
 // Navegación - Disponible inmediatamente (scope global)
-window.mostrarLogin = function() {
-    try {
-        console.log('mostrarLogin llamado');
-        // Asegurar que el sidebar esté completamente oculto en login
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar) {
-            sidebar.style.display = 'none';
-            sidebar.classList.remove('open');
-        }
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        if (sidebarOverlay) {
-            sidebarOverlay.classList.remove('active');
-        }
-        document.body.classList.remove('sidebar-open');
-        cambiarPantalla('portada', 'login');
-    } catch (error) {
-        console.error('Error al mostrar login:', error);
-        alert('Error al cargar la página de login. Por favor, recarga la página.');
-    }
-};
-
-window.validarLogin = function(event) {
-    event.preventDefault();
-    const form = event.target;
-    const button = form.querySelector('button[type="submit"]');
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    
-    // Validación
-    if (!FormValidator.validateForm(form)) {
-        ToastNotification.show('Por favor, completa todos los campos requeridos', 'error');
-        return false;
-    }
-    
-    // Simular carga
-    LoadingState.setLoading(button, 'Verificando...');
-    
-    // Simular delay de autenticación
-    setTimeout(() => {
-        if (email === mockData.usuario.email && password === mockData.usuario.password) {
-            const nombre = mockData.usuario.nombre;
-            document.getElementById('userName').textContent = nombre;
-            document.getElementById('sidebarUserName').textContent = nombre;
-            document.getElementById('userInitial').textContent = nombre.charAt(0).toUpperCase();
-            
-            ToastNotification.show('¡Bienvenido! Sesión iniciada correctamente', 'success');
-            LoadingState.removeLoading(button);
-            setTimeout(() => {
-                cambiarPantalla('login', 'menu');
-                // Abrir sidebar automáticamente en desktop
-                if (window.innerWidth > 768) {
-                    setTimeout(() => toggleSidebar(), 300);
-                }
-            }, 500);
-        } else {
-            ToastNotification.show('Credenciales incorrectas. Use: admin@comedor.com / demo-credential-2024', 'error');
-            LoadingState.removeLoading(button);
-        }
-    }, 800);
-    
-    return false;
-};
+// Login eliminado - ahora va directo al sistema desde portada
 
 window.cambiarPantalla = function(ocultar, mostrar) {
     try {
@@ -354,11 +293,7 @@ function inicializarBotonInicio() {
             e.preventDefault();
             e.stopPropagation();
         }
-        manejarClick(e);
-        if (typeof window.mostrarLogin === 'function') {
-            window.mostrarLogin();
-        }
-        return false;
+        return manejarClick(e);
     };
     
     // 4. Mousedown (se ejecuta antes que click)
@@ -366,9 +301,6 @@ function inicializarBotonInicio() {
         console.log('MOUSEDOWN detectado');
         e.preventDefault();
         manejarClick(e);
-        if (typeof window.mostrarLogin === 'function') {
-            window.mostrarLogin();
-        }
     }, true);
     
     // 5. Touchstart para móviles
@@ -377,9 +309,6 @@ function inicializarBotonInicio() {
         e.preventDefault();
         e.stopPropagation();
         manejarClick(e);
-        if (typeof window.mostrarLogin === 'function') {
-            window.mostrarLogin();
-        }
         return false;
     }, { passive: false, capture: true });
     
@@ -541,12 +470,6 @@ window.cerrarSesion = function() {
         sidebarOverlay.classList.remove('active');
     }
     document.body.classList.remove('sidebar-open');
-    
-    // Resetear formulario de login
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        loginForm.reset();
-    }
     
     // Volver a la portada
     cambiarPantalla('menu', 'portada');
