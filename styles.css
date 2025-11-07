@@ -173,8 +173,12 @@ body.sidebar-open {
     align-items: center;
     gap: 1rem;
     position: relative;
-    z-index: 20;
-    pointer-events: auto;
+    z-index: 999 !important;
+    pointer-events: auto !important;
+}
+
+.cta-section * {
+    pointer-events: auto !important;
 }
 
 @keyframes fadeInUp {
