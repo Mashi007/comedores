@@ -912,66 +912,71 @@ function crearGrafico8() {
     const ctx = document.getElementById('chart8');
     if (!ctx || typeof Chart === 'undefined') return;
     
+    // Datos de productos distribuidos en los 4 cuadrantes
     const productos = [
-        { name: 'Arroz', stock: 450, reorder: 150, usage: 85, category: 'Granos', color: '#3b82f6' },
-        { name: 'Frijoles', stock: 80, reorder: 50, usage: 45, category: 'Granos', color: '#8b5cf6' },
-        { name: 'Pollo', stock: 280, reorder: 100, usage: 120, category: 'Carnes', color: '#ef4444' },
-        { name: 'Carne Res', stock: 180, reorder: 80, usage: 95, category: 'Carnes', color: '#f59e0b' },
-        { name: 'Tomates', stock: 120, reorder: 60, usage: 35, category: 'Vegetales', color: '#10b981' },
-        { name: 'Lechuga', stock: 45, reorder: 30, usage: 25, category: 'Vegetales', color: '#06b6d4' },
-        { name: 'Aceite', stock: 200, reorder: 80, usage: 40, category: 'Condimentos', color: '#f97316' },
-        { name: 'Sal', stock: 350, reorder: 100, usage: 15, category: 'Condimentos', color: '#64748b' },
-        { name: 'Pasta', stock: 220, reorder: 90, usage: 65, category: 'Granos', color: '#ec4899' },
-        { name: 'Cebolla', stock: 95, reorder: 50, usage: 55, category: 'Vegetales', color: '#84cc16' }
+        // Cuadrante 1: Stock menor al inventario de seguridad (Stock < Reorden)
+        { name: 'Frijoles', stock: 35, reorder: 50, usage: 45, category: 'Granos', cuadrante: 1 },
+        { name: 'Lechuga', stock: 20, reorder: 30, usage: 25, category: 'Vegetales', cuadrante: 1 },
+        { name: 'Cebolla', stock: 40, reorder: 50, usage: 55, category: 'Vegetales', cuadrante: 1 },
+        
+        // Cuadrante 2: Dentro de inventario de seguridad (Reorden <= Stock < Reorden*2)
+        { name: 'Tomates', stock: 80, reorder: 60, usage: 35, category: 'Vegetales', cuadrante: 2 },
+        { name: 'Aceite', stock: 120, reorder: 80, usage: 40, category: 'Condimentos', cuadrante: 2 },
+        { name: 'Carne Res', stock: 140, reorder: 80, usage: 95, category: 'Carnes', cuadrante: 2 },
+        
+        // Cuadrante 3: Inventario según menús planificados (Reorden*2 <= Stock < Reorden*3)
+        { name: 'Pollo', stock: 250, reorder: 100, usage: 120, category: 'Carnes', cuadrante: 3 },
+        { name: 'Pasta', stock: 220, reorder: 90, usage: 65, category: 'Granos', cuadrante: 3 },
+        { name: 'Arroz', stock: 320, reorder: 150, usage: 85, category: 'Granos', cuadrante: 3 },
+        
+        // Cuadrante 4: Sobre stock (Stock >= Reorden*3)
+        { name: 'Sal', stock: 350, reorder: 100, usage: 15, category: 'Condimentos', cuadrante: 4 },
+        { name: 'Azúcar', stock: 400, reorder: 120, usage: 20, category: 'Condimentos', cuadrante: 4 }
     ];
     
-    const data = productos.map(p => ({
-        x: p.stock,
-        y: p.reorder,
-        r: Math.max(p.usage * 1.2, 15) // Radio basado en uso, mínimo 15 para visibilidad
-    }));
+    // Calcular valores máximos para los ejes
+    const maxStock = Math.max(...productos.map(p => p.stock)) * 1.2;
+    const maxReorder = Math.max(...productos.map(p => p.reorder)) * 1.2;
+    
+    // Función para determinar el cuadrante
+    function getCuadrante(stock, reorder) {
+        if (stock < reorder) return 1; // Stock menor al inventario de seguridad
+        if (stock < reorder * 2) return 2; // Dentro de inventario de seguridad
+        if (stock < reorder * 3) return 3; // Inventario según menús planificados
+        return 4; // Sobre stock
+    }
+    
+    // Función para obtener color según cuadrante
+    function getColorByCuadrante(cuadrante, opacity = '80') {
+        const colors = {
+            1: '#ef4444', // Rojo - Crítico
+            2: '#f59e0b', // Naranja - Atención
+            3: '#10b981', // Verde - Óptimo
+            4: '#3b82f6'  // Azul - Sobre stock
+        };
+        return colors[cuadrante] + opacity;
+    }
     
     chartInstances.chart8 = new Chart(ctx, {
         type: 'bubble',
         data: {
-            datasets: productos.map((p, index) => ({
-                label: p.name,
-                data: [{
-                    x: p.stock,
-                    y: p.reorder,
-                    r: Math.max(p.usage * 1.2, 15)
-                }],
-                backgroundColor: function(context) {
-                    const stock = p.stock;
-                    const reorder = p.reorder;
-                    if (stock <= reorder * 1.2) return 'rgba(239, 68, 68, 0.6)'; // Rojo si crítico
-                    if (stock <= reorder * 2) return 'rgba(245, 158, 11, 0.6)'; // Naranja si bajo
-                    return p.color + '80'; // Color del producto con transparencia
-                },
-                borderColor: function(context) {
-                    const stock = p.stock;
-                    const reorder = p.reorder;
-                    if (stock <= reorder * 1.2) return '#dc2626';
-                    if (stock <= reorder * 2) return '#d97706';
-                    return p.color;
-                },
-                borderWidth: 2,
-                hoverBackgroundColor: function(context) {
-                    const stock = p.stock;
-                    const reorder = p.reorder;
-                    if (stock <= reorder * 1.2) return 'rgba(239, 68, 68, 0.9)';
-                    if (stock <= reorder * 2) return 'rgba(245, 158, 11, 0.9)';
-                    return p.color + 'CC';
-                },
-                hoverBorderColor: function(context) {
-                    const stock = p.stock;
-                    const reorder = p.reorder;
-                    if (stock <= reorder * 1.2) return '#b91c1c';
-                    if (stock <= reorder * 2) return '#b45309';
-                    return p.color;
-                },
-                hoverBorderWidth: 3
-            }))
+            datasets: productos.map((p) => {
+                const cuadrante = getCuadrante(p.stock, p.reorder);
+                return {
+                    label: p.name,
+                    data: [{
+                        x: p.stock,
+                        y: p.reorder,
+                        r: Math.max(p.usage * 1.2, 15)
+                    }],
+                    backgroundColor: getColorByCuadrante(cuadrante, '80'),
+                    borderColor: getColorByCuadrante(cuadrante, 'FF'),
+                    borderWidth: 2,
+                    hoverBackgroundColor: getColorByCuadrante(cuadrante, 'CC'),
+                    hoverBorderColor: getColorByCuadrante(cuadrante, 'FF'),
+                    hoverBorderWidth: 3
+                };
+            })
         },
         options: {
             responsive: true,
@@ -1012,26 +1017,49 @@ function crearGrafico8() {
                             const p = productos[datasetIndex];
                             const stock = p.stock;
                             const reorder = p.reorder;
-                            const porcentaje = ((stock / reorder) * 100).toFixed(1);
-                            
-                            let estado = '';
-                            if (stock <= reorder * 1.2) {
-                                estado = '🔴 Crítico';
-                            } else if (stock <= reorder * 2) {
-                                estado = '🟡 Atención';
-                            } else {
-                                estado = '🟢 Óptimo';
-                            }
+                            const cuadrante = getCuadrante(stock, reorder);
+                            const cuadranteNames = {
+                                1: '🔴 Stock menor al inventario de seguridad',
+                                2: '🟡 Dentro de inventario de seguridad',
+                                3: '🟢 Inventario según menús planificados',
+                                4: '🔵 Sobre stock'
+                            };
                             
                             return [
                                 `📦 Stock actual: ${stock} kg`,
                                 `📋 Punto de reorden: ${reorder} kg`,
-                                `📊 Stock vs Reorden: ${porcentaje}%`,
+                                `📊 Stock vs Reorden: ${((stock / reorder) * 100).toFixed(1)}%`,
                                 `📈 Uso semanal: ${p.usage} kg`,
                                 `🏷️ Categoría: ${p.category}`,
-                                `🎯 Estado: ${estado}`,
-                                stock <= reorder * 1.2 ? '⚠️ COMPRA URGENTE REQUERIDA' : ''
+                                `📍 Cuadrante: ${cuadranteNames[cuadrante]}`,
+                                cuadrante === 1 ? '⚠️ COMPRA URGENTE REQUERIDA' : ''
                             ].filter(Boolean);
+                        }
+                    }
+                },
+                annotation: {
+                    annotations: {
+                        // Línea vertical para dividir cuadrantes (en reorden*2)
+                        line1: {
+                            type: 'line',
+                            xMin: maxStock / 2,
+                            xMax: maxStock / 2,
+                            yMin: 0,
+                            yMax: maxReorder,
+                            borderColor: 'rgba(100, 100, 100, 0.3)',
+                            borderWidth: 2,
+                            borderDash: [5, 5]
+                        },
+                        // Línea horizontal para dividir cuadrantes
+                        line2: {
+                            type: 'line',
+                            xMin: 0,
+                            xMax: maxStock,
+                            yMin: maxReorder / 2,
+                            yMax: maxReorder / 2,
+                            borderColor: 'rgba(100, 100, 100, 0.3)',
+                            borderWidth: 2,
+                            borderDash: [5, 5]
                         }
                     }
                 }
@@ -1047,10 +1075,12 @@ function crearGrafico8() {
                         },
                         color: '#64748b'
                     },
-                    beginAtZero: true,
+                    min: 0,
+                    max: maxStock,
                     grid: {
                         color: 'rgba(0, 0, 0, 0.05)',
-                        drawBorder: false
+                        drawBorder: true,
+                        borderColor: '#e2e8f0'
                     },
                     ticks: {
                         font: {
@@ -1071,10 +1101,12 @@ function crearGrafico8() {
                         },
                         color: '#64748b'
                     },
-                    beginAtZero: true,
+                    min: 0,
+                    max: maxReorder,
                     grid: {
                         color: 'rgba(0, 0, 0, 0.05)',
-                        drawBorder: false
+                        drawBorder: true,
+                        borderColor: '#e2e8f0'
                     },
                     ticks: {
                         font: {
@@ -1089,8 +1121,109 @@ function crearGrafico8() {
             animation: {
                 duration: 2000,
                 easing: 'easeInOutQuart'
+            },
+            onResize: function(chart, size) {
+                // Agregar etiquetas de cuadrantes después de que el gráfico se renderice
+                setTimeout(() => {
+                    agregarEtiquetasCuadrantes(chart, maxStock, maxReorder);
+                }, 100);
+            },
+            plugins: {
+                ...chartInstances.chart8?.options?.plugins,
+                tooltip: {
+                    ...chartInstances.chart8?.options?.plugins?.tooltip
+                }
             }
         }
+    });
+    
+    // Agregar etiquetas de cuadrantes después de la inicialización
+    setTimeout(() => {
+        agregarEtiquetasCuadrantes(chartInstances.chart8, maxStock, maxReorder);
+    }, 500);
+}
+
+function agregarEtiquetasCuadrantes(chart, maxStock, maxReorder) {
+    if (!chart || !chart.canvas) return;
+    
+    const canvas = chart.canvas;
+    const ctx = canvas.getContext('2d');
+    const chartArea = chart.chartArea;
+    
+    // Limpiar etiquetas anteriores
+    const existingLabels = canvas.parentElement.querySelectorAll('.cuadrante-label');
+    existingLabels.forEach(label => label.remove());
+    
+    // Crear contenedor para etiquetas si no existe
+    let labelContainer = canvas.parentElement.querySelector('.cuadrante-labels-container');
+    if (!labelContainer) {
+        labelContainer = document.createElement('div');
+        labelContainer.className = 'cuadrante-labels-container';
+        labelContainer.style.position = 'absolute';
+        labelContainer.style.top = '0';
+        labelContainer.style.left = '0';
+        labelContainer.style.width = '100%';
+        labelContainer.style.height = '100%';
+        labelContainer.style.pointerEvents = 'none';
+        canvas.parentElement.style.position = 'relative';
+        canvas.parentElement.appendChild(labelContainer);
+    }
+    
+    const labels = [
+        {
+            text: '1. Stock menor al inventario de seguridad',
+            x: maxStock * 0.25,
+            y: maxReorder * 0.25,
+            color: '#ef4444',
+            bg: 'rgba(239, 68, 68, 0.1)'
+        },
+        {
+            text: '2. Dentro de inventario de seguridad',
+            x: maxStock * 0.75,
+            y: maxReorder * 0.25,
+            color: '#f59e0b',
+            bg: 'rgba(245, 158, 11, 0.1)'
+        },
+        {
+            text: '3. Inventario según menús planificados',
+            x: maxStock * 0.25,
+            y: maxReorder * 0.75,
+            color: '#10b981',
+            bg: 'rgba(16, 185, 129, 0.1)'
+        },
+        {
+            text: '4. Sobre stock',
+            x: maxStock * 0.75,
+            y: maxReorder * 0.75,
+            color: '#3b82f6',
+            bg: 'rgba(59, 130, 246, 0.1)'
+        }
+    ];
+    
+    labels.forEach(label => {
+        const labelEl = document.createElement('div');
+        labelEl.className = 'cuadrante-label';
+        labelEl.textContent = label.text;
+        labelEl.style.position = 'absolute';
+        labelEl.style.padding = '0.5rem 1rem';
+        labelEl.style.borderRadius = '6px';
+        labelEl.style.fontSize = '0.85rem';
+        labelEl.style.fontWeight = '600';
+        labelEl.style.color = label.color;
+        labelEl.style.background = label.bg;
+        labelEl.style.border = `2px solid ${label.color}40`;
+        labelEl.style.pointerEvents = 'none';
+        labelEl.style.zIndex = '10';
+        
+        // Calcular posición basada en el área del gráfico
+        const xPercent = (label.x / maxStock) * 100;
+        const yPercent = (label.y / maxReorder) * 100;
+        
+        labelEl.style.left = xPercent + '%';
+        labelEl.style.top = yPercent + '%';
+        labelEl.style.transform = 'translate(-50%, -50%)';
+        
+        labelContainer.appendChild(labelEl);
     });
 }
 
