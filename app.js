@@ -547,6 +547,13 @@ window.cerrarSesion = function() {
     // Volver a la portada
     cambiarPantalla('menu', 'portada');
     
+    // RE-INICIALIZAR el botón de inicio cuando se cierra sesión
+    // (cambiarPantalla ya lo hace, pero lo hacemos aquí también por seguridad)
+    setTimeout(function() {
+        console.log('Re-inicializando botón de inicio después de cerrar sesión...');
+        inicializarBotonInicio();
+    }, 200);
+    
     ToastNotification.show('Sesión cerrada correctamente', 'info');
 };
 
