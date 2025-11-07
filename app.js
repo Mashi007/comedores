@@ -1332,6 +1332,9 @@ function guardarFactura(event) {
         actualizarKardex(prod.producto, prod.cantidad, fechaFactura);
     });
     
+    // Guardar en memoria temporal
+    guardarComprasEnMemoria();
+    
     ToastNotification.show('Factura guardada correctamente', 'success', 2000);
     cerrarFormularioDigitalizacion();
     
@@ -1744,13 +1747,257 @@ function enviarMensajeAI(mensajeTexto) {
             `;
             chatMessages.appendChild(aiMessage);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Guardar historial actualizado en memoria temporal
+            const historial = Array.from(chatMessages.querySelectorAll('.chat-message')).map(msg => ({
+                tipo: msg.classList.contains('user-message') ? 'user' : 'ai',
+                texto: msg.querySelector('.message-text')?.textContent || '',
+                tiempo: msg.querySelector('.message-time')?.textContent || ''
+            }));
+            guardarHistorialChat(historial);
         }, respuesta.tiempo || 2000);
     }, 500);
+}
+
+// ============================================
+// SISTEMA DE MEMORIA TEMPORAL (15 DÍAS)
+// ============================================
+const MEMORIA_TEMPORAL = {
+    PREFIX: 'comedores_demo_',
+    DURACION_DIAS: 15,
+    
+    // Guardar dato con timestamp
+    guardar: function(clave, dato) {
+        try {
+            const item = {
+                dato: dato,
+                timestamp: Date.now(),
+                expira: Date.now() + (this.DURACION_DIAS * 24 * 60 * 60 * 1000)
+            };
+            localStorage.setItem(this.PREFIX + clave, JSON.stringify(item));
+            console.log(`💾 Dato guardado: ${clave} (expira en ${this.DURACION_DIAS} días)`);
+            return true;
+        } catch (error) {
+            console.error('❌ Error al guardar en memoria temporal:', error);
+            return false;
+        }
+    },
+    
+    // Recuperar dato si no ha expirado
+    recuperar: function(clave) {
+        try {
+            const itemStr = localStorage.getItem(this.PREFIX + clave);
+            if (!itemStr) return null;
+            
+            const item = JSON.parse(itemStr);
+            
+            // Verificar si ha expirado
+            if (Date.now() > item.expira) {
+                console.log(`⏰ Dato expirado: ${clave}, eliminando...`);
+                this.eliminar(clave);
+                return null;
+            }
+            
+            const diasRestantes = Math.ceil((item.expira - Date.now()) / (24 * 60 * 60 * 1000));
+            console.log(`📦 Dato recuperado: ${clave} (${diasRestantes} días restantes)`);
+            return item.dato;
+        } catch (error) {
+            console.error('❌ Error al recuperar de memoria temporal:', error);
+            return null;
+        }
+    },
+    
+    // Eliminar dato específico
+    eliminar: function(clave) {
+        try {
+            localStorage.removeItem(this.PREFIX + clave);
+            console.log(`🗑️ Dato eliminado: ${clave}`);
+            return true;
+        } catch (error) {
+            console.error('❌ Error al eliminar de memoria temporal:', error);
+            return false;
+        }
+    },
+    
+    // Limpiar todos los datos expirados
+    limpiarExpirados: function() {
+        try {
+            let eliminados = 0;
+            const ahora = Date.now();
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const clave = localStorage.key(i);
+                if (clave && clave.startsWith(this.PREFIX)) {
+                    try {
+                        const item = JSON.parse(localStorage.getItem(clave));
+                        if (ahora > item.expira) {
+                            localStorage.removeItem(clave);
+                            eliminados++;
+                        }
+                    } catch (e) {
+                        // Si hay error al parsear, eliminar el item corrupto
+                        localStorage.removeItem(clave);
+                        eliminados++;
+                    }
+                }
+            }
+            
+            if (eliminados > 0) {
+                console.log(`🧹 Limpieza completada: ${eliminados} datos expirados eliminados`);
+            }
+            return eliminados;
+        } catch (error) {
+            console.error('❌ Error en limpieza de memoria temporal:', error);
+            return 0;
+        }
+    },
+    
+    // Limpiar todos los datos (sin importar expiración)
+    limpiarTodo: function() {
+        try {
+            let eliminados = 0;
+            const claves = [];
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const clave = localStorage.key(i);
+                if (clave && clave.startsWith(this.PREFIX)) {
+                    claves.push(clave);
+                }
+            }
+            
+            claves.forEach(clave => {
+                localStorage.removeItem(clave);
+                eliminados++;
+            });
+            
+            console.log(`🗑️ Todos los datos temporales eliminados: ${eliminados} items`);
+            return eliminados;
+        } catch (error) {
+            console.error('❌ Error al limpiar todo:', error);
+            return 0;
+        }
+    },
+    
+    // Obtener información de todos los datos almacenados
+    obtenerInfo: function() {
+        try {
+            const info = {
+                total: 0,
+                activos: 0,
+                expirados: 0,
+                items: []
+            };
+            
+            const ahora = Date.now();
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const clave = localStorage.key(i);
+                if (clave && clave.startsWith(this.PREFIX)) {
+                    info.total++;
+                    try {
+                        const item = JSON.parse(localStorage.getItem(clave));
+                        const diasRestantes = Math.ceil((item.expira - ahora) / (24 * 60 * 60 * 1000));
+                        
+                        if (ahora > item.expira) {
+                            info.expirados++;
+                        } else {
+                            info.activos++;
+                        }
+                        
+                        info.items.push({
+                            clave: clave.replace(this.PREFIX, ''),
+                            diasRestantes: diasRestantes > 0 ? diasRestantes : 0,
+                            expirado: ahora > item.expira,
+                            fechaCreacion: new Date(item.timestamp).toLocaleString('es-ES'),
+                            fechaExpiracion: new Date(item.expira).toLocaleString('es-ES')
+                        });
+                    } catch (e) {
+                        info.expirados++;
+                    }
+                }
+            }
+            
+            return info;
+        } catch (error) {
+            console.error('❌ Error al obtener info:', error);
+            return null;
+        }
+    }
+};
+
+// Integración con módulos existentes
+// Guardar datos de compras
+function guardarComprasEnMemoria() {
+    if (comprasData && comprasData.facturas) {
+        MEMORIA_TEMPORAL.guardar('compras_facturas', comprasData.facturas);
+    }
+    if (comprasData && comprasData.kardex) {
+        MEMORIA_TEMPORAL.guardar('compras_kardex', comprasData.kardex);
+    }
+}
+
+// Recuperar datos de compras
+function recuperarComprasDeMemoria() {
+    const facturas = MEMORIA_TEMPORAL.recuperar('compras_facturas');
+    const kardex = MEMORIA_TEMPORAL.recuperar('compras_kardex');
+    
+    if (facturas) {
+        comprasData.facturas = facturas;
+    }
+    if (kardex) {
+        comprasData.kardex = kardex;
+    }
+}
+
+// Guardar preferencias del usuario
+function guardarPreferencias(preferencias) {
+    MEMORIA_TEMPORAL.guardar('preferencias_usuario', preferencias);
+}
+
+// Recuperar preferencias del usuario
+function recuperarPreferencias() {
+    return MEMORIA_TEMPORAL.recuperar('preferencias_usuario') || {};
+}
+
+// Guardar historial de chat AI
+function guardarHistorialChat(mensajes) {
+    MEMORIA_TEMPORAL.guardar('chat_historial', mensajes);
+}
+
+// Recuperar historial de chat AI
+function recuperarHistorialChat() {
+    return MEMORIA_TEMPORAL.recuperar('chat_historial') || [];
+}
+
+// Guardar notificaciones
+function guardarNotificaciones(notificaciones) {
+    MEMORIA_TEMPORAL.guardar('notificaciones', notificaciones);
+}
+
+// Recuperar notificaciones
+function recuperarNotificaciones() {
+    return MEMORIA_TEMPORAL.recuperar('notificaciones') || [];
 }
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 DOM cargado, inicializando...');
+    
+    // Limpiar datos expirados al iniciar
+    MEMORIA_TEMPORAL.limpiarExpirados();
+    
+    // Recuperar datos guardados
+    recuperarComprasDeMemoria();
+    
+    // Mostrar info de memoria temporal en consola
+    const infoMemoria = MEMORIA_TEMPORAL.obtenerInfo();
+    if (infoMemoria && infoMemoria.total > 0) {
+        console.log('📊 Memoria Temporal:', {
+            total: infoMemoria.total,
+            activos: infoMemoria.activos,
+            expirados: infoMemoria.expirados
+        });
+    }
     
     const btnIniciar = document.getElementById('btnIniciar');
     console.log('🔘 Botón encontrado:', !!btnIniciar);
