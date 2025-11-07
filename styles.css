@@ -37,7 +37,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     overflow: hidden;
     min-height: 100vh;
     z-index: 100;
@@ -45,6 +49,7 @@ body {
 
 #portada:not(.active) {
     display: none !important;
+    visibility: hidden !important;
 }
 
 .portada-background {

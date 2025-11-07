@@ -11,21 +11,26 @@ function getPantallaActual() {
 function cambiarPantalla(ocultar, mostrar) {
     console.log('🔄 Cambiando pantalla de', ocultar, 'a', mostrar);
     
-    // Ocultar todas las pantallas primero
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
-    
-    // Mostrar la pantalla deseada
-    const mostrarEl = document.getElementById(mostrar);
-    if (!mostrarEl) {
-        console.error('❌ Pantalla no encontrada:', mostrar);
-        return;
-    }
-    
-    console.log('✅ Pantalla encontrada:', mostrar);
-    mostrarEl.classList.add('active');
-    console.log('✅ Clase active agregada');
+    try {
+        // Ocultar todas las pantallas primero
+        const todasPantallas = document.querySelectorAll('.screen');
+        console.log('📋 Pantallas encontradas:', todasPantallas.length);
+        todasPantallas.forEach(screen => {
+            screen.classList.remove('active');
+            screen.style.display = 'none';
+        });
+        
+        // Mostrar la pantalla deseada
+        const mostrarEl = document.getElementById(mostrar);
+        if (!mostrarEl) {
+            console.error('❌ Pantalla no encontrada:', mostrar);
+            return;
+        }
+        
+        console.log('✅ Pantalla encontrada:', mostrar);
+        mostrarEl.classList.add('active');
+        mostrarEl.style.display = 'block';
+        console.log('✅ Clase active agregada y display: block forzado');
     
     // Mostrar sidebar en pantallas del sistema
     const pantallasSistema = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'configuracion'];
@@ -58,26 +63,30 @@ function cambiarPantalla(ocultar, mostrar) {
         }
     });
     
-    // Verificar que la pantalla se muestre
-    setTimeout(() => {
-        const pantallaActiva = document.querySelector('.screen.active');
-        console.log('🔍 Pantalla activa después del cambio:', pantallaActiva?.id);
-        if (pantallaActiva) {
-            const display = window.getComputedStyle(pantallaActiva).display;
-            console.log('🔍 Display de pantalla activa:', display);
-            if (display === 'none') {
-                console.error('❌ La pantalla activa tiene display: none, forzando display: block');
-                pantallaActiva.style.display = 'block';
+        // Verificar que la pantalla se muestre
+        setTimeout(() => {
+            const pantallaActiva = document.querySelector('.screen.active');
+            console.log('🔍 Pantalla activa después del cambio:', pantallaActiva?.id);
+            if (pantallaActiva) {
+                const display = window.getComputedStyle(pantallaActiva).display;
+                console.log('🔍 Display de pantalla activa:', display);
+                if (display === 'none') {
+                    console.error('❌ La pantalla activa tiene display: none, forzando display: block');
+                    pantallaActiva.style.display = 'block';
+                    pantallaActiva.style.visibility = 'visible';
+                }
             }
+        }, 50);
+        
+        // Inicializar gráficos si es dashboard
+        if (mostrar === 'dashboard') {
+            setTimeout(inicializarGraficos, 300);
         }
-    }, 100);
-    
-    // Inicializar gráficos si es dashboard
-    if (mostrar === 'dashboard') {
-        setTimeout(inicializarGraficos, 300);
+        
+        console.log('✅ Cambio de pantalla completado');
+    } catch (error) {
+        console.error('❌ Error al cambiar pantalla:', error);
     }
-    
-    console.log('✅ Cambio de pantalla completado');
 }
 
 // Hacer función global
