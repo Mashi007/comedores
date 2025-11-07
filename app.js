@@ -37,7 +37,7 @@ function cambiarPantalla(ocultar, mostrar) {
         console.log('✅ Clase active agregada y display: block forzado');
     
     // Mostrar sidebar en pantallas del sistema
-    const pantallasSistema = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'chat-ai', 'costos', 'configuracion'];
+    const pantallasSistema = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'chat-ai', 'costos', 'calidad', 'configuracion'];
     const sidebar = document.getElementById('sidebar');
     
     if (pantallasSistema.includes(mostrar)) {
@@ -6350,4 +6350,592 @@ if (typeof window !== 'undefined') {
     window.actualizarDashboard = actualizarDashboard;
     window.exportarDashboard = exportarDashboard;
     window.toggleChartView = toggleChartView;
+}
+
+// ============================================
+// MÓDULO DE CONTROL DE CALIDAD
+// ============================================
+
+// Estructura de datos de calidad
+const calidadData = {
+    verificaciones: [] // Historial de verificaciones
+};
+
+// Inicializar módulo de calidad
+function inicializarModuloCalidad() {
+    console.log('✅ Inicializando módulo de control de calidad...');
+    
+    // Cargar datos desde memoria
+    recuperarCalidadDeMemoria();
+    
+    // Actualizar UI
+    cargarOrdenesPendientes();
+    actualizarKPIsCalidad();
+    cargarHistorialCalidad();
+}
+
+// Cargar órdenes pendientes de verificación
+function cargarOrdenesPendientes() {
+    const container = document.getElementById('ordenesCalidadList');
+    if (!container) return;
+    
+    // Obtener órdenes pendientes
+    const ordenesPendientes = (comprasData.ordenesCompra || []).filter(oc => 
+        oc.estado === 'pendiente_verificacion'
+    );
+    
+    if (ordenesPendientes.length === 0) {
+        container.innerHTML = `
+            <div class="orden-vacia">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.3; margin-bottom: 1rem;">
+                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <p>No hay órdenes pendientes de verificación</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = ordenesPendientes.map(orden => {
+        const fecha = new Date(orden.fechaFactura);
+        const fechaFormateada = fecha.toLocaleDateString('es-ES', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric' 
+        });
+        
+        return `
+            <div class="orden-calidad-card" onclick="abrirVerificacionCalidad('${orden.id}')">
+                <div class="orden-calidad-header">
+                    <div class="orden-info">
+                        <h3>${orden.numeroOrden}</h3>
+                        <p class="orden-proveedor">${orden.proveedor}</p>
+                    </div>
+                    <span class="badge-estado pendiente">Pendiente</span>
+                </div>
+                <div class="orden-calidad-body">
+                    <div class="orden-detail">
+                        <span class="detail-label">Factura:</span>
+                        <span class="detail-value">${orden.numeroFactura}</span>
+                    </div>
+                    <div class="orden-detail">
+                        <span class="detail-label">Fecha:</span>
+                        <span class="detail-value">${fechaFormateada}</span>
+                    </div>
+                    <div class="orden-detail">
+                        <span class="detail-label">Productos:</span>
+                        <span class="detail-value">${orden.productos.length} items</span>
+                    </div>
+                    <div class="orden-detail">
+                        <span class="detail-label">Total:</span>
+                        <span class="detail-value destacado">$${orden.total.toLocaleString('es-ES', {minimumFractionDigits: 2})}</span>
+                    </div>
+                </div>
+                <div class="orden-calidad-footer">
+                    <button class="btn-verificar" onclick="event.stopPropagation(); abrirVerificacionCalidad('${orden.id}')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Verificar Calidad
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Abrir modal de verificación de calidad
+function abrirVerificacionCalidad(ordenId) {
+    const orden = (comprasData.ordenesCompra || []).find(oc => oc.id == ordenId);
+    if (!orden) {
+        ToastNotification.show('Orden de compra no encontrada', 'error', 3000);
+        return;
+    }
+    
+    const modal = document.getElementById('modalVerificacionCalidad');
+    const titulo = document.getElementById('modalCalidadTitulo');
+    const ordenInfo = document.getElementById('calidadOrdenInfo');
+    const productosBody = document.getElementById('productosCalidadBody');
+    
+    if (!modal || !titulo || !ordenInfo || !productosBody) return;
+    
+    // Actualizar título
+    titulo.textContent = `Verificación de Calidad - ${orden.numeroOrden}`;
+    
+    // Información de la orden
+    const fecha = new Date(orden.fechaFactura);
+    ordenInfo.innerHTML = `
+        <div class="orden-info-card">
+            <div class="info-row">
+                <span class="info-label">Orden de Compra:</span>
+                <span class="info-value">${orden.numeroOrden}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Proveedor:</span>
+                <span class="info-value">${orden.proveedor}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Factura:</span>
+                <span class="info-value">${orden.numeroFactura}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Fecha Factura:</span>
+                <span class="info-value">${fecha.toLocaleDateString('es-ES')}</span>
+            </div>
+            <div class="info-row destacado">
+                <span class="info-label">Total Facturado:</span>
+                <span class="info-value">$${orden.total.toLocaleString('es-ES', {minimumFractionDigits: 2})}</span>
+            </div>
+        </div>
+    `;
+    
+    // Llenar tabla de productos
+    productosBody.innerHTML = orden.productos.map((prod, index) => {
+        return `
+            <tr data-producto-index="${index}">
+                <td><strong>${prod.producto}</strong></td>
+                <td>${prod.cantidad.toFixed(2)}</td>
+                <td>${prod.unidad}</td>
+                <td>$${prod.precioUnit.toFixed(2)}</td>
+                <td>
+                    <input type="number" class="cantidad-recibida-input" 
+                           value="${prod.cantidad.toFixed(2)}" 
+                           step="0.01" min="0" 
+                           data-index="${index}"
+                           onchange="actualizarTotalesCalidad()"
+                           required>
+                </td>
+                <td>
+                    <input type="number" class="ajuste-input" 
+                           value="0" 
+                           step="0.01" 
+                           data-index="${index}"
+                           onchange="actualizarTotalesCalidad()"
+                           placeholder="0.00">
+                </td>
+                <td>
+                    <input type="number" class="devolucion-input" 
+                           value="0" 
+                           step="0.01" min="0" 
+                           data-index="${index}"
+                           onchange="toggleMotivoDevolucion(${index}); actualizarTotalesCalidad();"
+                           placeholder="0.00">
+                </td>
+                <td>
+                    <select class="motivo-devolucion-select" 
+                            data-index="${index}" 
+                            style="display: none;"
+                            onchange="actualizarTotalesCalidad()">
+                        <option value="">Seleccionar motivo...</option>
+                        <option value="calidad">Mala Calidad</option>
+                        <option value="exceso">Entrega de Más</option>
+                        <option value="deterioro">Producto Deteriorado</option>
+                        <option value="vencido">Producto Vencido</option>
+                        <option value="incorrecto">Producto Incorrecto</option>
+                    </select>
+                </td>
+                <td>
+                    <textarea class="observaciones-calidad-input" 
+                              data-index="${index}"
+                              rows="2" 
+                              placeholder="Observaciones de calidad..."
+                              onchange="actualizarTotalesCalidad()"></textarea>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Guardar orden actual
+    window.ordenCalidadActual = orden;
+    
+    // Actualizar totales
+    actualizarTotalesCalidad();
+    
+    // Mostrar modal
+    modal.style.display = 'flex';
+}
+
+// Toggle motivo de devolución
+function toggleMotivoDevolucion(index) {
+    const devolucionInput = document.querySelector(`.devolucion-input[data-index="${index}"]`);
+    const motivoSelect = document.querySelector(`.motivo-devolucion-select[data-index="${index}"]`);
+    
+    if (devolucionInput && motivoSelect) {
+        const devolucion = parseFloat(devolucionInput.value) || 0;
+        if (devolucion > 0) {
+            motivoSelect.style.display = 'block';
+            motivoSelect.required = true;
+        } else {
+            motivoSelect.style.display = 'none';
+            motivoSelect.required = false;
+            motivoSelect.value = '';
+        }
+    }
+}
+
+// Actualizar totales de calidad
+function actualizarTotalesCalidad() {
+    if (!window.ordenCalidadActual) return;
+    
+    let totalFacturado = window.ordenCalidadActual.total;
+    let totalRecibido = 0;
+    let totalDevoluciones = 0;
+    
+    window.ordenCalidadActual.productos.forEach((prod, index) => {
+        const recibidaInput = document.querySelector(`.cantidad-recibida-input[data-index="${index}"]`);
+        const devolucionInput = document.querySelector(`.devolucion-input[data-index="${index}"]`);
+        
+        if (recibidaInput) {
+            const recibida = parseFloat(recibidaInput.value) || 0;
+            totalRecibido += recibida * prod.precioUnit;
+        }
+        
+        if (devolucionInput) {
+            const devolucion = parseFloat(devolucionInput.value) || 0;
+            totalDevoluciones += devolucion * prod.precioUnit;
+        }
+    });
+    
+    const totalAprobar = totalRecibido - totalDevoluciones;
+    
+    document.getElementById('totalFacturadoCalidad').textContent = 
+        `$${totalFacturado.toLocaleString('es-ES', {minimumFractionDigits: 2})}`;
+    document.getElementById('totalRecibidoCalidad').textContent = 
+        `$${totalRecibido.toLocaleString('es-ES', {minimumFractionDigits: 2})}`;
+    document.getElementById('totalDevolucionesCalidad').textContent = 
+        `$${totalDevoluciones.toLocaleString('es-ES', {minimumFractionDigits: 2})}`;
+    document.getElementById('totalAprobarCalidad').textContent = 
+        `$${totalAprobar.toLocaleString('es-ES', {minimumFractionDigits: 2})}`;
+}
+
+// Cerrar modal de calidad
+function cerrarModalCalidad() {
+    const modal = document.getElementById('modalVerificacionCalidad');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    window.ordenCalidadActual = null;
+}
+
+// Aprobar verificación de calidad
+function aprobarVerificacionCalidad(event) {
+    event.preventDefault();
+    
+    if (!window.ordenCalidadActual) {
+        ToastNotification.show('No hay orden seleccionada', 'warning', 3000);
+        return;
+    }
+    
+    const verificador = document.getElementById('verificadorCalidad').value;
+    const observacionesGenerales = document.getElementById('observacionesGeneralesCalidad').value;
+    
+    // Recopilar datos de verificación
+    const productosVerificados = window.ordenCalidadActual.productos.map((prod, index) => {
+        const recibidaInput = document.querySelector(`.cantidad-recibida-input[data-index="${index}"]`);
+        const ajusteInput = document.querySelector(`.ajuste-input[data-index="${index}"]`);
+        const devolucionInput = document.querySelector(`.devolucion-input[data-index="${index}"]`);
+        const motivoSelect = document.querySelector(`.motivo-devolucion-select[data-index="${index}"]`);
+        const observacionesInput = document.querySelector(`.observaciones-calidad-input[data-index="${index}"]`);
+        
+        const cantidadRecibida = parseFloat(recibidaInput?.value) || prod.cantidad;
+        const ajuste = parseFloat(ajusteInput?.value) || 0;
+        const devolucion = parseFloat(devolucionInput?.value) || 0;
+        const motivoDevolucion = motivoSelect?.value || '';
+        const observaciones = observacionesInput?.value || '';
+        
+        return {
+            producto: prod.producto,
+            cantidadFacturada: prod.cantidad,
+            cantidadRecibida: cantidadRecibida,
+            ajuste: ajuste,
+            devolucion: devolucion,
+            motivoDevolucion: motivoDevolucion,
+            observaciones: observaciones,
+            unidad: prod.unidad,
+            precioUnit: prod.precioUnit
+        };
+    });
+    
+    // Crear registro de verificación
+    const verificacion = {
+        id: Date.now(),
+        ordenCompraId: window.ordenCalidadActual.id,
+        numeroOrden: window.ordenCalidadActual.numeroOrden,
+        proveedor: window.ordenCalidadActual.proveedor,
+        fechaVerificacion: new Date().toISOString().split('T')[0],
+        verificador: verificador,
+        productos: productosVerificados,
+        observacionesGenerales: observacionesGenerales,
+        estado: 'aprobada',
+        totalFacturado: window.ordenCalidadActual.total,
+        totalAprobado: parseFloat(document.getElementById('totalAprobarCalidad').textContent.replace(/[^0-9.-]/g, ''))
+    };
+    
+    // Actualizar estado de orden
+    window.ordenCalidadActual.estado = 'aprobada';
+    window.ordenCalidadActual.verificacionCalidad = verificacion;
+    
+    // Guardar verificación
+    calidadData.verificaciones.push(verificacion);
+    
+    // Procesar productos aprobados (sumar a inventario)
+    productosVerificados.forEach(prod => {
+        const cantidadAprobar = prod.cantidadRecibida - prod.devolucion;
+        if (cantidadAprobar > 0) {
+            // Sumar a inventario
+            if (typeof inventarioData !== 'undefined' && inventarioData.productos) {
+                const prodInventario = inventarioData.productos.find(p => p.nombre === prod.producto);
+                if (prodInventario) {
+                    prodInventario.ingresos += cantidadAprobar;
+                    prodInventario.stockActual += cantidadAprobar;
+                    prodInventario.ultimaCompra = {
+                        fecha: verificacion.fechaVerificacion,
+                        cantidad: cantidadAprobar,
+                        precioUnit: prod.precioUnit
+                    };
+                    
+                    // Agregar movimiento
+                    inventarioData.movimientos.push({
+                        id: Date.now() + Math.random(),
+                        fecha: verificacion.fechaVerificacion,
+                        producto: prod.producto,
+                        tipo: 'entrada',
+                        cantidad: cantidadAprobar,
+                        unidad: prod.unidad,
+                        quienSolicita: 'Control de Calidad',
+                        saldoAnterior: prodInventario.stockActual - cantidadAprobar,
+                        saldoFinal: prodInventario.stockActual,
+                        observaciones: `Aprobado desde OC ${window.ordenCalidadActual.numeroOrden}`
+                    });
+                }
+            }
+        }
+        
+        // Si hay devolución por mala calidad, registrar en costos variables
+        if (prod.devolucion > 0 && prod.motivoDevolucion === 'calidad') {
+            // Registrar en costos variables para procesamiento contable
+            if (typeof costosData !== 'undefined') {
+                const costoDevolucion = prod.devolucion * prod.precioUnit;
+                console.log(`Devolución por calidad registrada: ${prod.producto} - $${costoDevolucion.toFixed(2)}`);
+            }
+        }
+    });
+    
+    // Guardar en memoria
+    guardarCalidadEnMemoria();
+    guardarComprasEnMemoria();
+    if (typeof guardarInventarioEnMemoria === 'function') {
+        guardarInventarioEnMemoria();
+    }
+    
+    // Actualizar UI
+    cargarOrdenesPendientes();
+    actualizarKPIsCalidad();
+    cargarHistorialCalidad();
+    
+    // Cerrar modal
+    cerrarModalCalidad();
+    
+    ToastNotification.show('Verificación de calidad aprobada y procesada correctamente', 'success', 4000);
+}
+
+// Rechazar verificación de calidad
+function rechazarVerificacionCalidad() {
+    if (!window.ordenCalidadActual) {
+        ToastNotification.show('No hay orden seleccionada', 'warning', 3000);
+        return;
+    }
+    
+    const motivo = prompt('Ingrese el motivo del rechazo:');
+    if (!motivo) return;
+    
+    // Actualizar estado de orden
+    window.ordenCalidadActual.estado = 'rechazada';
+    window.ordenCalidadActual.motivoRechazo = motivo;
+    
+    // Guardar
+    guardarComprasEnMemoria();
+    
+    // Actualizar UI
+    cargarOrdenesPendientes();
+    actualizarKPIsCalidad();
+    cargarHistorialCalidad();
+    
+    // Cerrar modal
+    cerrarModalCalidad();
+    
+    ToastNotification.show('Orden de compra rechazada', 'warning', 3000);
+}
+
+// Actualizar KPIs de calidad
+function actualizarKPIsCalidad() {
+    const ordenesPendientes = (comprasData.ordenesCompra || []).filter(oc => 
+        oc.estado === 'pendiente_verificacion'
+    ).length;
+    
+    const totalDevoluciones = calidadData.verificaciones.reduce((sum, v) => {
+        return sum + v.productos.reduce((s, p) => s + (p.devolucion * p.precioUnit), 0);
+    }, 0);
+    
+    const totalAjustes = calidadData.verificaciones.reduce((sum, v) => {
+        return sum + v.productos.reduce((s, p) => s + Math.abs(p.ajuste * p.precioUnit), 0);
+    }, 0);
+    
+    const totalOrdenes = (comprasData.ordenesCompra || []).length;
+    const ordenesAprobadas = (comprasData.ordenesCompra || []).filter(oc => 
+        oc.estado === 'aprobada'
+    ).length;
+    const tasaAprobacion = totalOrdenes > 0 ? ((ordenesAprobadas / totalOrdenes) * 100).toFixed(1) : 0;
+    
+    if (document.getElementById('kpiOrdenesPendientes')) {
+        document.getElementById('kpiOrdenesPendientes').textContent = ordenesPendientes;
+    }
+    if (document.getElementById('kpiDevoluciones')) {
+        document.getElementById('kpiDevoluciones').textContent = `$${totalDevoluciones.toLocaleString('es-ES', {minimumFractionDigits: 2})}`;
+    }
+    if (document.getElementById('kpiAjustes')) {
+        document.getElementById('kpiAjustes').textContent = totalAjustes > 0 ? `$${totalAjustes.toLocaleString('es-ES', {minimumFractionDigits: 2})}` : '0';
+    }
+    if (document.getElementById('kpiTasaAprobacion')) {
+        document.getElementById('kpiTasaAprobacion').textContent = tasaAprobacion + '%';
+    }
+    
+    // Actualizar badge en sidebar
+    const badge = document.getElementById('badgeCalidadPendiente');
+    if (badge) {
+        if (ordenesPendientes > 0) {
+            badge.textContent = ordenesPendientes;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+// Cargar historial de verificaciones
+function cargarHistorialCalidad() {
+    const tbody = document.getElementById('historialCalidadBody');
+    if (!tbody) return;
+    
+    const verificaciones = [...calidadData.verificaciones].sort((a, b) => 
+        new Date(b.fechaVerificacion) - new Date(a.fechaVerificacion)
+    );
+    
+    if (verificaciones.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                    No hay verificaciones registradas
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = verificaciones.map(ver => {
+        const fecha = new Date(ver.fechaVerificacion);
+        const fechaFormateada = fecha.toLocaleDateString('es-ES', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric' 
+        });
+        
+        const totalDevoluciones = ver.productos.reduce((sum, p) => sum + (p.devolucion * p.precioUnit), 0);
+        const totalAjustes = ver.productos.reduce((sum, p) => sum + Math.abs(p.ajuste * p.precioUnit), 0);
+        
+        return `
+            <tr>
+                <td><strong>${ver.numeroOrden}</strong></td>
+                <td>${ver.proveedor}</td>
+                <td>${fechaFormateada}</td>
+                <td><span class="badge-estado ${ver.estado}">${ver.estado === 'aprobada' ? 'Aprobada' : 'Rechazada'}</span></td>
+                <td>${ver.productos.length} productos</td>
+                <td>$${totalDevoluciones.toLocaleString('es-ES', {minimumFractionDigits: 2})}</td>
+                <td>$${totalAjustes.toLocaleString('es-ES', {minimumFractionDigits: 2})}</td>
+                <td>${ver.verificador}</td>
+                <td>
+                    <button class="btn-icon-small" onclick="verDetalleVerificacion('${ver.id}')" title="Ver Detalle">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Filtrar órdenes de calidad
+function filtrarOrdenesCalidad() {
+    const filtro = document.getElementById('filtroEstadoCalidad')?.value;
+    const ordenes = (comprasData.ordenesCompra || []);
+    
+    let ordenesFiltradas = ordenes;
+    if (filtro) {
+        if (filtro === 'pendiente') {
+            ordenesFiltradas = ordenes.filter(oc => oc.estado === 'pendiente_verificacion');
+        } else if (filtro === 'aprobada') {
+            ordenesFiltradas = ordenes.filter(oc => oc.estado === 'aprobada');
+        } else if (filtro === 'rechazada') {
+            ordenesFiltradas = ordenes.filter(oc => oc.estado === 'rechazada');
+        }
+    }
+    
+    // Actualizar lista
+    const container = document.getElementById('ordenesCalidadList');
+    if (container) {
+        if (filtro === 'pendiente' || !filtro) {
+            cargarOrdenesPendientes();
+        }
+    }
+}
+
+// Ver detalle de verificación
+function verDetalleVerificacion(verificacionId) {
+    const verificacion = calidadData.verificaciones.find(v => v.id == verificacionId);
+    if (verificacion) {
+        const orden = (comprasData.ordenesCompra || []).find(oc => oc.id == verificacion.ordenCompraId);
+        if (orden) {
+            window.ordenCalidadActual = orden;
+            abrirVerificacionCalidad(orden.id);
+            // Deshabilitar edición (solo lectura)
+            document.querySelectorAll('#formVerificacionCalidad input, #formVerificacionCalidad select, #formVerificacionCalidad textarea').forEach(el => {
+                el.disabled = true;
+            });
+            document.querySelectorAll('.form-exec-actions button').forEach(btn => {
+                btn.style.display = 'none';
+            });
+        }
+    }
+}
+
+// Guardar calidad en memoria
+function guardarCalidadEnMemoria() {
+    if (typeof MEMORIA_TEMPORAL !== 'undefined') {
+        MEMORIA_TEMPORAL.guardar('calidadVerificaciones', calidadData.verificaciones, 15);
+    }
+}
+
+// Recuperar calidad de memoria
+function recuperarCalidadDeMemoria() {
+    if (typeof MEMORIA_TEMPORAL !== 'undefined') {
+        const verificaciones = MEMORIA_TEMPORAL.recuperar('calidadVerificaciones');
+        if (verificaciones) {
+            calidadData.verificaciones = verificaciones;
+        }
+    }
+}
+
+// Exponer funciones globalmente
+if (typeof window !== 'undefined') {
+    window.inicializarModuloCalidad = inicializarModuloCalidad;
+    window.abrirVerificacionCalidad = abrirVerificacionCalidad;
+    window.cerrarModalCalidad = cerrarModalCalidad;
+    window.aprobarVerificacionCalidad = aprobarVerificacionCalidad;
+    window.rechazarVerificacionCalidad = rechazarVerificacionCalidad;
+    window.toggleMotivoDevolucion = toggleMotivoDevolucion;
+    window.actualizarTotalesCalidad = actualizarTotalesCalidad;
+    window.filtrarOrdenesCalidad = filtrarOrdenesCalidad;
+    window.verDetalleVerificacion = verDetalleVerificacion;
 }
