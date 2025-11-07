@@ -296,7 +296,6 @@ function inicializarGraficos() {
         try {
             crearGraficoHeatmap();
             crearGraficoDesviaciones();
-            crearGraficoROI();
         } catch (e) {
             // Silenciar errores
         }
