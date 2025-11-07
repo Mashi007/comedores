@@ -1256,8 +1256,19 @@ function crearGrafico3(periodo = '7') {
 }
 
 function crearGrafico4() {
+    console.log('📊 [CHART4] Iniciando creación...');
     const ctx = document.getElementById('chart4');
-    if (!ctx) return;
+    console.log('📊 [CHART4] Canvas encontrado:', !!ctx);
+    if (!ctx) {
+        console.error('❌ [CHART4] Canvas chart4 no encontrado');
+        return;
+    }
+    if (typeof Chart === 'undefined') {
+        console.error('❌ [CHART4] Chart.js no está disponible');
+        return;
+    }
+    console.log('📊 [CHART4] Dimensiones canvas:', ctx.offsetWidth, 'x', ctx.offsetHeight);
+    console.log('📊 [CHART4] Canvas visible:', ctx.offsetParent !== null);
     
     const data = dashboardData.topProductos;
     
@@ -1346,8 +1357,19 @@ function crearGrafico4() {
 }
 
 function crearGrafico5() {
+    console.log('📊 [CHART5] Iniciando creación...');
     const ctx = document.getElementById('chart5');
-    if (!ctx) return;
+    console.log('📊 [CHART5] Canvas encontrado:', !!ctx);
+    if (!ctx) {
+        console.error('❌ [CHART5] Canvas chart5 no encontrado');
+        return;
+    }
+    if (typeof Chart === 'undefined') {
+        console.error('❌ [CHART5] Chart.js no está disponible');
+        return;
+    }
+    console.log('📊 [CHART5] Dimensiones canvas:', ctx.offsetWidth, 'x', ctx.offsetHeight);
+    console.log('📊 [CHART5] Canvas visible:', ctx.offsetParent !== null);
     
     const data = dashboardData.satisfaccion;
     
