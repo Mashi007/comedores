@@ -384,25 +384,12 @@ function inicializarBotonInicio() {
     console.log('Botón computed style:', window.getComputedStyle(btnInicio).pointerEvents);
     console.log('Botón computed z-index:', window.getComputedStyle(btnInicio).zIndex);
     
-    // Agregar listener global para detectar cualquier click en la página
-    document.addEventListener('click', function(e) {
-        console.log('CLICK GLOBAL detectado en:', e.target);
-        console.log('CLICK GLOBAL path:', e.composedPath());
-        if (e.target === btnInicio || e.target.closest('#btnIniciarSesion')) {
-            console.log('✅ CLICK DETECTADO EN EL BOTÓN (desde listener global)');
-        }
-    }, true);
-    
-    // TEST: Simular click después de 1 segundo para verificar
-    setTimeout(function() {
-        console.log('=== TEST: Simulando click programático ===');
-        try {
-            btnInicio.click();
-            console.log('Click programático ejecutado');
-        } catch (err) {
-            console.error('Error al hacer click programático:', err);
-        }
-    }, 1000);
+    // Listener global para debugging (solo en desarrollo, puede comentarse en producción)
+    // document.addEventListener('click', function(e) {
+    //     if (e.target === btnInicio || e.target.closest('#btnIniciarSesion')) {
+    //         console.log('✅ CLICK DETECTADO EN EL BOTÓN');
+    //     }
+    // }, true);
     
     console.log('✅ Botón de inicio inicializado correctamente con múltiples listeners');
 }
