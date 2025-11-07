@@ -117,17 +117,8 @@ if (typeof window !== 'undefined') {
     window.cambiarPantalla = cambiarPantalla;
     window.navegar = navegar;
 }
-window.cerrarSimuladorOCR = cerrarSimuladorOCR;
-window.procesarFacturaOCR = procesarFacturaOCR;
-window.cerrarFormularioDigitalizacion = cerrarFormularioDigitalizacion;
-window.agregarProducto = agregarProducto;
-window.guardarFactura = guardarFactura;
-window.mostrarDashboardKardex = mostrarDashboardKardex;
-window.cerrarDashboardKardex = cerrarDashboardKardex;
-window.filtrarKardex = filtrarKardex;
 
 // Sidebar
-// Exponer toggleSidebar y otras funciones después de su declaración
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
