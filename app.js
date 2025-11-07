@@ -134,6 +134,13 @@ function cambiarPantalla(ocultar, mostrar) {
             }, 300);
         }
         
+        // Inicializar módulo de Producción si es produccion
+        if (mostrar === 'produccion') {
+            setTimeout(() => {
+                inicializarModuloProduccion();
+            }, 300);
+        }
+        
         console.log('✅ Cambio de pantalla completado');
     } catch (error) {
         console.error('❌ Error al cambiar pantalla:', error);
