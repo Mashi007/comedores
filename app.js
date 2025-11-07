@@ -199,6 +199,7 @@ function inicializarGraficos() {
     crearGrafico6();
     crearGrafico7();
     crearGrafico8();
+    crearGrafico9();
 }
 
 function crearGrafico1() {
@@ -1285,6 +1286,175 @@ function agregarEtiquetasCuadrantes(chart, maxStock, maxReorder, reordenNormaliz
         labelEl.style.transform = 'translate(-50%, -100%)'; // Centrar horizontalmente, arriba del punto
         
         labelContainer.appendChild(labelEl);
+    });
+}
+
+// Gráfico 9: Costos Variables por Tipo de Comida (Desayuno, Almuerzo, Cena)
+function crearGrafico9() {
+    const ctx = document.getElementById('chart9');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chart9) {
+        chartInstances.chart9.destroy();
+    }
+    
+    // Datos mock de costos por tipo de comida
+    const tiposComida = ['Desayuno', 'Almuerzo', 'Cena'];
+    
+    // Costos promedio por tipo de comida (últimos 7 días)
+    const costosPromedio = [
+        45.50,  // Desayuno: $45.50
+        78.30,  // Almuerzo: $78.30
+        65.20   // Cena: $65.20
+    ];
+    
+    // Costos ideales por tipo de comida
+    const costosIdeales = [
+        42.00,  // Desayuno ideal
+        75.00,  // Almuerzo ideal
+        62.00   // Cena ideal
+    ];
+    
+    // Calcular desviaciones porcentuales
+    const desviaciones = costosPromedio.map((costo, index) => {
+        const ideal = costosIdeales[index];
+        return ((costo - ideal) / ideal) * 100;
+    });
+    
+    chartInstances.chart9 = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: tiposComida,
+            datasets: [
+                {
+                    label: 'Costo Promedio',
+                    data: costosPromedio,
+                    backgroundColor: ['#3b82f6', '#2563eb', '#1d4ed8'],
+                    borderColor: ['#2563eb', '#1d4ed8', '#1e40af'],
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    barThickness: 40
+                },
+                {
+                    label: 'Costo Ideal',
+                    data: costosIdeales,
+                    backgroundColor: ['#22c55e', '#16a34a', '#15803d'],
+                    borderColor: ['#16a34a', '#15803d', '#166534'],
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    barThickness: 40
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: '600'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    callbacks: {
+                        label: (context) => {
+                            const datasetLabel = context.dataset.label;
+                            const value = context.parsed.y;
+                            const index = context.dataIndex;
+                            
+                            if (datasetLabel === 'Costo Promedio') {
+                                const desviacion = desviaciones[index];
+                                const desviacionColor = Math.abs(desviacion) > 10 ? '🔴' : Math.abs(desviacion) > 5 ? '🟠' : '🟢';
+                                return `${datasetLabel}: $${value.toFixed(2)} | Desviación: ${desviacionColor} ${desviacion >= 0 ? '+' : ''}${desviacion.toFixed(1)}%`;
+                            }
+                            return `${datasetLabel}: $${value.toFixed(2)}`;
+                        },
+                        afterLabel: (context) => {
+                            const index = context.dataIndex;
+                            const desviacion = desviaciones[index];
+                            const tipoComida = tiposComida[index];
+                            
+                            if (context.datasetIndex === 0) {
+                                let mensaje = '';
+                                if (Math.abs(desviacion) > 10) {
+                                    mensaje = `⚠️ ${tipoComida} está ${desviacion > 0 ? 'por encima' : 'por debajo'} del ideal en más del 10%`;
+                                } else if (Math.abs(desviacion) > 5) {
+                                    mensaje = `⚡ ${tipoComida} tiene una desviación moderada del ${Math.abs(desviacion).toFixed(1)}%`;
+                                } else {
+                                    mensaje = `✅ ${tipoComida} está dentro del rango ideal`;
+                                }
+                                return mensaje;
+                            }
+                            return '';
+                        }
+                    },
+                    displayColors: true,
+                    boxPadding: 6
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: (value) => '$' + value.toFixed(0),
+                        font: {
+                            size: 11
+                        },
+                        padding: 8
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Costo ($)',
+                        font: {
+                            size: 12,
+                            weight: '600'
+                        },
+                        padding: {
+                            bottom: 10
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        },
+                        padding: 10
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            }
+        }
     });
 }
 
