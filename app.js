@@ -97,6 +97,7 @@ function cambiarPantalla(ocultar, mostrar) {
 window.cambiarPantalla = cambiarPantalla;
 window.navegar = navegar;
 window.toggleSidebar = toggleSidebar;
+window.toggleUserMenu = toggleUserMenu;
 window.cerrarSesion = cerrarSesion;
 window.marcarLeida = marcarLeida;
 window.marcarTodasLeidas = marcarTodasLeidas;
@@ -125,6 +126,17 @@ function toggleSidebar() {
         document.body.classList.add('sidebar-open');
     } else {
         document.body.classList.remove('sidebar-open');
+    }
+}
+
+// Menú de usuario
+function toggleUserMenu() {
+    const userMenu = document.getElementById('userMenu');
+    const sidebarUser = document.querySelector('.sidebar-user');
+    
+    if (userMenu && sidebarUser) {
+        userMenu.classList.toggle('open');
+        sidebarUser.classList.toggle('active');
     }
 }
 

@@ -111,17 +111,20 @@
             </a>
         </nav>
         <div class="sidebar-footer">
-            <div class="sidebar-user">
+            <div class="sidebar-user" onclick="toggleUserMenu()">
                 <div class="user-avatar">U</div>
                 <div class="user-info">
                     <span class="user-name">Usuario Demo</span>
                     <span class="user-role">Administrador</span>
                 </div>
+                <span class="user-menu-arrow">▼</span>
             </div>
-            <button class="nav-item logout-btn" onclick="cerrarSesion(); return false;">
-                <span class="nav-icon">🚪</span>
-                <span class="nav-text">Cerrar Sesión</span>
-            </button>
+            <div class="user-menu" id="userMenu">
+                <a href="#" class="user-menu-item" onclick="cerrarSesion(); return false;">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Cerrar Sesión</span>
+                </a>
+            </div>
         </div>
     </div>
 
