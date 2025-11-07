@@ -1036,6 +1036,14 @@ function crearGrafico8() {
             responsive: true,
             maintainAspectRatio: true,
             aspectRatio: 3, // Gráfico más ancho para una sola fila (3:1)
+            layout: {
+                padding: {
+                    top: 50, // Espacio superior para las etiquetas
+                    bottom: 20,
+                    left: 20,
+                    right: 20
+                }
+            },
             interaction: {
                 intersect: false,
                 mode: 'point'
@@ -1254,10 +1262,19 @@ function agregarEtiquetasCuadrantes(chart, maxStock, maxReorder, reordenNormaliz
         labelEl.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
         
         // Posicionar dentro del área del gráfico, en la parte superior
+        // Asegurar que las etiquetas estén dentro del contenedor
         const leftPosition = chartArea.left + (chartWidth * label.xPercent / 100);
-        const topPosition = chartArea.top - 25; // 25px arriba del área del gráfico
+        const topPosition = Math.max(10, chartArea.top - 30); // Asegurar mínimo 10px desde arriba
         
-        labelEl.style.left = leftPosition + 'px';
+        // Verificar que no se salga del contenedor
+        const containerRect = canvas.parentElement.getBoundingClientRect();
+        const labelWidth = labelEl.offsetWidth || 200; // Ancho estimado
+        const labelHeight = labelEl.offsetHeight || 30; // Alto estimado
+        
+        // Ajustar posición si se sale por la izquierda
+        const adjustedLeft = Math.max(labelWidth / 2, Math.min(leftPosition, containerRect.width - labelWidth / 2));
+        
+        labelEl.style.left = adjustedLeft + 'px';
         labelEl.style.top = topPosition + 'px';
         labelEl.style.transform = 'translate(-50%, -100%)'; // Centrar horizontalmente, arriba del punto
         
