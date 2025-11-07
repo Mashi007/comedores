@@ -290,14 +290,28 @@ function inicializarBotonInicio() {
         return false;
     }
     
+    // FORZAR estilos para asegurar que el botón sea clickeable
+    btnInicio.style.cursor = 'pointer';
+    btnInicio.style.pointerEvents = 'auto';
+    btnInicio.style.zIndex = '9999';
+    btnInicio.style.position = 'relative';
+    btnInicio.disabled = false;
+    btnInicio.removeAttribute('disabled');
+    
     // Deshabilitar pointer-events en elementos hijos para que no intercepten clicks
     const span = btnInicio.querySelector('span');
     if (span) {
         span.style.pointerEvents = 'none';
+        span.style.userSelect = 'none';
     }
     const svg = btnInicio.querySelector('svg');
     if (svg) {
         svg.style.pointerEvents = 'none';
+    }
+    
+    // Agregar onclick directamente al HTML (más confiable)
+    if (!btnInicio.getAttribute('onclick')) {
+        btnInicio.setAttribute('onclick', 'window.mostrarLogin(); return false;');
     }
     
     // Agregar listeners de forma simple y directa
@@ -308,16 +322,53 @@ function inicializarBotonInicio() {
     btnInicio.addEventListener('click', manejarClick, true);
     
     // 3. onclick como respaldo absoluto (más compatible)
-    btnInicio.onclick = manejarClick;
+    btnInicio.onclick = function(e) {
+        console.log('onclick handler ejecutado directamente');
+        e = e || window.event;
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        manejarClick(e);
+        if (typeof window.mostrarLogin === 'function') {
+            window.mostrarLogin();
+        }
+        return false;
+    };
     
-    // 4. Touchstart para móviles
-    btnInicio.addEventListener('touchstart', function(e) {
+    // 4. Mousedown (se ejecuta antes que click)
+    btnInicio.addEventListener('mousedown', function(e) {
+        console.log('MOUSEDOWN detectado');
         e.preventDefault();
         manejarClick(e);
-    }, { passive: false });
+        if (typeof window.mostrarLogin === 'function') {
+            window.mostrarLogin();
+        }
+    }, true);
+    
+    // 5. Touchstart para móviles
+    btnInicio.addEventListener('touchstart', function(e) {
+        console.log('TOUCHSTART detectado');
+        e.preventDefault();
+        e.stopPropagation();
+        manejarClick(e);
+        if (typeof window.mostrarLogin === 'function') {
+            window.mostrarLogin();
+        }
+        return false;
+    }, { passive: false, capture: true });
+    
+    // 6. Agregar también al contenedor padre por si acaso
+    const ctaSection = btnInicio.closest('.cta-section');
+    if (ctaSection) {
+        ctaSection.style.pointerEvents = 'auto';
+        ctaSection.style.zIndex = '10';
+        ctaSection.style.position = 'relative';
+    }
     
     // Verificar que los listeners se agregaron
     console.log('Listeners agregados. onclick:', typeof btnInicio.onclick);
+    console.log('Botón onclick attribute:', btnInicio.getAttribute('onclick'));
     
     console.log('✅ Botón de inicio inicializado correctamente con múltiples listeners');
 }
