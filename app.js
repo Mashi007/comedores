@@ -1817,6 +1817,28 @@ if (typeof window !== 'undefined') {
     window.filtrarKardex = filtrarKardex;
 }
 
+// Inicializar módulo de compras
+function inicializarModuloCompras() {
+    console.log('🛒 Inicializando módulo de compras...');
+    
+    // Recuperar datos desde memoria
+    recuperarComprasDeMemoria();
+    
+    // Cargar lista de compras
+    cargarListaCompras();
+    
+    // Mostrar KARDEX (permanente)
+    mostrarDashboardKardex();
+    
+    // Verificar lista de compras pendiente desde planificación
+    verificarListaComprasPendiente();
+}
+
+// Exponer inicializarModuloCompras
+if (typeof window !== 'undefined') {
+    window.inicializarModuloCompras = inicializarModuloCompras;
+}
+
 function cargarListaCompras() {
     const lista = document.getElementById('listaCompras');
     
@@ -5887,6 +5909,541 @@ if (typeof window !== 'undefined') {
 window.addEventListener('DOMContentLoaded', function() {
     recuperarPlanificacionDeMemoria();
 });
+
+// ============================================
+// MÓDULO DE PRODUCCIÓN
+// ============================================
+
+// Estructura de datos de producción
+const produccionData = {
+    registros: [] // Registros de producción diaria
+};
+
+// Generar datos mock de producción
+function generarDatosMockProduccion() {
+    const hoy = new Date();
+    const recetas = ['Arroz con Frijoles', 'Pollo Asado', 'Carne a la Plancha', 'Ensalada Mixta', 'Sopa de Verduras', 'Flan de Vainilla'];
+    const comidas = ['desayuno', 'almuerzo', 'cena'];
+    const responsables = ['Juan Pérez', 'María González', 'Carlos Rodríguez', 'Ana Martínez'];
+    
+    produccionData.registros = [];
+    
+    // Generar registros para los últimos 7 días
+    for (let i = 0; i < 7; i++) {
+        const fecha = new Date(hoy);
+        fecha.setDate(fecha.getDate() - i);
+        const fechaStr = fecha.toISOString().split('T')[0];
+        
+        comidas.forEach(comida => {
+            const numRecetas = Math.floor(Math.random() * 3) + 1;
+            for (let j = 0; j < numRecetas; j++) {
+                const receta = recetas[Math.floor(Math.random() * recetas.length)];
+                const charolas = Math.floor(Math.random() * 50) + 20;
+                const merma = Math.random() * 15 + 2; // 2-17%
+                const comentarioMerma = merma > 10 ? 'Desperdicio por sobreproducción' : (merma > 5 ? 'Desperdicio normal' : 'Merma mínima');
+                
+                produccionData.registros.push({
+                    id: Date.now() + Math.random(),
+                    fecha: fechaStr,
+                    comida: comida,
+                    receta: receta,
+                    charolas: charolas,
+                    merma: parseFloat(merma.toFixed(2)),
+                    comentarioMerma: comentarioMerma,
+                    responsable: responsables[Math.floor(Math.random() * responsables.length)]
+                });
+            }
+        });
+    }
+    
+    // Ordenar por fecha (más recientes primero)
+    produccionData.registros.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+}
+
+// Inicializar módulo de producción
+function inicializarModuloProduccion() {
+    console.log('👨‍🍳 Inicializando módulo de producción...');
+    
+    // Recuperar datos desde memoria
+    recuperarProduccionDeMemoria();
+    
+    // Generar datos mock si no existen
+    if (produccionData.registros.length === 0) {
+        generarDatosMockProduccion();
+    }
+    
+    // Actualizar UI
+    actualizarKPIsProduccion();
+    actualizarResumenComidasProduccion();
+    crearGraficosProduccion();
+    cargarTablaProduccion();
+}
+
+// Actualizar KPIs de producción
+function actualizarKPIsProduccion() {
+    const hoy = new Date().toISOString().split('T')[0];
+    const registrosHoy = produccionData.registros.filter(r => r.fecha === hoy);
+    
+    const totalCharolas = registrosHoy.reduce((sum, r) => sum + r.charolas, 0);
+    const mermaPromedio = registrosHoy.length > 0 
+        ? registrosHoy.reduce((sum, r) => sum + r.merma, 0) / registrosHoy.length 
+        : 0;
+    const recetasProducidas = registrosHoy.length;
+    const eficiencia = mermaPromedio > 0 ? Math.max(0, 100 - mermaPromedio) : 100;
+    
+    if (document.getElementById('kpiTotalCharolas')) {
+        document.getElementById('kpiTotalCharolas').textContent = totalCharolas;
+    }
+    if (document.getElementById('kpiMermaPromedio')) {
+        document.getElementById('kpiMermaPromedio').textContent = mermaPromedio.toFixed(1) + '%';
+    }
+    if (document.getElementById('kpiRecetasProducidas')) {
+        document.getElementById('kpiRecetasProducidas').textContent = recetasProducidas;
+    }
+    if (document.getElementById('kpiEficienciaProduccion')) {
+        document.getElementById('kpiEficienciaProduccion').textContent = eficiencia.toFixed(1) + '%';
+    }
+}
+
+// Actualizar resumen por comidas
+function actualizarResumenComidasProduccion() {
+    const hoy = new Date().toISOString().split('T')[0];
+    const registrosHoy = produccionData.registros.filter(r => r.fecha === hoy);
+    
+    ['desayuno', 'almuerzo', 'cena'].forEach(comida => {
+        const registrosComida = registrosHoy.filter(r => r.comida === comida);
+        const totalCharolas = registrosComida.reduce((sum, r) => sum + r.charolas, 0);
+        const totalRecetas = registrosComida.length;
+        const mermaPromedio = registrosComida.length > 0 
+            ? registrosComida.reduce((sum, r) => sum + r.merma, 0) / registrosComida.length 
+            : 0;
+        
+        const card = document.querySelector(`.comida-resumen-card[data-comida="${comida}"]`);
+        if (card) {
+            const charolasEl = card.querySelector('.stat-comida:nth-child(1) .stat-value');
+            const recetasEl = card.querySelector('.stat-comida:nth-child(2) .stat-value');
+            const mermaEl = card.querySelector('.stat-comida:nth-child(3) .stat-value');
+            
+            if (charolasEl) charolasEl.textContent = totalCharolas;
+            if (recetasEl) recetasEl.textContent = totalRecetas;
+            if (mermaEl) mermaEl.textContent = mermaPromedio.toFixed(1) + '%';
+        }
+    });
+}
+
+// Crear gráficos de producción
+function crearGraficosProduccion() {
+    crearGraficoProduccionDiaria();
+    crearGraficoMermaReceta();
+    crearGraficoProduccionComida();
+    crearGraficoTendenciaMerma();
+}
+
+// Gráfico de producción diaria
+function crearGraficoProduccionDiaria() {
+    const ctx = document.getElementById('chartProduccionDiaria');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    // Destruir gráfico existente
+    if (chartInstances['chartProduccionDiaria']) {
+        chartInstances['chartProduccionDiaria'].destroy();
+    }
+    
+    // Agrupar por fecha
+    const datosPorFecha = {};
+    produccionData.registros.forEach(r => {
+        if (!datosPorFecha[r.fecha]) {
+            datosPorFecha[r.fecha] = 0;
+        }
+        datosPorFecha[r.fecha] += r.charolas;
+    });
+    
+    const fechas = Object.keys(datosPorFecha).sort().slice(-7);
+    const charolas = fechas.map(f => datosPorFecha[f] || 0);
+    
+    chartInstances['chartProduccionDiaria'] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: fechas.map(f => new Date(f).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })),
+            datasets: [{
+                label: 'Charolas Producidas',
+                data: charolas,
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `${context.parsed.y} charolas`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: (value) => value + ' charolas'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico de merma por receta
+function crearGraficoMermaReceta() {
+    const ctx = document.getElementById('chartMermaReceta');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances['chartMermaReceta']) {
+        chartInstances['chartMermaReceta'].destroy();
+    }
+    
+    // Agrupar por receta
+    const mermaPorReceta = {};
+    produccionData.registros.forEach(r => {
+        if (!mermaPorReceta[r.receta]) {
+            mermaPorReceta[r.receta] = { total: 0, count: 0 };
+        }
+        mermaPorReceta[r.receta].total += r.merma;
+        mermaPorReceta[r.receta].count++;
+    });
+    
+    const recetas = Object.keys(mermaPorReceta);
+    const mermas = recetas.map(r => mermaPorReceta[r].total / mermaPorReceta[r].count);
+    
+    chartInstances['chartMermaReceta'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: recetas,
+            datasets: [{
+                label: 'Merma Promedio (%)',
+                data: mermas,
+                backgroundColor: mermas.map(m => m > 10 ? 'rgba(239, 68, 68, 0.8)' : (m > 5 ? 'rgba(251, 191, 36, 0.8)' : 'rgba(34, 197, 94, 0.8)'))
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `${context.parsed.y.toFixed(1)}% merma`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: (value) => value + '%'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico de producción por comida
+function crearGraficoProduccionComida() {
+    const ctx = document.getElementById('chartProduccionComida');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances['chartProduccionComida']) {
+        chartInstances['chartProduccionComida'].destroy();
+    }
+    
+    const comidas = ['desayuno', 'almuerzo', 'cena'];
+    const charolas = comidas.map(c => 
+        produccionData.registros.filter(r => r.comida === c).reduce((sum, r) => sum + r.charolas, 0)
+    );
+    
+    chartInstances['chartProduccionComida'] = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: comidas.map(c => c.charAt(0).toUpperCase() + c.slice(1)),
+            datasets: [{
+                data: charolas,
+                backgroundColor: [
+                    'rgba(251, 191, 36, 0.8)',
+                    'rgba(59, 130, 246, 0.8)',
+                    'rgba(139, 92, 246, 0.8)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `${context.label}: ${context.parsed} charolas`
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico de tendencia de merma
+function crearGraficoTendenciaMerma() {
+    const ctx = document.getElementById('chartTendenciaMerma');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances['chartTendenciaMerma']) {
+        chartInstances['chartTendenciaMerma'].destroy();
+    }
+    
+    const datosPorFecha = {};
+    produccionData.registros.forEach(r => {
+        if (!datosPorFecha[r.fecha]) {
+            datosPorFecha[r.fecha] = { total: 0, count: 0 };
+        }
+        datosPorFecha[r.fecha].total += r.merma;
+        datosPorFecha[r.fecha].count++;
+    });
+    
+    const fechas = Object.keys(datosPorFecha).sort().slice(-7);
+    const mermas = fechas.map(f => datosPorFecha[f].total / datosPorFecha[f].count);
+    
+    chartInstances['chartTendenciaMerma'] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: fechas.map(f => new Date(f).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })),
+            datasets: [{
+                label: 'Merma Promedio (%)',
+                data: mermas,
+                borderColor: 'rgb(239, 68, 68)',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Objetivo Ideal',
+                data: new Array(fechas.length).fill(5),
+                borderColor: 'rgb(34, 197, 94)',
+                borderDash: [5, 5],
+                borderWidth: 2,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            if (context.datasetIndex === 0) {
+                                return `Merma: ${context.parsed.y.toFixed(1)}%`;
+                            }
+                            return 'Objetivo: 5%';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: (value) => value + '%'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Cargar tabla de producción
+function cargarTablaProduccion() {
+    const tbody = document.getElementById('tablaProduccionBody');
+    if (!tbody) return;
+    
+    const fechaFiltro = document.getElementById('filtroFechaProduccion')?.value;
+    const comidaFiltro = document.getElementById('filtroComidaProduccion')?.value;
+    const buscar = document.getElementById('buscarRecetaProduccion')?.value.toLowerCase() || '';
+    
+    let registrosFiltrados = produccionData.registros;
+    
+    if (fechaFiltro) {
+        registrosFiltrados = registrosFiltrados.filter(r => r.fecha === fechaFiltro);
+    }
+    if (comidaFiltro) {
+        registrosFiltrados = registrosFiltrados.filter(r => r.comida === comidaFiltro);
+    }
+    if (buscar) {
+        registrosFiltrados = registrosFiltrados.filter(r => r.receta.toLowerCase().includes(buscar));
+    }
+    
+    if (registrosFiltrados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem;">No hay registros de producción</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = registrosFiltrados.map(reg => {
+        const mermaClass = reg.merma > 10 ? 'merma-alta' : (reg.merma > 5 ? 'merma-media' : 'merma-baja');
+        return `
+            <tr>
+                <td>${new Date(reg.fecha).toLocaleDateString('es-ES')}</td>
+                <td><span class="badge-comida ${reg.comida}">${reg.comida.charAt(0).toUpperCase() + reg.comida.slice(1)}</span></td>
+                <td><strong>${reg.receta}</strong></td>
+                <td>${reg.charolas}</td>
+                <td><span class="merma-badge ${mermaClass}">${reg.merma.toFixed(1)}%</span></td>
+                <td>
+                    <div class="comentario-merma">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        ${reg.comentarioMerma}
+                    </div>
+                </td>
+                <td>${reg.responsable}</td>
+                <td>
+                    <button class="btn-icon-small" onclick="editarRegistroProduccion('${reg.id}')" title="Editar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18.5 2.5C18.8978 2.10218 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10218 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10218 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Filtrar producción
+function filtrarProduccion() {
+    cargarTablaProduccion();
+}
+
+// Mostrar simulador de producción
+function mostrarSimuladorProduccion() {
+    const modal = document.getElementById('simuladorProduccion');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+// Cerrar simulador de producción
+function cerrarSimuladorProduccion() {
+    const modal = document.getElementById('simuladorProduccion');
+    if (modal) {
+        modal.style.display = 'none';
+        document.getElementById('mensajeProduccion').value = '';
+    }
+}
+
+// Procesar mensaje de producción
+function procesarMensajeProduccion() {
+    const input = document.getElementById('mensajeProduccion');
+    const mensaje = input.value.trim();
+    
+    if (!mensaje) return;
+    
+    // Simular procesamiento de mensaje WhatsApp
+    // Formato esperado: "Receta: Arroz con Frijoles, Charolas: 50, Merma: 5%, Comentario: Normal"
+    const regex = /Receta:\s*([^,]+),\s*Charolas:\s*(\d+),\s*Merma:\s*([\d.]+)%(?:,\s*Comentario:\s*(.+))?/i;
+    const match = mensaje.match(regex);
+    
+    if (!match) {
+        ToastNotification.show('Formato incorrecto. Usa: "Receta: [nombre], Charolas: [número], Merma: [%], Comentario: [texto]"', 'warning', 4000);
+        return;
+    }
+    
+    const receta = match[1].trim();
+    const charolas = parseInt(match[2]);
+    const merma = parseFloat(match[3]);
+    const comentario = match[4]?.trim() || 'Sin comentarios';
+    
+    // Agregar registro
+    const nuevoRegistro = {
+        id: Date.now(),
+        fecha: new Date().toISOString().split('T')[0],
+        comida: 'almuerzo', // Por defecto, se podría detectar del mensaje
+        receta: receta,
+        charolas: charolas,
+        merma: merma,
+        comentarioMerma: comentario,
+        responsable: 'Usuario WhatsApp'
+    };
+    
+    produccionData.registros.unshift(nuevoRegistro);
+    
+    // Guardar en memoria
+    guardarProduccionEnMemoria();
+    
+    // Actualizar UI
+    actualizarKPIsProduccion();
+    actualizarResumenComidasProduccion();
+    crearGraficosProduccion();
+    cargarTablaProduccion();
+    
+    // Limpiar input
+    input.value = '';
+    
+    // Mostrar respuesta simulada
+    const mensajesContainer = document.getElementById('mensajesProduccion');
+    if (mensajesContainer) {
+        const respuesta = document.createElement('div');
+        respuesta.className = 'message received';
+        respuesta.innerHTML = `
+            <div class="message-content">
+                <p>✅ Registro guardado:<br>${receta} - ${charolas} charolas - ${merma}% merma</p>
+            </div>
+            <div class="message-time">Ahora</div>
+        `;
+        mensajesContainer.appendChild(respuesta);
+        mensajesContainer.scrollTop = mensajesContainer.scrollHeight;
+    }
+    
+    ToastNotification.show('Producción registrada correctamente', 'success', 3000);
+}
+
+// Usar ejemplo de producción
+function usarEjemploProduccion() {
+    const input = document.getElementById('mensajeProduccion');
+    input.value = 'Receta: Arroz con Frijoles, Charolas: 50, Merma: 5%, Comentario: Producción normal';
+}
+
+// Editar registro de producción (placeholder)
+function editarRegistroProduccion(id) {
+    ToastNotification.show('Función de edición en desarrollo', 'info', 2000);
+}
+
+// Guardar producción en memoria
+function guardarProduccionEnMemoria() {
+    if (typeof MEMORIA_TEMPORAL !== 'undefined') {
+        MEMORIA_TEMPORAL.guardar('produccionRegistros', produccionData.registros, 15);
+    }
+}
+
+// Recuperar producción de memoria
+function recuperarProduccionDeMemoria() {
+    if (typeof MEMORIA_TEMPORAL !== 'undefined') {
+        const registros = MEMORIA_TEMPORAL.recuperar('produccionRegistros');
+        if (registros) {
+            produccionData.registros = registros;
+        }
+    }
+}
+
+// Exponer funciones globalmente
+if (typeof window !== 'undefined') {
+    window.inicializarModuloProduccion = inicializarModuloProduccion;
+    window.mostrarSimuladorProduccion = mostrarSimuladorProduccion;
+    window.cerrarSimuladorProduccion = cerrarSimuladorProduccion;
+    window.procesarMensajeProduccion = procesarMensajeProduccion;
+    window.usarEjemploProduccion = usarEjemploProduccion;
+    window.filtrarProduccion = filtrarProduccion;
+    window.editarRegistroProduccion = editarRegistroProduccion;
+}
 
 // ============================================
 // GRÁFICOS INNOVADORES DEL DASHBOARD
