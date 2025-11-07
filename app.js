@@ -152,21 +152,47 @@ window.cambiarPantalla = function(ocultar, mostrar) {
             document.body.classList.remove('sidebar-open');
         }
         
-        console.log('Pantalla cambiada de', ocultar, 'a', mostrar);
+        console.log('✅ [DEBUG] Pantalla cambiada exitosamente de', ocultar, 'a', mostrar);
     } catch (error) {
-        console.error('Error al cambiar pantalla:', error);
+        console.error('❌ [ERROR] Error al cambiar pantalla:', error);
+        console.error('❌ [ERROR] Stack trace:', error.stack);
+        console.error('❌ [ERROR] Ocultar:', ocultar, 'Mostrar:', mostrar);
         alert('Error al cambiar de pantalla. Por favor, recarga la página.');
     }
 };
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 [INIT] DOMContentLoaded - Iniciando aplicación');
     try {
+        console.log('🚀 [INIT] Llamando inicializarApp()');
         inicializarApp();
+        console.log('🚀 [INIT] Llamando inicializarValidaciones()');
         inicializarValidaciones();
+        console.log('🚀 [INIT] Llamando inicializarBotonInicio()');
         inicializarBotonInicio();
+        console.log('✅ [INIT] Inicialización completa');
+        
+        // Verificar que todas las funciones globales estén disponibles
+        console.log('🔍 [INIT] Verificando funciones globales...');
+        const funcionesGlobales = [
+            'toggleSidebar', 'cerrarSesion', 'navegar', 'cambiarPantalla',
+            'simularOCRWhatsApp', 'mostrarFormularioInventario', 'nuevoMenu',
+            'sugerenciaIA', 'generarCompras', 'crearEncuesta', 'resetearFiltros',
+            'aplicarFiltros', 'filtrarCompras'
+        ];
+        
+        funcionesGlobales.forEach(func => {
+            if (typeof window[func] === 'function') {
+                console.log('✅ [INIT]', func, 'disponible');
+            } else {
+                console.error('❌ [INIT]', func, 'NO está disponible');
+            }
+        });
+        
     } catch (error) {
-        console.error('Error en inicialización:', error);
+        console.error('❌ [ERROR] Error en inicialización:', error);
+        console.error('❌ [ERROR] Stack trace:', error.stack);
     }
 });
 
@@ -441,26 +467,43 @@ function inicializarValidaciones() {
 }
 
 window.toggleSidebar = function() {
+    console.log('🔵 [DEBUG] toggleSidebar() llamado');
     try {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
         const body = document.body;
         
+        console.log('🔵 [DEBUG] Sidebar encontrado:', !!sidebar);
+        console.log('🔵 [DEBUG] Overlay encontrado:', !!overlay);
+        
         if (!sidebar) {
-            console.error('Sidebar no encontrado');
+            console.error('❌ [ERROR] Sidebar no encontrado');
             return;
         }
         
+        const wasOpen = sidebar.classList.contains('open');
         sidebar.classList.toggle('open');
-        if (overlay) overlay.classList.toggle('active');
+        const isNowOpen = sidebar.classList.contains('open');
+        
+        console.log('🔵 [DEBUG] Sidebar estado:', wasOpen ? 'abierto' : 'cerrado', '→', isNowOpen ? 'abierto' : 'cerrado');
+        
+        if (overlay) {
+            overlay.classList.toggle('active');
+            console.log('🔵 [DEBUG] Overlay toggled');
+        }
         body.classList.toggle('sidebar-open');
         
         // Actualizar estado de botones hamburguesa
-        document.querySelectorAll('.hamburger-btn').forEach(btn => {
+        const hamburgerBtns = document.querySelectorAll('.hamburger-btn');
+        console.log('🔵 [DEBUG] Botones hamburguesa encontrados:', hamburgerBtns.length);
+        hamburgerBtns.forEach(btn => {
             btn.classList.toggle('active');
         });
+        
+        console.log('✅ [DEBUG] toggleSidebar() completado exitosamente');
     } catch (error) {
-        console.error('Error en toggleSidebar:', error);
+        console.error('❌ [ERROR] Error en toggleSidebar:', error);
+        console.error('❌ [ERROR] Stack:', error.stack);
     }
 };
 
@@ -493,18 +536,31 @@ window.cerrarSesion = function() {
 
 
 window.navegar = function(destino) {
+    console.log('🟢 [DEBUG] navegar() llamado con destino:', destino);
+    console.log('🟢 [DEBUG] Tipo de destino:', typeof destino);
+    console.log('🟢 [DEBUG] Destino válido:', !!destino);
+    
     try {
-        console.log('Navegando a:', destino);
+        if (!destino) {
+            console.error('❌ [ERROR] Destino no proporcionado');
+            return;
+        }
+        
+        console.log('🟢 [DEBUG] Ancho de ventana:', window.innerWidth);
         
         // Cerrar sidebar en móvil después de navegar
         if (window.innerWidth <= 768) {
+            console.log('🟢 [DEBUG] Móvil detectado, cerrando sidebar si está abierto');
             const sidebar = document.getElementById('sidebar');
             if (sidebar && sidebar.classList.contains('open')) {
+                console.log('🟢 [DEBUG] Sidebar abierto en móvil, cerrando...');
                 toggleSidebar();
             }
         }
         
+        console.log('🟢 [DEBUG] Llamando cambiarPantalla("menu", "' + destino + '")');
         cambiarPantalla('menu', destino);
+        console.log('🟢 [DEBUG] cambiarPantalla() completado');
     
     // Actualizar item activo en sidebar
     document.querySelectorAll('.nav-item').forEach(item => {
@@ -744,8 +800,21 @@ function aplicarFiltros() {
 }
 
 function resetearFiltros() {
-    document.getElementById('filtroPeriodo').value = '30';
-    document.getElementById('filtroCategoria').value = 'all';
+    console.log('🟠 [DEBUG] resetearFiltros() llamado');
+    const periodo = document.getElementById('filtroPeriodo');
+    const categoria = document.getElementById('filtroCategoria');
+    
+    console.log('🟠 [DEBUG] Filtro período encontrado:', !!periodo);
+    console.log('🟠 [DEBUG] Filtro categoría encontrado:', !!categoria);
+    
+    if (!periodo || !categoria) {
+        console.error('❌ [ERROR] Filtros no encontrados para resetear');
+        return;
+    }
+    
+    periodo.value = '30';
+    categoria.value = 'all';
+    console.log('🟠 [DEBUG] Filtros reseteados');
     ToastNotification.show('Filtros reseteados a valores por defecto', 'info', 2000);
     aplicarFiltros();
 }
@@ -1362,6 +1431,7 @@ function crearGrafico6() {
 
 // Compras
 window.simularOCRWhatsApp = function() {
+    console.log('🟣 [DEBUG] simularOCRWhatsApp() llamado');
     const proveedores = ['Proveedor A', 'Proveedor B', 'Proveedor C', 'Proveedor Nuevo'];
     const productosEjemplo = [
         { nombre: 'Arroz', cantidad: 50 },
@@ -1441,6 +1511,7 @@ function actualizarKPIsCompras() {
 }
 
 window.filtrarCompras = function() {
+    console.log('🟣 [DEBUG] filtrarCompras() llamado');
     const fechaDesde = document.getElementById('fechaDesde').value;
     const fechaHasta = document.getElementById('fechaHasta').value;
     const proveedor = document.getElementById('filtroProveedor').value;
@@ -2209,6 +2280,7 @@ function cargarConfiguracion() {
 }
 
 window.generarCompras = function() {
+    console.log('🟣 [DEBUG] generarCompras() llamado');
     if (mockData.menus.length === 0) {
         ToastNotification.show('No hay menús planificados para generar compras', 'warning');
         return;
