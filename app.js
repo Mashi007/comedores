@@ -225,9 +225,8 @@ function inicializarBotonInicio() {
             if (sidebarUserNameEl) sidebarUserNameEl.textContent = nombre;
             if (userInitialEl) userInitialEl.textContent = nombre.charAt(0).toUpperCase();
             
-            // Cambiar pantalla
-            portada.classList.remove('active');
-            menu.classList.add('active');
+            // Cambiar pantalla usando la función navegar para inicializar todo correctamente
+            cambiarPantalla('portada', 'menu');
             
             // Mostrar sidebar
             const sidebar = document.getElementById('sidebar');
