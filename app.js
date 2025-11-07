@@ -258,14 +258,6 @@ function inicializarGraficos() {
         }
     });
     
-    requestAnimationFrame(() => {
-        try {
-            crearGraficoEficienciaModulos();
-        } catch (e) {
-            console.error('Error en gráfico eficiencia:', e);
-        }
-    });
-    
     // Crear gráficos secundarios con lazy loading progresivo
     // Usar requestIdleCallback si está disponible, sino setTimeout
     const scheduleWork = window.requestIdleCallback || ((fn) => setTimeout(fn, 1));
