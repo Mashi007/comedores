@@ -266,47 +266,50 @@ function inicializarGraficos() {
         }
     });
     
-    // Crear gráficos secundarios con lazy loading
-    setTimeout(() => {
+    // Crear gráficos secundarios con lazy loading progresivo
+    // Usar requestIdleCallback si está disponible, sino setTimeout
+    const scheduleWork = window.requestIdleCallback || ((fn) => setTimeout(fn, 1));
+    
+    scheduleWork(() => {
         try {
             crearGrafico1();
             crearGrafico2();
             crearGrafico3();
         } catch (e) {
-            console.error('Error en gráficos secundarios 1-3:', e);
+            // Silenciar errores en producción
         }
-    }, 50);
+    });
     
-    setTimeout(() => {
+    scheduleWork(() => {
         try {
             crearGrafico4();
             crearGrafico5();
             crearGrafico6();
         } catch (e) {
-            console.error('Error en gráficos secundarios 4-6:', e);
+            // Silenciar errores
         }
-    }, 100);
+    });
     
-    setTimeout(() => {
+    scheduleWork(() => {
         try {
             crearGrafico7();
             crearGrafico8();
             crearGrafico9();
         } catch (e) {
-            console.error('Error en gráficos secundarios 7-9:', e);
+            // Silenciar errores
         }
-    }, 150);
+    });
     
-    // Crear gráficos innovadores al final
-    setTimeout(() => {
+    // Crear gráficos innovadores al final (menos críticos)
+    scheduleWork(() => {
         try {
             crearGraficoHeatmap();
             crearGraficoDesviaciones();
             crearGraficoROI();
         } catch (e) {
-            console.error('Error en gráficos innovadores:', e);
+            // Silenciar errores
         }
-    }, 200);
+    });
 }
 
 // Actualizar KPIs del Dashboard
