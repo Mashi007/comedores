@@ -68,11 +68,19 @@ window.validarLogin = function(event) {
     // Simular delay de autenticación
     setTimeout(() => {
         if (email === mockData.usuario.email && password === mockData.usuario.password) {
-            document.getElementById('userName').textContent = mockData.usuario.nombre;
+            const nombre = mockData.usuario.nombre;
+            document.getElementById('userName').textContent = nombre;
+            document.getElementById('sidebarUserName').textContent = nombre;
+            document.getElementById('userInitial').textContent = nombre.charAt(0).toUpperCase();
+            
             ToastNotification.show('¡Bienvenido! Sesión iniciada correctamente', 'success');
             LoadingState.removeLoading(button);
             setTimeout(() => {
                 cambiarPantalla('login', 'menu');
+                // Abrir sidebar automáticamente en desktop
+                if (window.innerWidth > 768) {
+                    setTimeout(() => toggleSidebar(), 300);
+                }
             }, 500);
         } else {
             ToastNotification.show('Credenciales incorrectas. Use: admin@comedor.com / demo-credential-2024', 'error');
@@ -105,6 +113,18 @@ window.cambiarPantalla = function(ocultar, mostrar) {
         
         // Mostrar la pantalla deseada
         mostrarEl.classList.add('active');
+        
+        // Mostrar/ocultar sidebar según la pantalla
+        const sidebar = document.getElementById('sidebar');
+        const pantallasConSidebar = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'configuracion'];
+        
+        if (pantallasConSidebar.includes(mostrar)) {
+            sidebar.style.display = 'flex';
+        } else {
+            sidebar.style.display = 'none';
+            document.body.classList.remove('sidebar-open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
         
         console.log('Pantalla cambiada de', ocultar, 'a', mostrar);
     } catch (error) {
@@ -151,17 +171,56 @@ function inicializarValidaciones() {
     }, true);
 }
 
+window.toggleSidebar = function() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const body = document.body;
+    
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+    body.classList.toggle('sidebar-open');
+    
+    // Actualizar estado de botones hamburguesa
+    document.querySelectorAll('.hamburger-btn').forEach(btn => {
+        btn.classList.toggle('active');
+    });
+};
+
 window.cerrarSesion = function() {
+    // Cerrar sidebar si está abierto
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar.classList.contains('open')) {
+        toggleSidebar();
+    }
+    
     cambiarPantalla('menu', 'portada');
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.reset();
     }
+    
+    ToastNotification.show('Sesión cerrada correctamente', 'info');
 };
 
 
 window.navegar = function(destino) {
+    // Cerrar sidebar en móvil después de navegar
+    if (window.innerWidth <= 768) {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('open')) {
+            toggleSidebar();
+        }
+    }
+    
     cambiarPantalla('menu', destino);
+    
+    // Actualizar item activo en sidebar
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.section === destino) {
+            item.classList.add('active');
+        }
+    });
     
     // Recargar datos según la sección
     if (destino === 'dashboard') {
