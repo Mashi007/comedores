@@ -95,6 +95,7 @@ function cambiarPantalla(ocultar, mostrar) {
         if (mostrar === 'compras') {
             setTimeout(() => {
                 inicializarModuloCompras();
+                verificarListaComprasPendiente();
             }, 300);
         }
         
@@ -5432,14 +5433,19 @@ function generarListaCompras() {
         return;
     }
     
-    // Navegar a módulo de compras con lista generada
-    navegar('compras');
-    ToastNotification.show(`Lista de compras generada: ${listaCompras.length} productos`, 'success', 3000);
-    
     // Guardar lista en memoria para que esté disponible en compras
     if (typeof MEMORIA_TEMPORAL !== 'undefined') {
         MEMORIA_TEMPORAL.guardar('listaComprasPlanificacion', listaCompras, 1);
+        MEMORIA_TEMPORAL.guardar('costoTotalPlanificacion', costoTotal, 1);
     }
+    
+    // Navegar a módulo de compras y mostrar formulario
+    navegar('compras');
+    
+    // Esperar a que se cargue el módulo de compras
+    setTimeout(() => {
+        mostrarFormularioListaCompras(listaCompras, costoTotal);
+    }, 500);
 }
 
 // Vista anterior
@@ -5476,8 +5482,76 @@ function vistaSiguiente() {
 
 // Cargar vista semana
 function cargarVistaSemana() {
-    // Implementación básica de vista semana
-    ToastNotification.show('Vista semana en desarrollo', 'info', 2000);
+    const semanaDias = document.getElementById('semanaDias');
+    const semanaDesayuno = document.getElementById('semanaDesayuno');
+    const semanaAlmuerzo = document.getElementById('semanaAlmuerzo');
+    const semanaCena = document.getElementById('semanaCena');
+    
+    if (!semanaDias || !semanaDesayuno || !semanaAlmuerzo || !semanaCena) return;
+    
+    // Calcular semana actual
+    const fecha = planificacionData.fechaActual;
+    const diaSemana = fecha.getDay();
+    const diff = fecha.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1); // Lunes
+    const lunes = new Date(fecha.setDate(diff));
+    
+    // Generar días de la semana
+    const diasSemana = [];
+    for (let i = 0; i < 7; i++) {
+        const dia = new Date(lunes);
+        dia.setDate(lunes.getDate() + i);
+        diasSemana.push(dia);
+    }
+    
+    // Renderizar headers de días
+    const diasNombres = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    semanaDias.innerHTML = diasSemana.map((dia, index) => {
+        const fechaStr = dia.toISOString().split('T')[0];
+        const esHoy = dia.toDateString() === new Date().toDateString();
+        return `
+            <div class="semana-dia-header ${esHoy ? 'hoy' : ''}">
+                <div class="dia-nombre">${diasNombres[index]}</div>
+                <div class="dia-numero">${dia.getDate()}</div>
+            </div>
+        `;
+    }).join('');
+    
+    // Renderizar recetas por comida
+    const renderizarRecetasSemana = (comida, container) => {
+        container.innerHTML = diasSemana.map((dia, diaIndex) => {
+            const fechaStr = dia.toISOString().split('T')[0];
+            const menu = planificacionData.menus[fechaStr] || { desayuno: [], almuerzo: [], cena: [] };
+            const recetas = menu[comida] || [];
+            
+            return `
+                <div class="semana-dia-col" data-fecha="${fechaStr}" data-dia="${diaIndex}">
+                    <div class="semana-recetas">
+                        ${recetas.length > 0 ? recetas.map((rec, recIndex) => {
+                            const receta = planificacionData.recetas.find(r => r.id === rec.recetaId) || recetasMaestras.find(r => r.id === rec.recetaId);
+                            return `
+                                <div class="semana-receta-item" onclick="seleccionarDia('${fechaStr}'); cambiarVista('dia');">
+                                    <div class="semana-receta-nombre">${rec.nombre || receta?.nombre || 'Receta'}</div>
+                                    <div class="semana-receta-info">
+                                        <span>${receta?.rendimiento || 10} porc.</span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('') : `
+                            <div class="semana-receta-empty" onclick="seleccionarDia('${fechaStr}'); cambiarVista('dia');">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    };
+    
+    renderizarRecetasSemana('desayuno', semanaDesayuno);
+    renderizarRecetasSemana('almuerzo', semanaAlmuerzo);
+    renderizarRecetasSemana('cena', semanaCena);
 }
 
 // Agregar receta día
@@ -5518,6 +5592,186 @@ function recuperarPlanificacionDeMemoria() {
     }
 }
 
+// Mostrar formulario de lista de compras
+function mostrarFormularioListaCompras(listaCompras, costoTotal) {
+    const modal = document.getElementById('formularioListaCompras');
+    const tbody = document.getElementById('productosListaComprasBody');
+    const totalEl = document.getElementById('totalListaCompras');
+    
+    if (!modal || !tbody) return;
+    
+    // Llenar tabla de productos
+    let totalEstimado = 0;
+    tbody.innerHTML = listaCompras.map((item, index) => {
+        // Obtener precio estimado del inventario o usar precio promedio
+        let precioUnit = 15.00; // Precio por defecto
+        if (typeof inventarioData !== 'undefined' && inventarioData.productos) {
+            const prodInventario = inventarioData.productos.find(p => p.nombre === item.producto);
+            if (prodInventario && prodInventario.ultimaCompra) {
+                // Usar precio de última compra si está disponible
+                precioUnit = prodInventario.ultimaCompra.precioUnit || 15.00;
+            }
+        }
+        
+        const subtotal = item.cantidad * precioUnit;
+        totalEstimado += subtotal;
+        
+        return `
+            <tr>
+                <td><strong>${item.producto}</strong></td>
+                <td>${item.necesario.toFixed(2)}</td>
+                <td>${item.stockActual.toFixed(2)}</td>
+                <td><strong>${item.cantidad.toFixed(2)}</strong></td>
+                <td>${item.unidad}</td>
+                <td>
+                    <input type="number" class="precio-unit-input" value="${precioUnit.toFixed(2)}" step="0.01" min="0" 
+                           data-index="${index}" onchange="actualizarTotalListaCompras()" style="width: 100px; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem;">
+                </td>
+                <td class="subtotal-item" data-index="${index}">$${subtotal.toFixed(2)}</td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Actualizar total
+    if (totalEl) {
+        totalEl.textContent = `$${totalEstimado.toFixed(2)}`;
+    }
+    
+    // Establecer fecha de entrega por defecto (3 días desde hoy)
+    const fechaEntrega = document.getElementById('fechaEntregaLista');
+    if (fechaEntrega) {
+        const fecha = new Date();
+        fecha.setDate(fecha.getDate() + 3);
+        fechaEntrega.value = fecha.toISOString().split('T')[0];
+    }
+    
+    // Mostrar modal
+    modal.style.display = 'flex';
+    
+    // Guardar datos en variable global para actualización
+    window.listaComprasActual = listaCompras;
+}
+
+// Actualizar total de lista de compras
+function actualizarTotalListaCompras() {
+    if (!window.listaComprasActual) return;
+    
+    let total = 0;
+    window.listaComprasActual.forEach((item, index) => {
+        const precioInput = document.querySelector(`.precio-unit-input[data-index="${index}"]`);
+        const subtotalEl = document.querySelector(`.subtotal-item[data-index="${index}"]`);
+        
+        if (precioInput && subtotalEl) {
+            const precio = parseFloat(precioInput.value) || 0;
+            const subtotal = item.cantidad * precio;
+            subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+            total += subtotal;
+        }
+    });
+    
+    const totalEl = document.getElementById('totalListaCompras');
+    if (totalEl) {
+        totalEl.textContent = `$${total.toFixed(2)}`;
+    }
+}
+
+// Cerrar formulario de lista de compras
+function cerrarFormularioListaCompras() {
+    const modal = document.getElementById('formularioListaCompras');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    window.listaComprasActual = null;
+}
+
+// Aprobar y enviar lista de compras
+function aprobarYEnviarListaCompras(event) {
+    event.preventDefault();
+    
+    if (!window.listaComprasActual || window.listaComprasActual.length === 0) {
+        ToastNotification.show('No hay productos en la lista', 'warning', 3000);
+        return;
+    }
+    
+    const proveedor = document.getElementById('proveedorLista').value;
+    const fechaEntrega = document.getElementById('fechaEntregaLista').value;
+    const observaciones = document.getElementById('observacionesLista').value;
+    
+    // Calcular total final
+    let totalFinal = 0;
+    const productosFinales = window.listaComprasActual.map((item, index) => {
+        const precioInput = document.querySelector(`.precio-unit-input[data-index="${index}"]`);
+        const precio = parseFloat(precioInput.value) || 0;
+        const subtotal = item.cantidad * precio;
+        totalFinal += subtotal;
+        
+        return {
+            producto: item.producto,
+            cantidad: item.cantidad,
+            unidad: item.unidad,
+            precioUnit: precio,
+            subtotal: subtotal
+        };
+    });
+    
+    // Crear pedido de compra
+    const pedidoCompra = {
+        id: Date.now(),
+        proveedor: proveedor,
+        fechaSolicitud: new Date().toISOString().split('T')[0],
+        fechaEntrega: fechaEntrega,
+        productos: productosFinales,
+        total: totalFinal,
+        observaciones: observaciones,
+        estado: 'aprobado',
+        origen: 'planificacion'
+    };
+    
+    // Guardar en comprasData si existe
+    if (typeof comprasData !== 'undefined') {
+        if (!comprasData.pedidos) {
+            comprasData.pedidos = [];
+        }
+        comprasData.pedidos.push(pedidoCompra);
+    }
+    
+    // Guardar en memoria
+    if (typeof MEMORIA_TEMPORAL !== 'undefined') {
+        MEMORIA_TEMPORAL.guardar('pedidoCompraAprobado', pedidoCompra, 1);
+    }
+    
+    // Mostrar mensaje de éxito
+    ToastNotification.show('Lista de compras aprobada y enviada correctamente', 'success', 4000);
+    
+    // Cerrar modal
+    cerrarFormularioListaCompras();
+    
+    // Limpiar lista de memoria
+    if (typeof MEMORIA_TEMPORAL !== 'undefined') {
+        MEMORIA_TEMPORAL.eliminar('listaComprasPlanificacion');
+        MEMORIA_TEMPORAL.eliminar('costoTotalPlanificacion');
+    }
+    
+    // Recargar lista de compras
+    if (typeof cargarListaCompras === 'function') {
+        cargarListaCompras();
+    }
+}
+
+// Verificar si hay lista de compras pendiente al cargar módulo de compras
+function verificarListaComprasPendiente() {
+    if (typeof MEMORIA_TEMPORAL !== 'undefined') {
+        const listaCompras = MEMORIA_TEMPORAL.recuperar('listaComprasPlanificacion');
+        const costoTotal = MEMORIA_TEMPORAL.recuperar('costoTotalPlanificacion');
+        
+        if (listaCompras && listaCompras.length > 0) {
+            setTimeout(() => {
+                mostrarFormularioListaCompras(listaCompras, costoTotal || 0);
+            }, 500);
+        }
+    }
+}
+
 // Exponer funciones globalmente
 if (typeof window !== 'undefined') {
     window.inicializarModuloPlanificacion = inicializarModuloPlanificacion;
@@ -5536,6 +5790,11 @@ if (typeof window !== 'undefined') {
     window.exportarPlanificacion = exportarPlanificacion;
     window.duplicarSemana = duplicarSemana;
     window.actualizarCostoReceta = actualizarCostoReceta;
+    window.mostrarFormularioListaCompras = mostrarFormularioListaCompras;
+    window.cerrarFormularioListaCompras = cerrarFormularioListaCompras;
+    window.aprobarYEnviarListaCompras = aprobarYEnviarListaCompras;
+    window.actualizarTotalListaCompras = actualizarTotalListaCompras;
+    window.verificarListaComprasPendiente = verificarListaComprasPendiente;
 }
 
 // Recuperar datos al cargar

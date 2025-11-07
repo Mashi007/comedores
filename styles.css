@@ -2410,6 +2410,249 @@ body.sidebar-open .page-container {
     border-top: 2px solid var(--border-color);
 }
 
+/* Vista Semana */
+.semana-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.semana-header {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.semana-hora-col {
+    padding: 1rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.semana-dia {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+.semana-dia-header {
+    padding: 1rem;
+    text-align: center;
+    background: var(--bg-color);
+    border-radius: 0.75rem;
+    border: 2px solid var(--border-color);
+}
+
+.semana-dia-header.hoy {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(59, 130, 246, 0.1));
+    border-color: var(--primary-color);
+    border-width: 3px;
+}
+
+.dia-nombre {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.dia-numero {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.semana-body {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 0.5rem;
+}
+
+.semana-comidas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.comida-slot {
+    min-height: 150px;
+    background: var(--card-bg);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+}
+
+.comida-slot.desayuno {
+    border-left: 4px solid #f59e0b;
+}
+
+.comida-slot.almuerzo {
+    border-left: 4px solid #3b82f6;
+}
+
+.comida-slot.cena {
+    border-left: 4px solid #6366f1;
+}
+
+.comida-label {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.recetas-container {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+.semana-dia-col {
+    min-height: 100px;
+}
+
+.semana-recetas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.semana-receta-item {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.semana-receta-item:hover {
+    background: rgba(37, 99, 235, 0.05);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.semana-receta-nombre {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.semana-receta-info {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.semana-receta-empty {
+    width: 100%;
+    height: 40px;
+    border: 2px dashed var(--border-color);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-secondary);
+}
+
+.semana-receta-empty:hover {
+    border-color: var(--primary-color);
+    background: rgba(37, 99, 235, 0.05);
+    color: var(--primary-color);
+}
+
+/* Lista de Compras */
+.lista-compras-info {
+    background: rgba(37, 99, 235, 0.1);
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.lista-compras-info p {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.lista-productos-container {
+    margin: 1.5rem 0;
+}
+
+.lista-productos-container h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.lista-compras-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.lista-compras-table thead {
+    background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+    color: white;
+}
+
+.lista-compras-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.lista-compras-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.lista-compras-table tbody tr:hover {
+    background: rgba(37, 99, 235, 0.05);
+}
+
+.lista-compras-table tfoot {
+    background: var(--bg-color);
+    font-weight: 700;
+}
+
+.lista-compras-table tfoot td {
+    border-top: 2px solid var(--border-color);
+    padding: 1rem;
+}
+
+.precio-unit-input {
+    width: 100px;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    background: white;
+    color: var(--text-primary);
+}
+
+.precio-unit-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
     .planificacion-container {
@@ -2420,6 +2663,15 @@ body.sidebar-open .page-container {
         border-left: none;
         border-top: 2px solid var(--border-color);
         max-height: none;
+    }
+    
+    .semana-header,
+    .semana-body {
+        grid-template-columns: 100px 1fr;
+    }
+    
+    .recetas-container {
+        grid-template-columns: repeat(5, 1fr);
     }
 }
 
