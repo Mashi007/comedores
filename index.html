@@ -452,19 +452,29 @@
             <div class="dashboard-main-charts">
                 <div class="chart-card-exec large">
                     <div class="chart-header-exec">
-                        <h3>Tendencia de Producción y Costos</h3>
+                        <div>
+                            <h3>Tendencia de Producción y Costos</h3>
+                            <p class="chart-subtitle">Análisis comparativo de los últimos 30 días</p>
+                        </div>
                         <div class="chart-legend-exec">
                             <span class="legend-item"><span class="legend-color" style="background: #3b82f6;"></span> Producción</span>
                             <span class="legend-item"><span class="legend-color" style="background: #10b981;"></span> Costos</span>
                         </div>
                     </div>
-                    <canvas id="chartTendenciaPrincipal" width="400" height="300"></canvas>
+                    <div style="position: relative; height: 400px; width: 100%;">
+                        <canvas id="chartTendenciaPrincipal"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
-                        <h3>Eficiencia por Módulo</h3>
+                        <div>
+                            <h3>Eficiencia por Módulo</h3>
+                            <p class="chart-subtitle">Rendimiento operativo</p>
+                        </div>
                     </div>
-                    <canvas id="chartEficienciaModulos" width="400" height="300"></canvas>
+                    <div style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="chartEficienciaModulos"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -480,78 +490,110 @@
                             </svg>
                         </button>
                     </div>
-                    <canvas id="chart1" width="400" height="250"></canvas>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart1"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
                         <h3>Distribución de Compras</h3>
                     </div>
-                    <canvas id="chart2" width="400" height="250"></canvas>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart2"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
                         <h3>Producción Diaria</h3>
                     </div>
-                    <canvas id="chart3" width="400" height="250"></canvas>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart3"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
                         <h3>Top Productos</h3>
                     </div>
-                    <canvas id="chart4" width="400" height="250"></canvas>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart4"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
                         <h3>Satisfacción del Cliente</h3>
                     </div>
-                    <canvas id="chart5" width="400" height="250"></canvas>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart5"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
                         <h3>Merma vs Planificado</h3>
                     </div>
-                    <canvas id="chart6" width="400" height="250"></canvas>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart6"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
                         <h3>Merma por Receta</h3>
                     </div>
-                    <canvas id="chart7" width="400" height="250"></canvas>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart7"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
                         <h3>Inventario por Producto</h3>
                     </div>
-                    <canvas id="chart8" width="400" height="250"></canvas>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart8"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
                         <h3>Costos por Tipo de Comida</h3>
                     </div>
-                    <canvas id="chart9" width="400" height="250"></canvas>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart9"></canvas>
+                    </div>
                 </div>
             </div>
 
             <!-- Nuevos Gráficos Innovadores -->
             <div class="dashboard-innovative-charts">
-                <div class="chart-card-exec large">
+                <div class="chart-card-exec">
                     <div class="chart-header-exec">
-                        <h3>Heatmap de Actividad Semanal</h3>
-                        <p class="chart-subtitle">Intensidad de producción por día y comida</p>
+                        <div>
+                            <h3>Heatmap de Actividad Semanal</h3>
+                            <p class="chart-subtitle">Intensidad de producción por día y comida</p>
+                        </div>
                     </div>
-                    <canvas id="chartHeatmap" width="400" height="300"></canvas>
+                    <div style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="chartHeatmap"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
-                        <h3>Análisis de Desviaciones</h3>
+                        <div>
+                            <h3>Análisis de Desviaciones</h3>
+                            <p class="chart-subtitle">Comparativa de variaciones</p>
+                        </div>
                     </div>
-                    <canvas id="chartDesviaciones" width="400" height="300"></canvas>
+                    <div style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="chartDesviaciones"></canvas>
+                    </div>
                 </div>
                 <div class="chart-card-exec">
                     <div class="chart-header-exec">
-                        <h3>ROI por Categoría</h3>
+                        <div>
+                            <h3>ROI por Categoría</h3>
+                            <p class="chart-subtitle">Retorno de inversión</p>
+                        </div>
                     </div>
-                    <canvas id="chartROI" width="400" height="300"></canvas>
+                    <div style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="chartROI"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
