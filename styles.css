@@ -4106,8 +4106,32 @@ body.sidebar-open .page-container {
 }
 
 /* Estados del KARDEX */
+.kardex-table .estado-sobrestock {
+    color: #2563eb;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .kardex-table .estado-optimo {
     color: #059669;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.kardex-table .estado-adecuado {
+    color: #22c55e;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.kardex-table .estado-minimo {
+    color: #f59e0b;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -4130,8 +4154,23 @@ body.sidebar-open .page-container {
     gap: 0.5rem;
 }
 
+.kardex-table .dias-sobrestock {
+    color: #2563eb;
+    font-weight: 600;
+}
+
 .kardex-table .dias-optimo {
     color: #059669;
+    font-weight: 600;
+}
+
+.kardex-table .dias-adecuado {
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.kardex-table .dias-minimo {
+    color: #f59e0b;
     font-weight: 600;
 }
 

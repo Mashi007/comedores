@@ -1964,7 +1964,14 @@ function actualizarKardex(producto, cantidadIngreso, fecha) {
         saldoFinal,
         consumoPromedio,
         diasEstimados,
-        estado: diasEstimados > 30 ? '🟢 Óptimo' : (diasEstimados > 15 ? '🟡 Atención' : '🔴 Crítico')
+        estado: (() => {
+            if (diasEstimados > 60) return '🔵 Sobre Stock';
+            if (diasEstimados > 30) return '🟢 Óptimo';
+            if (diasEstimados > 20) return '🟢 Adecuado';
+            if (diasEstimados > 15) return '🟡 Inventario Mínimo';
+            if (diasEstimados > 10) return '🟡 Atención';
+            return '🔴 Crítico';
+        })()
     };
     
     comprasData.kardex.push(movimiento);
@@ -2009,9 +2016,32 @@ function cargarKardex() {
     }
     
     tbody.innerHTML = kardexFiltrado.map(mov => {
-        // Determinar clases CSS según estado
-        const estadoClase = mov.diasEstimados > 30 ? 'estado-optimo' : (mov.diasEstimados > 15 ? 'estado-atencion' : 'estado-critico');
-        const diasClase = mov.diasEstimados > 30 ? 'dias-optimo' : (mov.diasEstimados > 15 ? 'dias-atencion' : 'dias-critico');
+        // Determinar clases CSS según estado con más variedad
+        let estadoClase, diasClase;
+        if (mov.diasEstimados > 60) {
+            estadoClase = 'estado-sobrestock';
+            diasClase = 'dias-sobrestock';
+        } else if (mov.diasEstimados > 30) {
+            estadoClase = 'estado-optimo';
+            diasClase = 'dias-optimo';
+        } else if (mov.diasEstimados > 20) {
+            estadoClase = 'estado-adecuado';
+            diasClase = 'dias-adecuado';
+        } else if (mov.diasEstimados > 15) {
+            estadoClase = 'estado-minimo';
+            diasClase = 'dias-minimo';
+        } else if (mov.diasEstimados > 10) {
+            estadoClase = 'estado-atencion';
+            diasClase = 'dias-atencion';
+        } else {
+            estadoClase = 'estado-critico';
+            diasClase = 'dias-critico';
+        }
+        
+        // Si el movimiento tiene estadoClase definido, usarlo
+        if (mov.estadoClase) {
+            estadoClase = mov.estadoClase;
+        }
         
         return `
         <tr>
@@ -2025,7 +2055,14 @@ function cargarKardex() {
             <td class="${diasClase}">
                 <strong>${mov.diasEstimados} días</strong>
             </td>
-            <td class="${estadoClase}">${mov.estado || (mov.diasEstimados > 30 ? '🟢 Óptimo' : (mov.diasEstimados > 15 ? '🟡 Atención' : '🔴 Crítico'))}</td>
+            <td class="${estadoClase}">${mov.estado || (() => {
+                if (mov.diasEstimados > 60) return '🔵 Sobre Stock';
+                if (mov.diasEstimados > 30) return '🟢 Óptimo';
+                if (mov.diasEstimados > 20) return '🟢 Adecuado';
+                if (mov.diasEstimados > 15) return '🟡 Inventario Mínimo';
+                if (mov.diasEstimados > 10) return '🟡 Atención';
+                return '🔴 Crítico';
+            })()}</td>
         </tr>
         `;
     }).join('');
@@ -2075,16 +2112,31 @@ function generarDatosMockKardex() {
             let cantidadIngreso = 0;
             let cantidadSalida = 0;
             
-            if (i === 0) {
-                // Primer movimiento: ingreso grande para estado óptimo
-                cantidadIngreso = consumoPromedio * (35 + Math.random() * 10); // 35-45 días
-                cantidadSalida = 0;
-            } else if (i === 1) {
-                // Segundo movimiento: ingreso medio para estado atención
-                cantidadIngreso = consumoPromedio * (20 + Math.random() * 5); // 20-25 días
-                cantidadSalida = consumoPromedio * (5 + Math.random() * 3); // Consumo de 5-8 días
+            // Generar diferentes estados de manera más variada
+            const tipoEstado = Math.floor(Math.random() * 6); // 0-5 para diferentes estados
+            
+            if (tipoEstado === 0) {
+                // Sobre Stock (>60 días)
+                cantidadIngreso = consumoPromedio * (70 + Math.random() * 20); // 70-90 días
+                cantidadSalida = consumoPromedio * (5 + Math.random() * 5); // Consumo de 5-10 días
+            } else if (tipoEstado === 1) {
+                // Óptimo (30-60 días)
+                cantidadIngreso = consumoPromedio * (40 + Math.random() * 15); // 40-55 días
+                cantidadSalida = consumoPromedio * (5 + Math.random() * 5); // Consumo de 5-10 días
+            } else if (tipoEstado === 2) {
+                // Adecuado (20-30 días)
+                cantidadIngreso = consumoPromedio * (25 + Math.random() * 5); // 25-30 días
+                cantidadSalida = consumoPromedio * (3 + Math.random() * 3); // Consumo de 3-6 días
+            } else if (tipoEstado === 3) {
+                // Inventario Mínimo (15-20 días)
+                cantidadIngreso = consumoPromedio * (18 + Math.random() * 2); // 18-20 días
+                cantidadSalida = consumoPromedio * (3 + Math.random() * 2); // Consumo de 3-5 días
+            } else if (tipoEstado === 4) {
+                // Atención (10-15 días)
+                cantidadIngreso = consumoPromedio * (12 + Math.random() * 3); // 12-15 días
+                cantidadSalida = consumoPromedio * (2 + Math.random() * 2); // Consumo de 2-4 días
             } else {
-                // Tercer movimiento: ingreso pequeño para estado crítico
+                // Crítico (<10 días)
                 cantidadIngreso = consumoPromedio * (5 + Math.random() * 5); // 5-10 días
                 cantidadSalida = consumoPromedio * (2 + Math.random() * 2); // Consumo de 2-4 días
             }
@@ -2092,13 +2144,22 @@ function generarDatosMockKardex() {
             const saldoFinal = saldoInicial + cantidadIngreso - cantidadSalida;
             const diasEstimados = Math.floor(saldoFinal / consumoPromedio);
             
-            // Determinar estado basado en días estimados
+            // Determinar estado basado en días estimados con más variedad
             let estado;
             let estadoClase;
-            if (diasEstimados > 30) {
+            if (diasEstimados > 60) {
+                estado = '🔵 Sobre Stock';
+                estadoClase = 'estado-sobrestock';
+            } else if (diasEstimados > 30) {
                 estado = '🟢 Óptimo';
                 estadoClase = 'estado-optimo';
+            } else if (diasEstimados > 20) {
+                estado = '🟢 Adecuado';
+                estadoClase = 'estado-adecuado';
             } else if (diasEstimados > 15) {
+                estado = '🟡 Inventario Mínimo';
+                estadoClase = 'estado-minimo';
+            } else if (diasEstimados > 10) {
                 estado = '🟡 Atención';
                 estadoClase = 'estado-atencion';
             } else {
