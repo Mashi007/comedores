@@ -102,7 +102,6 @@ window.marcarLeida = marcarLeida;
 window.marcarTodasLeidas = marcarTodasLeidas;
 window.gestionarNotificacion = gestionarNotificacion;
 window.enviarMensajeAI = enviarMensajeAI;
-window.MEMORIA_TEMPORAL = MEMORIA_TEMPORAL; // Exponer para debugging
 window.mostrarSimuladorOCR = mostrarSimuladorOCR;
 window.cerrarSimuladorOCR = cerrarSimuladorOCR;
 window.procesarFacturaOCR = procesarFacturaOCR;
@@ -1987,6 +1986,9 @@ function guardarNotificaciones(notificaciones) {
 function recuperarNotificaciones() {
     return MEMORIA_TEMPORAL.recuperar('notificaciones') || [];
 }
+
+// Exponer MEMORIA_TEMPORAL globalmente después de su declaración
+window.MEMORIA_TEMPORAL = MEMORIA_TEMPORAL;
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
