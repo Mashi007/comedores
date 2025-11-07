@@ -5294,6 +5294,303 @@ body.sidebar-open .page-container {
     color: var(--text-primary);
 }
 
+/* ============================================
+   DASHBOARD GERENCIAL - DISEÑO ESTRATÉGICO
+   ============================================ */
+
+.dashboard-kpis-exec {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.kpi-exec-card {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 1.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.kpi-exec-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.kpi-exec-card.primary {
+    border-left: 4px solid #3b82f6;
+}
+
+.kpi-exec-card.success {
+    border-left: 4px solid #10b981;
+}
+
+.kpi-exec-card.warning {
+    border-left: 4px solid #f59e0b;
+}
+
+.kpi-exec-card.info {
+    border-left: 4px solid #06b6d4;
+}
+
+.kpi-exec-icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.kpi-exec-card.primary .kpi-exec-icon {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.kpi-exec-card.success .kpi-exec-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.kpi-exec-card.warning .kpi-exec-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.kpi-exec-card.info .kpi-exec-icon {
+    background: rgba(6, 182, 212, 0.1);
+    color: #06b6d4;
+}
+
+.kpi-exec-content {
+    flex: 1;
+}
+
+.kpi-exec-content h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.kpi-exec-content p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.kpi-exec-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.trend-icon {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.kpi-exec-card.success .trend-icon,
+.kpi-exec-card.info .trend-icon {
+    color: #10b981;
+}
+
+.kpi-exec-card.warning .trend-icon {
+    color: #f59e0b;
+}
+
+.trend-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.trend-label {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.dashboard-main-charts {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.chart-card-exec {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.chart-card-exec:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.chart-card-exec.large {
+    grid-column: 1 / -1;
+}
+
+.chart-header-exec {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.chart-header-exec h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.chart-subtitle {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.chart-legend-exec {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.chart-action-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-action-btn:hover {
+    background: var(--bg-color);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.chart-card-exec canvas {
+    width: 100% !important;
+    height: 300px !important;
+    max-height: 300px;
+}
+
+.chart-card-exec.large canvas {
+    height: 400px !important;
+    max-height: 400px;
+}
+
+.charts-grid-exec {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.charts-grid-exec .chart-card-exec canvas {
+    height: 250px !important;
+    max-height: 250px;
+}
+
+.dashboard-innovative-charts {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.dashboard-innovative-charts .chart-card-exec.large {
+    grid-column: span 1;
+}
+
+.header-actions-dashboard {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.dashboard-filter {
+    padding: 0.625rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dashboard-filter:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+@media (max-width: 1200px) {
+    .dashboard-main-charts {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-innovative-charts {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-kpis-exec {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-grid-exec {
+        grid-template-columns: 1fr;
+    }
+    
+    .header-actions-dashboard {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .dashboard-filter {
+        width: 100%;
+    }
+}
+
 .categoria-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

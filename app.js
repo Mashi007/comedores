@@ -6549,202 +6549,259 @@ if (typeof window !== 'undefined') {
 // Gráfico Principal: Tendencia de Producción y Costos
 function crearGraficoTendenciaPrincipal() {
     const ctx = document.getElementById('chartTendenciaPrincipal');
-    if (!ctx || typeof Chart === 'undefined') return;
-    
-    if (chartInstances.chartTendenciaPrincipal) {
-        chartInstances.chartTendenciaPrincipal.destroy();
+    if (!ctx || typeof Chart === 'undefined') {
+        console.warn('Chart.js no disponible o canvas no encontrado');
+        return;
     }
     
-    // Generar datos de los últimos 30 días con tendencias más realistas
+    // Destruir instancia anterior si existe
+    if (chartInstances.chartTendenciaPrincipal) {
+        try {
+            chartInstances.chartTendenciaPrincipal.destroy();
+        } catch (e) {
+            console.warn('Error al destruir gráfico anterior:', e);
+        }
+    }
+    
+    // Generar datos mock realistas para 30 días
     const dias = [];
     const produccion = [];
     const costos = [];
     const hoy = new Date();
     
-    // Base para tendencias más suaves
-    let baseProduccion = 75;
-    let baseCostos = 1000;
+    // Valores base con tendencia realista
+    let baseProd = 70;
+    let baseCosto = 950;
     
     for (let i = 29; i >= 0; i--) {
         const fecha = new Date(hoy);
         fecha.setDate(fecha.getDate() - i);
         dias.push(fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }));
         
-        // Datos mock con variación suave y tendencia
-        const variacionProd = (Math.random() - 0.5) * 10;
-        baseProduccion += variacionProd * 0.1;
-        baseProduccion = Math.max(60, Math.min(90, baseProduccion));
-        produccion.push(Math.round(baseProduccion));
+        // Simular variación realista con tendencia suave
+        const variacionProd = (Math.random() - 0.5) * 8;
+        baseProd = Math.max(65, Math.min(85, baseProd + variacionProd * 0.15));
+        produccion.push(Math.round(baseProd));
         
-        const variacionCosto = (Math.random() - 0.5) * 200;
-        baseCostos += variacionCosto * 0.1;
-        baseCostos = Math.max(800, Math.min(1300, baseCostos));
-        costos.push(Math.round(baseCostos));
+        const variacionCosto = (Math.random() - 0.5) * 150;
+        baseCosto = Math.max(850, Math.min(1100, baseCosto + variacionCosto * 0.15));
+        costos.push(Math.round(baseCosto));
     }
     
-    // Calcular rangos para escalas apropiadas
+    // Calcular rangos dinámicos
     const minProd = Math.min(...produccion);
     const maxProd = Math.max(...produccion);
     const minCosto = Math.min(...costos);
     const maxCosto = Math.max(...costos);
     
-    chartInstances.chartTendenciaPrincipal = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: dias,
-            datasets: [{
-                label: 'Producción (Charolas)',
-                data: produccion,
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.05)',
-                borderWidth: 2.5,
-                fill: true,
-                tension: 0.4,
-                pointRadius: 3,
-                pointHoverRadius: 6,
-                pointBackgroundColor: '#3b82f6',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointHoverBorderWidth: 3,
-                yAxisID: 'y',
-                order: 1
-            }, {
-                label: 'Costos ($)',
-                data: costos,
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.05)',
-                borderWidth: 2.5,
-                fill: true,
-                tension: 0.4,
-                pointRadius: 3,
-                pointHoverRadius: 6,
-                pointBackgroundColor: '#10b981',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointHoverBorderWidth: 3,
-                yAxisID: 'y1',
-                order: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                mode: 'index',
-                intersect: false
+    const paddingProd = (maxProd - minProd) * 0.15;
+    const paddingCosto = (maxCosto - minCosto) * 0.15;
+    
+    try {
+        chartInstances.chartTendenciaPrincipal = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dias,
+                datasets: [{
+                    label: 'Producción (Charolas)',
+                    data: produccion,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 0,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointHoverBorderWidth: 3,
+                    yAxisID: 'y',
+                    order: 1
+                }, {
+                    label: 'Costos ($)',
+                    data: costos,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 0,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointHoverBorderWidth: 3,
+                    yAxisID: 'y1',
+                    order: 2
+                }]
             },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    align: 'start',
-                    labels: {
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        padding: 20,
-                        font: { size: 13, weight: '600' },
-                        color: '#374151'
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 10,
+                        right: 15,
+                        bottom: 10,
+                        left: 10
                     }
                 },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                    padding: 14,
-                    titleFont: { size: 14, weight: '700' },
-                    bodyFont: { size: 13 },
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                    borderWidth: 1,
-                    cornerRadius: 8,
-                    displayColors: true,
-                    callbacks: {
-                        title: function(context) {
-                            return context[0].label;
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 15,
+                            font: { 
+                                size: 12, 
+                                weight: '600',
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                            },
+                            color: '#1e293b'
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 12,
+                        titleFont: { 
+                            size: 13, 
+                            weight: '700',
+                            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
                         },
-                        label: function(context) {
-                            if (context.datasetIndex === 0) {
-                                return `Producción: ${context.parsed.y} charolas`;
-                            } else {
-                                return `Costos: $${context.parsed.y.toLocaleString('es-ES')}`;
+                        bodyFont: { 
+                            size: 12,
+                            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                        },
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        callbacks: {
+                            title: function(context) {
+                                return `Fecha: ${context[0].label}`;
+                            },
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return `Producción: ${context.parsed.y} charolas`;
+                                } else {
+                                    return `Costos: $${context.parsed.y.toLocaleString('es-ES')}`;
+                                }
                             }
                         }
                     }
-                }
-            },
-            scales: {
-                x: {
-                    grid: {
-                        display: true,
-                        color: 'rgba(0, 0, 0, 0.05)',
-                        drawBorder: false
-                    },
-                    ticks: {
-                        maxRotation: 0,
-                        minRotation: 0,
-                        font: { size: 11 },
-                        color: '#6b7280',
-                        maxTicksLimit: 10
-                    }
                 },
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    beginAtZero: false,
-                    min: Math.max(0, minProd - 10),
-                    max: maxProd + 10,
-                    title: {
+                scales: {
+                    x: {
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.04)',
+                            drawBorder: false,
+                            drawOnChartArea: true
+                        },
+                        ticks: {
+                            maxRotation: 0,
+                            minRotation: 0,
+                            font: { 
+                                size: 10,
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                            },
+                            color: '#64748b',
+                            maxTicksLimit: 12,
+                            padding: 8
+                        }
+                    },
+                    y: {
+                        type: 'linear',
                         display: true,
-                        text: 'Producción (Charolas)',
-                        font: { size: 12, weight: '600' },
-                        color: '#3b82f6',
-                        padding: { top: 10, bottom: 10 }
+                        position: 'left',
+                        beginAtZero: false,
+                        min: Math.max(0, minProd - paddingProd),
+                        max: maxProd + paddingProd,
+                        title: {
+                            display: true,
+                            text: 'Producción (Charolas)',
+                            font: { 
+                                size: 11, 
+                                weight: '600',
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                            },
+                            color: '#3b82f6',
+                            padding: { top: 5, bottom: 5 }
+                        },
+                        grid: {
+                            color: 'rgba(59, 130, 246, 0.08)',
+                            drawBorder: false,
+                            drawOnChartArea: true
+                        },
+                        ticks: {
+                            color: '#3b82f6',
+                            font: { 
+                                size: 10,
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                            },
+                            stepSize: Math.ceil((maxProd - minProd) / 6),
+                            padding: 8,
+                            callback: function(value) {
+                                return value;
+                            }
+                        }
                     },
-                    grid: {
-                        color: 'rgba(59, 130, 246, 0.1)',
-                        drawBorder: false
-                    },
-                    ticks: {
-                        color: '#3b82f6',
-                        font: { size: 11 },
-                        stepSize: 10,
-                        callback: function(value) {
-                            return value;
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: false,
+                        min: Math.max(0, minCosto - paddingCosto),
+                        max: maxCosto + paddingCosto,
+                        title: {
+                            display: true,
+                            text: 'Costos ($)',
+                            font: { 
+                                size: 11, 
+                                weight: '600',
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                            },
+                            color: '#10b981',
+                            padding: { top: 5, bottom: 5 }
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#10b981',
+                            font: { 
+                                size: 10,
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                            },
+                            stepSize: Math.ceil((maxCosto - minCosto) / 6),
+                            padding: 8,
+                            callback: function(value) {
+                                return '$' + value.toLocaleString('es-ES');
+                            }
                         }
                     }
                 },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    beginAtZero: false,
-                    min: Math.max(0, minCosto - 100),
-                    max: maxCosto + 100,
-                    title: {
-                        display: true,
-                        text: 'Costos ($)',
-                        font: { size: 12, weight: '600' },
-                        color: '#10b981',
-                        padding: { top: 10, bottom: 10 }
-                    },
-                    grid: {
-                        drawOnChartArea: false,
-                        drawBorder: false
-                    },
-                    ticks: {
-                        color: '#10b981',
-                        font: { size: 11 },
-                        stepSize: 100,
-                        callback: function(value) {
-                            return '$' + value.toLocaleString('es-ES');
-                        }
-                    }
+                animation: {
+                    duration: 1200,
+                    easing: 'easeOutQuart'
                 }
-            },
-            animation: {
-                duration: 1500,
-                easing: 'easeInOutQuart'
             }
-        }
-    });
+        });
+        
+        console.log('✅ Gráfico de Tendencia Principal creado exitosamente');
+    } catch (error) {
+        console.error('❌ Error al crear gráfico de tendencia:', error);
+    }
 }
 
 // Gráfico de Eficiencia por Módulo (Radar Chart)
