@@ -9,11 +9,17 @@ function getPantallaActual() {
 }
 
 function cambiarPantalla(ocultar, mostrar) {
+    console.log('Cambiando pantalla de', ocultar, 'a', mostrar);
     const ocultarEl = document.getElementById(ocultar);
     const mostrarEl = document.getElementById(mostrar);
     
-    if (ocultarEl) ocultarEl.classList.remove('active');
-    if (mostrarEl) mostrarEl.classList.add('active');
+    if (!ocultarEl || !mostrarEl) {
+        console.error('Pantalla no encontrada:', ocultar, mostrar);
+        return;
+    }
+    
+    ocultarEl.classList.remove('active');
+    mostrarEl.classList.add('active');
     
     // Mostrar sidebar en pantallas del sistema
     const pantallasSistema = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'configuracion'];
@@ -24,12 +30,14 @@ function cambiarPantalla(ocultar, mostrar) {
         // Abrir sidebar automáticamente en móvil
         if (window.innerWidth <= 768) {
             sidebar.classList.add('open');
-            document.getElementById('sidebarOverlay').classList.add('active');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (overlay) overlay.classList.add('active');
         }
     } else {
         sidebar.style.display = 'none';
         sidebar.classList.remove('open');
-        document.getElementById('sidebarOverlay').classList.remove('active');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (overlay) overlay.classList.remove('active');
     }
     
     // Actualizar item activo en sidebar
@@ -45,6 +53,9 @@ function cambiarPantalla(ocultar, mostrar) {
         setTimeout(inicializarGraficos, 300);
     }
 }
+
+// Hacer función global
+window.cambiarPantalla = cambiarPantalla;
 
 // Sidebar
 function toggleSidebar() {
@@ -238,7 +249,21 @@ function crearGrafico6() {
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('btnIniciar').addEventListener('click', function() {
-        cambiarPantalla('portada', 'menu');
-    });
+    const btnIniciar = document.getElementById('btnIniciar');
+    if (btnIniciar) {
+        btnIniciar.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Botón iniciar clickeado');
+            cambiarPantalla('portada', 'menu');
+        });
+        
+        // También agregar onclick directo como respaldo
+        btnIniciar.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            cambiarPantalla('portada', 'menu');
+            return false;
+        };
+    }
 });
