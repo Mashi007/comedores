@@ -2170,34 +2170,37 @@ function generarDatosMockKardex() {
             let cantidadIngreso = 0;
             let cantidadSalida = 0;
             
-            // Generar diferentes estados de manera más variada
-            const tipoEstado = Math.floor(Math.random() * 6); // 0-5 para diferentes estados
+            // Asignar estado de forma cíclica para asegurar variedad equilibrada
+            // Cada producto tendrá un estado diferente de forma predecible
+            const estadoIndex = (index * numMovimientos + i) % 6; // 0-5 para diferentes estados
             
-            if (tipoEstado === 0) {
-                // Sobre Stock (>60 días)
-                cantidadIngreso = consumoPromedio * (70 + Math.random() * 20); // 70-90 días
-                cantidadSalida = consumoPromedio * (5 + Math.random() * 5); // Consumo de 5-10 días
-            } else if (tipoEstado === 1) {
-                // Óptimo (30-60 días)
-                cantidadIngreso = consumoPromedio * (40 + Math.random() * 15); // 40-55 días
-                cantidadSalida = consumoPromedio * (5 + Math.random() * 5); // Consumo de 5-10 días
-            } else if (tipoEstado === 2) {
-                // Adecuado (20-30 días)
-                cantidadIngreso = consumoPromedio * (25 + Math.random() * 5); // 25-30 días
-                cantidadSalida = consumoPromedio * (3 + Math.random() * 3); // Consumo de 3-6 días
-            } else if (tipoEstado === 3) {
-                // Inventario Mínimo (15-20 días)
-                cantidadIngreso = consumoPromedio * (18 + Math.random() * 2); // 18-20 días
-                cantidadSalida = consumoPromedio * (3 + Math.random() * 2); // Consumo de 3-5 días
-            } else if (tipoEstado === 4) {
-                // Atención (10-15 días)
-                cantidadIngreso = consumoPromedio * (12 + Math.random() * 3); // 12-15 días
-                cantidadSalida = consumoPromedio * (2 + Math.random() * 2); // Consumo de 2-4 días
-            } else {
-                // Crítico (<10 días)
-                cantidadIngreso = consumoPromedio * (5 + Math.random() * 5); // 5-10 días
-                cantidadSalida = consumoPromedio * (2 + Math.random() * 2); // Consumo de 2-4 días
-            }
+            // Definir configuración de estados para distribución equilibrada
+            const estadosConfig = [
+                { dias: 75, variacion: 15, nombre: 'sobrestock' },    // 60-90 días
+                { dias: 45, variacion: 10, nombre: 'optimo' },        // 35-55 días
+                { dias: 25, variacion: 5, nombre: 'adecuado' },        // 20-30 días
+                { dias: 17, variacion: 2, nombre: 'minimo' },         // 15-19 días
+                { dias: 12, variacion: 3, nombre: 'atencion' },       // 9-15 días
+                { dias: 5, variacion: 3, nombre: 'critico' }          // 2-8 días
+            ];
+            
+            const estadoConfig = estadosConfig[estadoIndex];
+            
+            // Calcular cantidad de ingreso basada en el estado objetivo
+            const variacionDias = (Math.random() - 0.5) * estadoConfig.variacion;
+            let diasObjetivo = estadoConfig.dias + variacionDias;
+            
+            // Asegurar que los días objetivo estén en el rango correcto del estado
+            if (estadoConfig.nombre === 'sobrestock' && diasObjetivo < 60) diasObjetivo = 65 + Math.random() * 25;
+            if (estadoConfig.nombre === 'optimo' && (diasObjetivo < 30 || diasObjetivo > 60)) diasObjetivo = 35 + Math.random() * 20;
+            if (estadoConfig.nombre === 'adecuado' && (diasObjetivo < 20 || diasObjetivo > 30)) diasObjetivo = 22 + Math.random() * 8;
+            if (estadoConfig.nombre === 'minimo' && (diasObjetivo < 15 || diasObjetivo > 20)) diasObjetivo = 16 + Math.random() * 4;
+            if (estadoConfig.nombre === 'atencion' && (diasObjetivo < 10 || diasObjetivo > 15)) diasObjetivo = 11 + Math.random() * 4;
+            if (estadoConfig.nombre === 'critico' && diasObjetivo > 10) diasObjetivo = 3 + Math.random() * 5;
+            
+            // Calcular cantidad de ingreso para alcanzar el objetivo de días
+            cantidadIngreso = consumoPromedio * diasObjetivo;
+            cantidadSalida = consumoPromedio * (2 + Math.random() * 4); // Consumo de 2-6 días
             
             const saldoFinal = saldoInicial + cantidadIngreso - cantidadSalida;
             const diasEstimados = Math.floor(saldoFinal / consumoPromedio);
