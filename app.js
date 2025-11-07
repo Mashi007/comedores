@@ -85,6 +85,17 @@ const mockData = {
 window.mostrarLogin = function() {
     try {
         console.log('mostrarLogin llamado');
+        // Asegurar que el sidebar esté completamente oculto en login
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            sidebar.style.display = 'none';
+            sidebar.classList.remove('open');
+        }
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        if (sidebarOverlay) {
+            sidebarOverlay.classList.remove('active');
+        }
+        document.body.classList.remove('sidebar-open');
         cambiarPantalla('portada', 'login');
     } catch (error) {
         console.error('Error al mostrar login:', error);
