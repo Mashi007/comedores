@@ -947,19 +947,21 @@ window.buscarEnTabla = function(tablaId, busqueda) {
 };
 
 function crearGrafico1(periodo = '7') {
-    console.log('📊 [CHART1] Iniciando creación...');
     const ctx = document.getElementById('chart1');
-    console.log('📊 [CHART1] Canvas encontrado:', !!ctx);
     if (!ctx) {
-        console.error('❌ [CHART1] Canvas chart1 no encontrado');
+        console.error('❌ [CHART1] Canvas no encontrado');
         return;
     }
     if (typeof Chart === 'undefined') {
-        console.error('❌ [CHART1] Chart.js no está disponible');
+        console.error('❌ [CHART1] Chart.js no disponible');
         return;
     }
-    console.log('📊 [CHART1] Dimensiones canvas:', ctx.offsetWidth, 'x', ctx.offsetHeight);
-    console.log('📊 [CHART1] Canvas visible:', ctx.offsetParent !== null);
+    
+    // Asegurar que el canvas tenga dimensiones
+    if (ctx.offsetWidth === 0 || ctx.offsetHeight === 0) {
+        ctx.width = ctx.parentElement.offsetWidth || 400;
+        ctx.height = 250;
+    }
     
     const data = dashboardData.consumoInventario[periodo] || dashboardData.consumoInventario['7'];
     
@@ -1057,19 +1059,20 @@ function crearGrafico1(periodo = '7') {
 }
 
 function crearGrafico2(categoria = 'all') {
-    console.log('📊 [CHART2] Iniciando creación...');
     const ctx = document.getElementById('chart2');
-    console.log('📊 [CHART2] Canvas encontrado:', !!ctx);
     if (!ctx) {
-        console.error('❌ [CHART2] Canvas chart2 no encontrado');
+        console.error('❌ [CHART2] Canvas no encontrado');
         return;
     }
     if (typeof Chart === 'undefined') {
-        console.error('❌ [CHART2] Chart.js no está disponible');
+        console.error('❌ [CHART2] Chart.js no disponible');
         return;
     }
-    console.log('📊 [CHART2] Dimensiones canvas:', ctx.offsetWidth, 'x', ctx.offsetHeight);
-    console.log('📊 [CHART2] Canvas visible:', ctx.offsetParent !== null);
+    
+    if (ctx.offsetWidth === 0 || ctx.offsetHeight === 0) {
+        ctx.width = ctx.parentElement.offsetWidth || 400;
+        ctx.height = 250;
+    }
     
     let labels, data, colors;
     
@@ -1159,19 +1162,20 @@ function crearGrafico2(categoria = 'all') {
 }
 
 function crearGrafico3(periodo = '7') {
-    console.log('📊 [CHART3] Iniciando creación...');
     const ctx = document.getElementById('chart3');
-    console.log('📊 [CHART3] Canvas encontrado:', !!ctx);
     if (!ctx) {
-        console.error('❌ [CHART3] Canvas chart3 no encontrado');
+        console.error('❌ [CHART3] Canvas no encontrado');
         return;
     }
     if (typeof Chart === 'undefined') {
-        console.error('❌ [CHART3] Chart.js no está disponible');
+        console.error('❌ [CHART3] Chart.js no disponible');
         return;
     }
-    console.log('📊 [CHART3] Dimensiones canvas:', ctx.offsetWidth, 'x', ctx.offsetHeight);
-    console.log('📊 [CHART3] Canvas visible:', ctx.offsetParent !== null);
+    
+    if (ctx.offsetWidth === 0 || ctx.offsetHeight === 0) {
+        ctx.width = ctx.parentElement.offsetWidth || 400;
+        ctx.height = 250;
+    }
     
     const data = dashboardData.produccionDiaria[periodo] || dashboardData.produccionDiaria['7'];
     
@@ -1256,19 +1260,20 @@ function crearGrafico3(periodo = '7') {
 }
 
 function crearGrafico4() {
-    console.log('📊 [CHART4] Iniciando creación...');
     const ctx = document.getElementById('chart4');
-    console.log('📊 [CHART4] Canvas encontrado:', !!ctx);
     if (!ctx) {
-        console.error('❌ [CHART4] Canvas chart4 no encontrado');
+        console.error('❌ [CHART4] Canvas no encontrado');
         return;
     }
     if (typeof Chart === 'undefined') {
-        console.error('❌ [CHART4] Chart.js no está disponible');
+        console.error('❌ [CHART4] Chart.js no disponible');
         return;
     }
-    console.log('📊 [CHART4] Dimensiones canvas:', ctx.offsetWidth, 'x', ctx.offsetHeight);
-    console.log('📊 [CHART4] Canvas visible:', ctx.offsetParent !== null);
+    
+    if (ctx.offsetWidth === 0 || ctx.offsetHeight === 0) {
+        ctx.width = ctx.parentElement.offsetWidth || 400;
+        ctx.height = 250;
+    }
     
     const data = dashboardData.topProductos;
     
@@ -1357,19 +1362,20 @@ function crearGrafico4() {
 }
 
 function crearGrafico5() {
-    console.log('📊 [CHART5] Iniciando creación...');
     const ctx = document.getElementById('chart5');
-    console.log('📊 [CHART5] Canvas encontrado:', !!ctx);
     if (!ctx) {
-        console.error('❌ [CHART5] Canvas chart5 no encontrado');
+        console.error('❌ [CHART5] Canvas no encontrado');
         return;
     }
     if (typeof Chart === 'undefined') {
-        console.error('❌ [CHART5] Chart.js no está disponible');
+        console.error('❌ [CHART5] Chart.js no disponible');
         return;
     }
-    console.log('📊 [CHART5] Dimensiones canvas:', ctx.offsetWidth, 'x', ctx.offsetHeight);
-    console.log('📊 [CHART5] Canvas visible:', ctx.offsetParent !== null);
+    
+    if (ctx.offsetWidth === 0 || ctx.offsetHeight === 0) {
+        ctx.width = ctx.parentElement.offsetWidth || 400;
+        ctx.height = 250;
+    }
     
     const data = dashboardData.satisfaccion;
     
@@ -1462,19 +1468,20 @@ function crearGrafico5() {
 }
 
 function crearGrafico6() {
-    console.log('📊 [CHART6] Iniciando creación...');
     const ctx = document.getElementById('chart6');
-    console.log('📊 [CHART6] Canvas encontrado:', !!ctx);
     if (!ctx) {
-        console.error('❌ [CHART6] Canvas chart6 no encontrado');
+        console.error('❌ [CHART6] Canvas no encontrado');
         return;
     }
     if (typeof Chart === 'undefined') {
-        console.error('❌ [CHART6] Chart.js no está disponible');
+        console.error('❌ [CHART6] Chart.js no disponible');
         return;
     }
-    console.log('📊 [CHART6] Dimensiones canvas:', ctx.offsetWidth, 'x', ctx.offsetHeight);
-    console.log('📊 [CHART6] Canvas visible:', ctx.offsetParent !== null);
+    
+    if (ctx.offsetWidth === 0 || ctx.offsetHeight === 0) {
+        ctx.width = ctx.parentElement.offsetWidth || 400;
+        ctx.height = 250;
+    }
     
     const data = dashboardData.mermaVsPlanificado;
     

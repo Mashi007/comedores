@@ -799,10 +799,12 @@ body.sidebar-open {
 .chart-card canvas {
     max-height: 300px;
     min-height: 250px;
+    height: 250px !important;
     width: 100% !important;
-    height: auto !important;
     cursor: crosshair;
-    display: block;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 /* Compras */
