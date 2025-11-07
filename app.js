@@ -222,38 +222,79 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function inicializarBotonInicio() {
-    const btnInicio = document.getElementById('btnIniciarSesion');
-    if (btnInicio) {
-        // Agregar múltiples event listeners para asegurar que funcione
-        btnInicio.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Botón de inicio clickeado');
-            if (typeof mostrarLogin === 'function') {
-                mostrarLogin();
-            } else {
-                console.error('mostrarLogin no está definido');
-                cambiarPantalla('portada', 'login');
-            }
-            return false;
-        });
-        
-        btnInicio.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Botón de inicio tocado (touch)');
-            if (typeof mostrarLogin === 'function') {
-                mostrarLogin();
-            } else {
-                cambiarPantalla('portada', 'login');
-            }
-            return false;
-        });
-        
-        console.log('Botón de inicio inicializado correctamente');
-    } else {
-        console.error('Botón de inicio no encontrado');
+    console.log('inicializarBotonInicio() ejecutándose...');
+    
+    // Intentar encontrar el botón de múltiples formas
+    let btnInicio = document.getElementById('btnIniciarSesion');
+    
+    // Si no se encuentra por ID, buscar por clase
+    if (!btnInicio) {
+        console.log('Botón no encontrado por ID, buscando por clase...');
+        btnInicio = document.querySelector('.btn-hero');
     }
+    
+    // Si aún no se encuentra, esperar un poco y reintentar
+    if (!btnInicio) {
+        console.log('Botón no encontrado, reintentando en 100ms...');
+        setTimeout(function() {
+            inicializarBotonInicio();
+        }, 100);
+        return;
+    }
+    
+    console.log('Botón encontrado:', btnInicio);
+    console.log('Botón visible:', btnInicio.offsetWidth > 0 && btnInicio.offsetHeight > 0);
+    console.log('Botón disabled:', btnInicio.disabled);
+    
+    // Remover cualquier listener previo
+    const nuevoBtn = btnInicio.cloneNode(true);
+    btnInicio.parentNode.replaceChild(nuevoBtn, btnInicio);
+    btnInicio = nuevoBtn;
+    
+    // Función para manejar el click
+    function manejarClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('=== BOTÓN CLICKEADO ===');
+        console.log('Event:', e);
+        console.log('mostrarLogin disponible:', typeof mostrarLogin);
+        console.log('cambiarPantalla disponible:', typeof cambiarPantalla);
+        
+        if (typeof mostrarLogin === 'function') {
+            console.log('Llamando mostrarLogin()...');
+            mostrarLogin();
+        } else if (typeof cambiarPantalla === 'function') {
+            console.log('Llamando cambiarPantalla()...');
+            cambiarPantalla('portada', 'login');
+        } else {
+            console.error('Ni mostrarLogin ni cambiarPantalla están disponibles');
+            // Fallback directo
+            const portada = document.getElementById('portada');
+            const login = document.getElementById('login');
+            if (portada && login) {
+                portada.classList.remove('active');
+                login.classList.add('active');
+                console.log('Navegación directa ejecutada');
+            }
+        }
+        return false;
+    }
+    
+    // Agregar múltiples event listeners
+    btnInicio.addEventListener('click', manejarClick, true); // Usar capture phase
+    btnInicio.addEventListener('mousedown', manejarClick, true);
+    btnInicio.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('=== BOTÓN TOCADO (TOUCH) ===');
+        manejarClick(e);
+        return false;
+    }, true);
+    
+    // También agregar onclick como respaldo
+    btnInicio.onclick = manejarClick;
+    
+    console.log('✅ Botón de inicio inicializado correctamente con múltiples listeners');
 }
 
 function inicializarApp() {
