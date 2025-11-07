@@ -111,17 +111,12 @@ function cambiarPantalla(ocultar, mostrar) {
     }
 }
 
-// Hacer funciones globales INMEDIATAMENTE para que estén disponibles en onclick
-window.cambiarPantalla = cambiarPantalla;
-window.navegar = navegar;
-window.toggleSidebar = toggleSidebar;
-window.toggleUserMenu = toggleUserMenu;
-window.cerrarSesion = cerrarSesion;
-window.marcarLeida = marcarLeida;
-window.marcarTodasLeidas = marcarTodasLeidas;
-window.gestionarNotificacion = gestionarNotificacion;
-window.enviarMensajeAI = enviarMensajeAI;
-window.mostrarSimuladorOCR = mostrarSimuladorOCR;
+// Exponer funciones de navegación INMEDIATAMENTE (ya están declaradas arriba)
+// Estas funciones deben estar disponibles para onclick inline en HTML
+if (typeof window !== 'undefined') {
+    window.cambiarPantalla = cambiarPantalla;
+    window.navegar = navegar;
+}
 window.cerrarSimuladorOCR = cerrarSimuladorOCR;
 window.procesarFacturaOCR = procesarFacturaOCR;
 window.cerrarFormularioDigitalizacion = cerrarFormularioDigitalizacion;
@@ -1332,14 +1327,29 @@ function procesarFacturaOCR() {
     }, 1500);
 }
 
+// Exponer procesarFacturaOCR después de su declaración
+if (typeof window !== 'undefined') {
+    window.procesarFacturaOCR = procesarFacturaOCR;
+}
+
 function cerrarFormularioDigitalizacion() {
     document.getElementById('formularioDigitalizacion').style.display = 'none';
+}
+
+// Exponer cerrarFormularioDigitalizacion después de su declaración
+if (typeof window !== 'undefined') {
+    window.cerrarFormularioDigitalizacion = cerrarFormularioDigitalizacion;
 }
 
 function agregarProducto() {
     const productosList = document.getElementById('productosList');
     const nuevoProducto = document.createElement('div');
     nuevoProducto.className = 'producto-item';
+    
+    // Exponer agregarProducto después de su declaración
+    if (typeof window !== 'undefined' && !window.agregarProducto) {
+        window.agregarProducto = agregarProducto;
+    }
     nuevoProducto.innerHTML = `
         <input type="text" placeholder="Producto" required>
         <input type="number" placeholder="Cantidad" step="0.01" required>
@@ -1450,9 +1460,19 @@ function mostrarDashboardKardex() {
     cargarProductosEnFiltro();
 }
 
+// Exponer funciones de KARDEX después de su declaración
+if (typeof window !== 'undefined') {
+    window.mostrarDashboardKardex = mostrarDashboardKardex;
+}
+
 function cerrarDashboardKardex() {
     // Función mantenida por compatibilidad, pero ya no cierra el KARDEX
     // El KARDEX es permanente ahora
+}
+
+// Exponer cerrarDashboardKardex después de su declaración
+if (typeof window !== 'undefined') {
+    window.cerrarDashboardKardex = cerrarDashboardKardex;
 }
 
 function cargarKardex() {
@@ -1499,6 +1519,11 @@ function cargarProductosEnFiltro() {
 
 function filtrarKardex() {
     cargarKardex();
+}
+
+// Exponer filtrarKardex después de su declaración
+if (typeof window !== 'undefined') {
+    window.filtrarKardex = filtrarKardex;
 }
 
 function cargarListaCompras() {
@@ -1591,6 +1616,13 @@ function actualizarContadorNotificaciones() {
             contador.style.display = 'none';
         }
     }
+}
+
+// Exponer funciones de notificaciones después de su declaración
+if (typeof window !== 'undefined') {
+    window.marcarLeida = marcarLeida;
+    window.marcarTodasLeidas = marcarTodasLeidas;
+    window.gestionarNotificacion = gestionarNotificacion;
 }
 
 // Chat AI - Base de datos de ejemplos precargados
