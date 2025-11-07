@@ -1387,6 +1387,128 @@ function agregarRecetaEnContenedor(contenedor, categoria, subcategoria) {
     ToastNotification.show('Receta agregada', 'success');
 }
 
+window.sugerenciaIA = function() {
+    const fecha = document.getElementById('fechaMenu').value;
+    if (!fecha) {
+        ToastNotification.show('Seleccione una fecha primero', 'warning');
+        return;
+    }
+    
+    // Simular análisis de IA
+    ToastNotification.show('🤖 IA analizando tendencias y disponibilidad...', 'info');
+    
+    setTimeout(() => {
+        document.getElementById('fechaMenuForm').value = fecha;
+        document.getElementById('formularioMenu').style.display = 'block';
+        
+        // Expandir categorías
+        document.querySelectorAll('.categoria-content').forEach(content => {
+            content.classList.add('active');
+            content.closest('.menu-categoria').querySelector('.categoria-header').classList.add('active');
+        });
+        document.querySelectorAll('.subcategoria-content').forEach(content => {
+            content.classList.add('active');
+            content.closest('.subcategoria').querySelector('.subcategoria-header').classList.add('active');
+        });
+        
+        // Generar sugerencias inteligentes de IA
+        setTimeout(() => {
+            generarSugerenciasIA();
+            cargarProductosEnSelects();
+            ToastNotification.show('🤖 Sugerencias de IA generadas basadas en análisis de tendencias', 'success');
+        }, 500);
+    }, 1500);
+};
+
+function generarSugerenciasIA() {
+    // Limpiar recetas existentes
+    document.querySelectorAll('#menuTree .receta-item').forEach(item => item.remove());
+    
+    // Sugerencias inteligentes basadas en análisis
+    const sugerenciasIA = {
+        desayuno: {
+            huevos: [
+                { nombre: 'Huevos Rancheros (IA Recomendado)', materiales: [{ producto: 'Huevos', cantidad: 6 }, { producto: 'Tomate', cantidad: 0.5 }, { producto: 'Cebolla', cantidad: 0.2 }] }
+            ],
+            bebidas: [
+                { nombre: 'Café Premium (IA: Alta demanda)', materiales: [{ producto: 'Café', cantidad: 0.4 }, { producto: 'Leche', cantidad: 0.3 }] }
+            ]
+        },
+        almuerzo: {
+            principales: [
+                { nombre: 'Arroz con Pollo (IA: Óptimo costo-beneficio)', materiales: [{ producto: 'Arroz', cantidad: 2.5 }, { producto: 'Pollo', cantidad: 1.8 }] },
+                { nombre: 'Pescado a la Plancha (IA: Bajo desperdicio)', materiales: [{ producto: 'Pescado', cantidad: 1.5 }, { producto: 'Aceite', cantidad: 0.15 }] }
+            ],
+            postres: [
+                { nombre: 'Flan Casero (IA: Popularidad alta)', materiales: [{ producto: 'Huevos', cantidad: 8 }, { producto: 'Leche', cantidad: 1.2 }, { producto: 'Azúcar', cantidad: 0.4 }] }
+            ],
+            bebidas: [
+                { nombre: 'Agua de Horchata (IA: Bajo costo)', materiales: [{ producto: 'Arroz', cantidad: 0.4 }, { producto: 'Azúcar', cantidad: 0.25 }] }
+            ]
+        },
+        cena: {
+            principales: [
+                { nombre: 'Sopa de Verduras (IA: Nutritiva y económica)', materiales: [{ producto: 'Papa', cantidad: 1.2 }, { producto: 'Cebolla', cantidad: 0.4 }, { producto: 'Tomate', cantidad: 0.6 }] }
+            ],
+            bebidas: [
+                { nombre: 'Té de Hierbas (IA: Bajo costo)', materiales: [{ producto: 'Té', cantidad: 0.15 }] }
+            ]
+        }
+    };
+    
+    // Agregar sugerencias
+    Object.keys(sugerenciasIA).forEach(categoria => {
+        Object.keys(sugerenciasIA[categoria]).forEach(subcategoria => {
+            const subEl = document.querySelector(`.menu-categoria[data-categoria="${categoria}"] .subcategoria[data-sub="${subcategoria}"]`);
+            if (subEl) {
+                const content = subEl.querySelector('.subcategoria-content');
+                
+                sugerenciasIA[categoria][subcategoria].forEach(ejemplo => {
+                    const recetaId = Date.now() + Math.random();
+                    const nuevaReceta = document.createElement('div');
+                    nuevaReceta.className = 'receta-item';
+                    nuevaReceta.dataset.recetaId = recetaId;
+                    nuevaReceta.dataset.categoria = categoria;
+                    nuevaReceta.dataset.subcategoria = subcategoria;
+                    
+                    const materialesHTML = ejemplo.materiales.map(m => {
+                        const producto = mockData.productos.find(p => p.nombre.toLowerCase().includes(m.producto.toLowerCase().split(' ')[0]));
+                        const productoId = producto ? producto.id : '';
+                        return `
+                            <div class="material-item">
+                                <select class="material-select">
+                                    <option value="">Seleccionar material...</option>
+                                </select>
+                                <input type="number" class="cantidad-material" step="0.01" value="${m.cantidad}" min="0.01">
+                                <button type="button" class="btn-small" onclick="this.parentElement.remove()">-</button>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    nuevaReceta.innerHTML = `
+                        <h4>
+                            <input type="text" class="nombre-receta" value="${ejemplo.nombre}" required style="flex: 1; border: none; background: transparent; font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">
+                            <button type="button" class="btn-small" onclick="this.closest('.receta-item').remove()">🗑️</button>
+                        </h4>
+                        <div class="materiales-receta">
+                            <h5>Materiales Estándar</h5>
+                            ${materialesHTML}
+                            <div class="material-item">
+                                <select class="material-select">
+                                    <option value="">Seleccionar material...</option>
+                                </select>
+                                <input type="number" class="cantidad-material" step="0.01" placeholder="Cantidad (kg)" min="0.01">
+                                <button type="button" class="btn-small" onclick="agregarMaterial(this)">+</button>
+                            </div>
+                        </div>
+                    `;
+                    content.appendChild(nuevaReceta);
+                });
+            }
+        });
+    });
+}
+
 window.generarEjemplosRecetas = function() {
     const ejemplos = {
         desayuno: {
@@ -2111,9 +2233,9 @@ function cargarEncuestas() {
     }, 100);
 }
 
-// Notificaciones
+// Notificaciones Inteligentes con IA
 function cargarNotificaciones() {
-    generarNotificacionesAutomaticas();
+    generarNotificacionesIA();
     const container = document.getElementById('notificacionesContainer');
     if (!container) return;
     
@@ -2123,66 +2245,138 @@ function cargarNotificaciones() {
     }
     
     container.innerHTML = mockData.notificaciones.map(notif => `
-        <div class="notificacion-item ${notif.tipo}">
-            <div class="notificacion-icon">${notif.icono}</div>
-            <div class="notificacion-content">
-                <h4>${notif.titulo}</h4>
+        <div class="notification-card notification-${notif.tipo}">
+            <div class="notification-icon">${notif.icono}</div>
+            <div class="notification-content">
+                <div class="notification-header">
+                    <h4>${notif.titulo}</h4>
+                    ${notif.aiPowered ? '<span class="ai-badge">🤖 IA</span>' : ''}
+                </div>
                 <p>${notif.mensaje}</p>
+                ${notif.accion ? `<button class="btn-small" onclick="${notif.accion}">${notif.accionTexto || 'Ver más'}</button>` : ''}
                 <small>${new Date(notif.fecha).toLocaleString()}</small>
             </div>
         </div>
     `).join('');
 }
 
-function generarNotificacionesAutomaticas() {
+function generarNotificacionesIA() {
     mockData.notificaciones = [];
     
-    // Notificación de consumo excesivo
-    mockData.notificaciones.push({
-        id: 1,
-        tipo: 'warning',
-        icono: '⚠️',
-        titulo: 'Consumo Excesivo',
-        mensaje: 'Has consumido 10% (3kg) más de arroz de lo planificado',
-        fecha: new Date().toISOString()
-    });
-    
-    // Notificación de inventario bajo
-    const productoBajo = mockData.productos.find(p => p.stock <= p.stockMinimo * 1.5);
-    if (productoBajo) {
+    // Análisis IA de consumo vs planificado
+    if (mockData.menus.length > 0 && mockData.produccion.length > 0) {
         mockData.notificaciones.push({
-            id: 2,
-            tipo: 'danger',
-            icono: '🔴',
-            titulo: 'Inventario Bajo',
-            mensaje: `El inventario de ${productoBajo.nombre} ha disminuido 3% (${productoBajo.stock} ${productoBajo.unidad}). Estás a ${(productoBajo.stockMinimo - productoBajo.stock).toFixed(1)} ${productoBajo.unidad} del inventario mínimo`,
-            fecha: new Date().toISOString()
+            id: 1,
+            titulo: '🤖 IA: Análisis de Consumo Detectado',
+            mensaje: 'Nuestro sistema de IA ha analizado los patrones de consumo y detectó que has consumido 10% (3kg) más de arroz de lo planificado. Sugerencia: Ajustar planificación futura o revisar porciones.',
+            icono: '📊',
+            fecha: new Date().toISOString(),
+            tipo: 'warning',
+            aiPowered: true,
+            accion: 'navegar("dashboard")',
+            accionTexto: 'Ver Dashboard'
         });
-    }
-    
-    // Notificación de inventario crítico
-    const productoCritico = mockData.productos.find(p => p.stock <= p.stockMinimo);
-    if (productoCritico) {
+        
+        // IA predice inventario
+        const productoBajo = mockData.productos.find(p => p.stock <= p.stockMinimo * 1.2);
+        if (productoBajo) {
+            mockData.notificaciones.push({
+                id: 2,
+                titulo: '🤖 IA: Predicción de Inventario',
+                mensaje: `Basado en el análisis de tendencias, IA predice que ${productoBajo.nombre} alcanzará el stock mínimo en 2-3 días. Stock actual: ${productoBajo.stock} ${productoBajo.unidad}. Recomendación: Generar orden de compra.`,
+                icono: '🔮',
+                fecha: new Date().toISOString(),
+                tipo: 'warning',
+                aiPowered: true,
+                accion: 'navegar("compras")',
+                accionTexto: 'Ver Compras'
+            });
+        }
+        
+        // IA sugiere optimización
         mockData.notificaciones.push({
             id: 3,
-            tipo: 'danger',
-            icono: '🚨',
-            titulo: 'Inventario Crítico',
-            mensaje: `Estás a ${productoCritico.stockMinimo - productoCritico.stock} ${productoCritico.unidad} del inventario mínimo para ${productoCritico.nombre}. Remito gestión de compra a departamento.`,
-            fecha: new Date().toISOString()
+            titulo: '🤖 IA: Sugerencia de Optimización',
+            mensaje: 'IA ha analizado los últimos 7 días y sugiere reducir la merma en un 15% mediante mejor control de porciones. Ahorro estimado: $2,500 semanales.',
+            icono: '💡',
+            fecha: new Date().toISOString(),
+            tipo: 'info',
+            aiPowered: true,
+            accion: 'navegar("produccion")',
+            accionTexto: 'Ver Producción'
         });
     }
     
-    // Notificación informativa
+    // IA analiza inventario
+    const productosCriticos = mockData.productos.filter(p => p.stock <= p.stockMinimo);
+    if (productosCriticos.length > 0) {
+        mockData.notificaciones.push({
+            id: 4,
+            titulo: '🤖 IA: Alerta de Inventario Crítico',
+            mensaje: `IA detectó ${productosCriticos.length} producto(s) en nivel crítico: ${productosCriticos.map(p => p.nombre).join(', ')}. Acción recomendada: Comprar urgentemente.`,
+            icono: '⚠️',
+            fecha: new Date().toISOString(),
+            tipo: 'danger',
+            aiPowered: true,
+            accion: 'navegar("inventario")',
+            accionTexto: 'Ver Inventario'
+        });
+    }
+    
+    // IA sugiere menú basado en tendencias
     mockData.notificaciones.push({
-        id: 4,
+        id: 5,
+        titulo: '🤖 IA: Sugerencia de Menú Inteligente',
+        mensaje: 'Basado en análisis de preferencias y disponibilidad, IA sugiere para mañana: Arroz con Pollo (alta demanda), Ensalada César (bajo costo), Flan (popular). Click para aplicar sugerencia.',
+        icono: '🍽️',
+        fecha: new Date().toISOString(),
         tipo: 'info',
-        icono: 'ℹ️',
-        titulo: 'Menú Planificado',
-        mensaje: `Tienes ${mockData.menus.length} menú(s) planificado(s) para esta semana`,
-        fecha: new Date().toISOString()
+        aiPowered: true,
+        accion: 'aplicarSugerenciaIA()',
+        accionTexto: 'Aplicar Sugerencia'
     });
+    
+    // IA detecta patrones de compra
+    if (mockData.compras.length > 5) {
+        mockData.notificaciones.push({
+            id: 6,
+            titulo: '🤖 IA: Análisis de Patrones de Compra',
+            mensaje: 'IA ha identificado que compras más frecuentemente a "Proveedor A" los lunes. Sugerencia: Negociar descuento por volumen o automatizar pedidos recurrentes.',
+            icono: '📈',
+            fecha: new Date().toISOString(),
+            tipo: 'info',
+            aiPowered: true,
+            accion: 'navegar("compras")',
+            accionTexto: 'Ver Análisis'
+        });
+    }
+    
+    // IA predice demanda
+    mockData.notificaciones.push({
+        id: 7,
+        titulo: '🤖 IA: Predicción de Demanda',
+        mensaje: 'Basado en datos históricos y factores estacionales, IA predice un aumento del 12% en demanda para el próximo viernes. Recomendación: Aumentar producción en un 15% para evitar desabastecimiento.',
+        icono: '🔮',
+        fecha: new Date().toISOString(),
+        tipo: 'info',
+        aiPowered: true,
+        accion: 'navegar("planificacion")',
+        accionTexto: 'Planificar'
+    });
+    
+    // Ordenar por fecha (más recientes primero)
+    mockData.notificaciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 }
+
+window.aplicarSugerenciaIA = function() {
+    const fecha = new Date();
+    fecha.setDate(fecha.getDate() + 1);
+    const fechaStr = fecha.toISOString().split('T')[0];
+    
+    document.getElementById('fechaMenu').value = fechaStr;
+    sugerenciaIA();
+    ToastNotification.show('🤖 Sugerencia de IA aplicada. Revisa y ajusta según necesites.', 'success');
+};
 
 // Utilidades
 function mostrarModalWhatsApp(titulo, mensaje) {

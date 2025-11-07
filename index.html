@@ -448,6 +448,9 @@
             <div class="planificacion-actions">
                 <input type="date" id="fechaMenu" class="filter-input" required>
                 <button class="btn-primary" onclick="nuevoMenu()">Nuevo Menú</button>
+                <button class="btn-secondary" onclick="sugerenciaIA()" title="IA sugiere menú basado en tendencias">
+                    🤖 Sugerencia IA
+                </button>
                 <label for="excelUpload" class="btn-secondary" style="cursor: pointer; margin: 0;">
                     📄 Subir Template Excel
                     <input type="file" id="excelUpload" accept=".xlsx,.xls" style="display: none;" onchange="subirExcel(event)">

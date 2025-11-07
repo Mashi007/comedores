@@ -290,11 +290,17 @@ body.sidebar-open {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
-    display: flex;
+    position: relative;
+    display: inline-flex;
     align-items: center;
     gap: 0.75rem;
-    position: relative;
+    pointer-events: auto !important;
+    user-select: none;
+    -webkit-user-select: none;
+    opacity: 1 !important;
+    z-index: 10;
     overflow: hidden;
+    text-decoration: none;
 }
 
 .btn-hero::before {
@@ -1056,10 +1062,11 @@ body.sidebar-open {
 /* Notificaciones */
 .notificaciones-container {
     display: grid;
-    gap: 1rem;
+    gap: 1.5rem;
+    padding: 1rem 0;
 }
 
-.notificacion-item {
+.notification-card {
     background: var(--card-bg);
     padding: 1.5rem;
     border-radius: 1rem;
@@ -1067,32 +1074,105 @@ body.sidebar-open {
     border-left: 4px solid;
     display: flex;
     align-items: start;
+    gap: 1.25rem;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.notification-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: currentColor;
+    opacity: 0.3;
+}
+
+.notification-card:hover {
+    transform: translateX(5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.notification-card.notification-warning {
+    border-left-color: var(--warning-color);
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.05) 0%, var(--card-bg) 5%);
+}
+
+.notification-card.notification-danger {
+    border-left-color: var(--danger-color);
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.05) 0%, var(--card-bg) 5%);
+}
+
+.notification-card.notification-info {
+    border-left-color: var(--primary-color);
+    background: linear-gradient(90deg, rgba(37, 99, 235, 0.05) 0%, var(--card-bg) 5%);
+}
+
+.notification-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    flex-shrink: 0;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
     gap: 1rem;
 }
 
-.notificacion-item.warning {
-    border-left-color: var(--warning-color);
+.notification-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    flex: 1;
 }
 
-.notificacion-item.danger {
-    border-left-color: var(--danger-color);
+.ai-badge {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    animation: pulse-ai 2s infinite;
 }
 
-.notificacion-item.info {
-    border-left-color: var(--primary-color);
+@keyframes pulse-ai {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    }
+    50% {
+        box-shadow: 0 2px 15px rgba(99, 102, 241, 0.6);
+    }
 }
 
-.notificacion-icon {
-    font-size: 1.5rem;
-}
-
-.notificacion-content h4 {
-    margin-bottom: 0.5rem;
-}
-
-.notificacion-content p {
+.notification-content p {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.notification-content small {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.notification-content .btn-small {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
 /* Configuración */
