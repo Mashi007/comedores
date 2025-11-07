@@ -638,15 +638,12 @@ body.sidebar-open .page-container {
     padding: 1.5rem;
     border-radius: 1rem;
     box-shadow: var(--shadow);
+    position: relative;
 }
 
 .chart-card canvas {
     width: 100% !important;
     height: 250px !important;
-}
-
-.chart-card {
-    position: relative;
 }
 
 .cuadrante-labels-container {
