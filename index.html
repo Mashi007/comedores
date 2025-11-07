@@ -10,13 +10,50 @@
 <body>
     <!-- Portada -->
     <div id="portada" class="screen active">
+        <div class="portada-background">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+        </div>
         <div class="portada-container">
-            <div class="logo">
-                <h1>🍽️ Sistema de Gestión</h1>
-                <h2>Comedores Industriales</h2>
+            <div class="logo-wrapper">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+                        <path d="M30 50 L45 65 L70 40" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="logo">
+                    <h1 class="logo-title">
+                        <span class="logo-main">Sistema de Gestión</span>
+                        <span class="logo-accent">Comedores Industriales</span>
+                    </h1>
+                </div>
             </div>
-            <p class="subtitle">Gestión integral de inventarios, producción y servicio al cliente</p>
-            <button class="btn-primary" onclick="mostrarLogin(); return false;">Iniciar Sesión</button>
+            <p class="subtitle">Plataforma integral para la gestión de inventarios, producción y servicio al cliente</p>
+            <div class="features-preview">
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <span>Dashboard Inteligente</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🤖</div>
+                    <span>IA & Automatización</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <span>Integración WhatsApp</span>
+                </div>
+            </div>
+            <div class="cta-section">
+                <button class="btn-hero" onclick="mostrarLogin(); return false;">
+                    <span>Iniciar Sesión</span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <p class="demo-hint">Demo interactivo • Sin registro requerido</p>
+            </div>
         </div>
     </div>
 
