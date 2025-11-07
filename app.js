@@ -583,9 +583,45 @@ function crearGrafico3() {
         chartInstances.chart3.destroy();
     }
     
-    const charolas = [64, 69, 66, 72, 68];
-    const labels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'];
-    const merma = [12, 14, 13, 15, 14];
+    // Generar datos mock para 30 días del mes
+    const hoy = new Date();
+    const diasDelMes = 30;
+    const charolas = [];
+    const merma = [];
+    const labels = [];
+    const fechasCompletas = [];
+    
+    // Generar datos realistas con variación semanal
+    const baseProduccion = 65;
+    const variacionSemanal = [0, 5, -2, 8, 3, -5, -3]; // Variación por día de la semana
+    
+    for (let i = 0; i < diasDelMes; i++) {
+        const fecha = new Date(hoy);
+        fecha.setDate(fecha.getDate() - (diasDelMes - 1 - i));
+        
+        const diaSemana = fecha.getDay(); // 0 = Domingo, 6 = Sábado
+        const variacion = variacionSemanal[diaSemana];
+        const variacionAleatoria = (Math.random() * 8) - 4; // Variación aleatoria entre -4 y +4
+        const produccion = Math.round(baseProduccion + variacion + variacionAleatoria);
+        
+        charolas.push(Math.max(50, Math.min(85, produccion))); // Limitar entre 50 y 85
+        merma.push(Math.round(produccion * 0.18 + (Math.random() * 4 - 2))); // Merma proporcional con variación
+        
+        // Formato de etiqueta: día del mes
+        const dia = fecha.getDate();
+        labels.push(dia.toString());
+        
+        // Guardar fecha completa para tooltips
+        const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        fechasCompletas.push({
+            dia: dia,
+            diaSemana: diasSemana[diaSemana],
+            mes: meses[fecha.getMonth()],
+            fecha: fecha.toLocaleDateString('es-ES')
+        });
+    }
+    
     const promedio = (charolas.reduce((a, b) => a + b, 0) / charolas.length).toFixed(1);
     const maxCharolas = Math.max(...charolas);
     const minCharolas = Math.min(...charolas);
@@ -610,19 +646,21 @@ function crearGrafico3() {
                         if (c >= promedio * 0.9) return '#f59e0b';
                         return '#dc2626';
                     }),
-                    borderWidth: 2,
-                    borderRadius: 6,
+                    borderWidth: 1.5,
+                    borderRadius: 4,
                     borderSkipped: false,
-                    barThickness: 50,
-                    maxBarThickness: 60
+                    barThickness: 'flex',
+                    maxBarThickness: 25,
+                    categoryPercentage: 0.8,
+                    barPercentage: 0.9
                 },
                 {
-                    label: 'Promedio Semanal',
-                    data: Array(5).fill(parseFloat(promedio)),
+                    label: 'Promedio Mensual',
+                    data: Array(diasDelMes).fill(parseFloat(promedio)),
                     type: 'line',
                     borderColor: '#6366f1',
-                    borderWidth: 2,
-                    borderDash: [5, 5],
+                    borderWidth: 2.5,
+                    borderDash: [8, 4],
                     pointRadius: 0,
                     pointHoverRadius: 6,
                     pointBackgroundColor: '#6366f1',
@@ -679,8 +717,8 @@ function crearGrafico3() {
                     callbacks: {
                         title: function(context) {
                             const index = context[0].dataIndex;
-                            const diasCompletos = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-                            return `${diasCompletos[index]} - ${labels[index]}`;
+                            const fechaInfo = fechasCompletas[index];
+                            return `${fechaInfo.diaSemana}, ${fechaInfo.dia} de ${fechaInfo.mes}`;
                         },
                         label: function(context) {
                             if (context.datasetIndex === 0) {
@@ -688,20 +726,27 @@ function crearGrafico3() {
                                 const diferencia = (charolas[index] - parseFloat(promedio)).toFixed(1);
                                 const porcentajeMerma = ((merma[index] / charolas[index]) * 100).toFixed(1);
                                 const eficiencia = ((charolas[index] / maxCharolas) * 100).toFixed(1);
+                                const fechaInfo = fechasCompletas[index];
+                                
+                                // Calcular posición en el mes
+                                const semana = Math.floor(index / 7) + 1;
+                                const diaSemana = index % 7;
                                 
                                 return [
+                                    `📅 ${fechaInfo.fecha}`,
                                     `📦 Producción: ${charolas[index]} charolas`,
-                                    `📊 Promedio semanal: ${promedio} charolas`,
+                                    `📊 Promedio mensual: ${promedio} charolas`,
                                     diferencia >= 0 
                                         ? `✅ +${diferencia} charolas sobre el promedio` 
                                         : `⚠️ ${diferencia} charolas bajo el promedio`,
                                     `📉 Merma: ${merma[index]} kg (${porcentajeMerma}%)`,
                                     `⚡ Eficiencia: ${eficiencia}%`,
-                                    charolas[index] === maxCharolas ? '🏆 Día de mayor producción' : '',
-                                    charolas[index] === minCharolas ? '📌 Día de menor producción' : ''
+                                    `📆 Semana ${semana} del mes`,
+                                    charolas[index] === maxCharolas ? '🏆 Día de mayor producción del mes' : '',
+                                    charolas[index] === minCharolas ? '📌 Día de menor producción del mes' : ''
                                 ].filter(Boolean);
                             } else {
-                                return `📊 Línea de promedio: ${promedio} charolas`;
+                                return `📊 Línea de promedio mensual: ${promedio} charolas`;
                             }
                         },
                         labelColor: function(context) {
@@ -736,14 +781,15 @@ function crearGrafico3() {
                     },
                     ticks: {
                         font: {
-                            size: 11,
+                            size: 10,
                             weight: '500'
                         },
                         stepSize: 10,
                         callback: function(value) {
                             return value + ' ch';
                         },
-                        padding: 8
+                        padding: 6,
+                        maxTicksLimit: 10
                     },
                     title: {
                         display: true,
@@ -766,14 +812,23 @@ function crearGrafico3() {
                     },
                     ticks: {
                         font: {
-                            size: 12,
-                            weight: '600'
+                            size: 9,
+                            weight: '500'
                         },
-                        padding: 10
+                        padding: 5,
+                        maxRotation: 45,
+                        minRotation: 0,
+                        callback: function(value, index) {
+                            // Mostrar solo cada 3 días para no saturar
+                            if (index % 3 === 0 || index === labels.length - 1) {
+                                return labels[index];
+                            }
+                            return '';
+                        }
                     },
                     title: {
                         display: true,
-                        text: 'Días de la Semana',
+                        text: 'Días del Mes',
                         font: {
                             size: 12,
                             weight: 'bold'
