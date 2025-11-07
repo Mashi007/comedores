@@ -51,19 +51,36 @@ window.mostrarLogin = function() {
 
 window.validarLogin = function(event) {
     event.preventDefault();
+    const form = event.target;
+    const button = form.querySelector('button[type="submit"]');
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     
-    console.log('Validando login:', email);
-    
-    if (email === mockData.usuario.email && password === mockData.usuario.password) {
-        document.getElementById('userName').textContent = mockData.usuario.nombre;
-        cambiarPantalla('login', 'menu');
-        return false;
-    } else {
-        alert('Credenciales incorrectas. Use: admin@comedor.com / demo-credential-2024');
+    // Validación
+    if (!FormValidator.validateForm(form)) {
+        ToastNotification.show('Por favor, completa todos los campos requeridos', 'error');
         return false;
     }
+    
+    // Simular carga
+    LoadingState.setLoading(button, 'Verificando...');
+    
+    // Simular delay de autenticación
+    setTimeout(() => {
+        if (email === mockData.usuario.email && password === mockData.usuario.password) {
+            document.getElementById('userName').textContent = mockData.usuario.nombre;
+            ToastNotification.show('¡Bienvenido! Sesión iniciada correctamente', 'success');
+            LoadingState.removeLoading(button);
+            setTimeout(() => {
+                cambiarPantalla('login', 'menu');
+            }, 500);
+        } else {
+            ToastNotification.show('Credenciales incorrectas. Use: admin@comedor.com / demo-credential-2024', 'error');
+            LoadingState.removeLoading(button);
+        }
+    }, 800);
+    
+    return false;
 };
 
 window.cambiarPantalla = function(ocultar, mostrar) {
@@ -100,6 +117,7 @@ window.cambiarPantalla = function(ocultar, mostrar) {
 document.addEventListener('DOMContentLoaded', function() {
     try {
         inicializarApp();
+        inicializarValidaciones();
     } catch (error) {
         console.error('Error en inicialización:', error);
     }
@@ -113,6 +131,24 @@ function inicializarApp() {
     } catch (error) {
         console.error('Error al inicializar app:', error);
     }
+}
+
+function inicializarValidaciones() {
+    // Validación en tiempo real para todos los campos
+    document.addEventListener('blur', function(e) {
+        if (e.target.matches('input[required], select[required], textarea[required]')) {
+            FormValidator.validateField(e.target);
+        }
+    }, true);
+    
+    // Limpiar errores al escribir
+    document.addEventListener('input', function(e) {
+        if (e.target.matches('input, select, textarea')) {
+            if (e.target.classList.contains('error')) {
+                FormValidator.removeError(e.target);
+            }
+        }
+    }, true);
 }
 
 window.cerrarSesion = function() {
@@ -146,6 +182,60 @@ window.navegar = function(destino) {
     }
 };
 
+// Dashboard - Datos Mock Avanzados
+const dashboardData = {
+    consumoInventario: {
+        '7': [
+            { dia: 'Lun', fecha: '2024-01-15', consumo: 45, productos: ['Arroz: 15kg', 'Frijoles: 12kg', 'Papa: 18kg'] },
+            { dia: 'Mar', fecha: '2024-01-16', consumo: 52, productos: ['Arroz: 18kg', 'Carne: 20kg', 'Pollo: 14kg'] },
+            { dia: 'Mié', fecha: '2024-01-17', consumo: 48, productos: ['Frijoles: 15kg', 'Papa: 20kg', 'Verduras: 13kg'] },
+            { dia: 'Jue', fecha: '2024-01-18', consumo: 61, productos: ['Arroz: 22kg', 'Carne: 25kg', 'Pollo: 14kg'] },
+            { dia: 'Vie', fecha: '2024-01-19', consumo: 55, productos: ['Arroz: 20kg', 'Frijoles: 18kg', 'Papa: 17kg'] },
+            { dia: 'Sáb', fecha: '2024-01-20', consumo: 42, productos: ['Arroz: 15kg', 'Verduras: 15kg', 'Otros: 12kg'] },
+            { dia: 'Dom', fecha: '2024-01-21', consumo: 38, productos: ['Arroz: 12kg', 'Frijoles: 10kg', 'Papa: 16kg'] }
+        ]
+    },
+    comprasCategoria: {
+        carnes: { valor: 35, monto: 18500, facturas: 8 },
+        verduras: { valor: 25, monto: 11200, facturas: 12 },
+        granos: { valor: 30, monto: 13200, facturas: 15 },
+        otros: { valor: 10, monto: 2330, facturas: 5 }
+    },
+    produccionDiaria: {
+        '7': [
+            { dia: 'Lun', fecha: '2024-01-15', comidas: 320, charolas: 16, merma: 3.2 },
+            { dia: 'Mar', fecha: '2024-01-16', comidas: 345, charolas: 18, merma: 3.5 },
+            { dia: 'Mié', fecha: '2024-01-17', comidas: 310, charolas: 16, merma: 2.8 },
+            { dia: 'Jue', fecha: '2024-01-18', comidas: 365, charolas: 19, merma: 4.1 },
+            { dia: 'Vie', fecha: '2024-01-19', comidas: 342, charolas: 18, merma: 3.6 },
+            { dia: 'Sáb', fecha: '2024-01-20', comidas: 280, charolas: 14, merma: 2.5 },
+            { dia: 'Dom', fecha: '2024-01-21', comidas: 250, charolas: 13, merma: 2.2 }
+        ]
+    },
+    topProductos: [
+        { nombre: 'Arroz', uso: 180, categoria: 'Granos', variacion: '+5%', tendencia: 'up' },
+        { nombre: 'Frijoles', uso: 150, categoria: 'Granos', variacion: '+3%', tendencia: 'up' },
+        { nombre: 'Papa', uso: 200, categoria: 'Verduras', variacion: '-2%', tendencia: 'down' },
+        { nombre: 'Carne', uso: 120, categoria: 'Carnes', variacion: '+8%', tendencia: 'up' },
+        { nombre: 'Pollo', uso: 90, categoria: 'Carnes', variacion: '+12%', tendencia: 'up' }
+    ],
+    satisfaccion: [
+        { semana: 'Sem 1', fecha: '2024-01-01', valor: 4.2, respuestas: 145, comentarios: 23 },
+        { semana: 'Sem 2', fecha: '2024-01-08', valor: 4.4, respuestas: 158, comentarios: 28 },
+        { semana: 'Sem 3', fecha: '2024-01-15', valor: 4.5, respuestas: 162, comentarios: 31 },
+        { semana: 'Sem 4', fecha: '2024-01-22', valor: 4.6, respuestas: 175, comentarios: 35 }
+    ],
+    mermaVsPlanificado: [
+        { dia: 'Lun', planificado: 50, merma: 5, eficiencia: 90, productos: ['Arroz: 2kg', 'Frijoles: 1.5kg', 'Otros: 1.5kg'] },
+        { dia: 'Mar', planificado: 55, merma: 6, eficiencia: 89, productos: ['Carne: 3kg', 'Pollo: 2kg', 'Otros: 1kg'] },
+        { dia: 'Mié', planificado: 52, merma: 4, eficiencia: 92, productos: ['Verduras: 2kg', 'Granos: 1.5kg', 'Otros: 0.5kg'] },
+        { dia: 'Jue', planificado: 58, merma: 7, eficiencia: 88, productos: ['Carne: 4kg', 'Arroz: 2kg', 'Otros: 1kg'] },
+        { dia: 'Vie', planificado: 54, merma: 5, eficiencia: 91, productos: ['Pollo: 2.5kg', 'Frijoles: 1.5kg', 'Otros: 1kg'] }
+    ]
+};
+
+let chartInstances = {};
+
 // Dashboard - Gráficos
 function inicializarGraficos() {
     // Verificar que Chart.js esté disponible
@@ -169,28 +259,166 @@ function inicializarGraficos() {
     }, 100);
 }
 
-function crearGrafico1() {
+function aplicarFiltros() {
+    const periodo = document.getElementById('filtroPeriodo').value;
+    const categoria = document.getElementById('filtroCategoria').value;
+    
+    // Recrear gráficos con nuevos filtros
+    if (chartInstances.chart1) chartInstances.chart1.destroy();
+    if (chartInstances.chart2) chartInstances.chart2.destroy();
+    if (chartInstances.chart3) chartInstances.chart3.destroy();
+    if (chartInstances.chart4) chartInstances.chart4.destroy();
+    if (chartInstances.chart5) chartInstances.chart5.destroy();
+    if (chartInstances.chart6) chartInstances.chart6.destroy();
+    
+    crearGrafico1(periodo);
+    crearGrafico2(categoria);
+    crearGrafico3(periodo);
+    crearGrafico4();
+    crearGrafico5();
+    crearGrafico6();
+}
+
+function resetearFiltros() {
+    document.getElementById('filtroPeriodo').value = '30';
+    document.getElementById('filtroCategoria').value = 'all';
+    aplicarFiltros();
+}
+
+window.aplicarFiltros = aplicarFiltros;
+window.resetearFiltros = resetearFiltros;
+
+// Búsqueda en tablas
+window.buscarEnTabla = function(tablaId, busqueda) {
+    const tbody = document.getElementById(tablaId);
+    if (!tbody) return;
+    
+    const filas = tbody.querySelectorAll('tr');
+    const textoBusqueda = busqueda.toLowerCase().trim();
+    
+    if (!textoBusqueda) {
+        filas.forEach(fila => fila.style.display = '');
+        return;
+    }
+    
+    let encontradas = 0;
+    filas.forEach(fila => {
+        const texto = fila.textContent.toLowerCase();
+        if (texto.includes(textoBusqueda)) {
+            fila.style.display = '';
+            encontradas++;
+        } else {
+            fila.style.display = 'none';
+        }
+    });
+    
+    if (encontradas === 0 && textoBusqueda) {
+        // Mostrar mensaje si no hay resultados
+        const mensaje = tbody.querySelector('.no-results');
+        if (!mensaje) {
+            const tr = document.createElement('tr');
+            tr.className = 'no-results';
+            tr.innerHTML = `<td colspan="100%" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No se encontraron resultados para "${busqueda}"</td>`;
+            tbody.appendChild(tr);
+        }
+    } else {
+        const mensaje = tbody.querySelector('.no-results');
+        if (mensaje) mensaje.remove();
+    }
+};
+
+function crearGrafico1(periodo = '7') {
     const ctx = document.getElementById('chart1');
     if (!ctx) return;
     if (typeof Chart === 'undefined') return;
+    
+    const data = dashboardData.consumoInventario[periodo] || dashboardData.consumoInventario['7'];
+    
     try {
-        new Chart(ctx, {
+        if (chartInstances.chart1) chartInstances.chart1.destroy();
+        
+        chartInstances.chart1 = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                labels: data.map(d => d.dia),
                 datasets: [{
                     label: 'Consumo (kg)',
-                    data: [45, 52, 48, 61, 55, 42, 38],
+                    data: data.map(d => d.consumo),
                     borderColor: '#2563eb',
                     backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    tension: 0.4
+                    borderWidth: 3,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#2563eb',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 4,
+                    shadowBlur: 10,
+                    shadowColor: 'rgba(37, 99, 235, 0.3)'
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
                 plugins: {
-                    legend: { display: false }
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        padding: 15,
+                        titleFont: { size: 16, weight: 'bold' },
+                        bodyFont: { size: 14 },
+                        borderColor: '#2563eb',
+                        borderWidth: 2,
+                        cornerRadius: 10,
+                        displayColors: false,
+                        callbacks: {
+                            title: function(context) {
+                                const dataPoint = data[context[0].dataIndex];
+                                return `${dataPoint.dia} - ${dataPoint.fecha}`;
+                            },
+                            label: function(context) {
+                                const dataPoint = data[context.dataIndex];
+                                return [
+                                    `Consumo Total: ${context.parsed.y} kg`,
+                                    '',
+                                    'Desglose por producto:',
+                                    ...dataPoint.productos.map(p => `  • ${p}`)
+                                ];
+                            },
+                            afterBody: function(context) {
+                                return `\n📊 Detalle completo del consumo`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' kg';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
                 }
             }
         });
@@ -199,122 +427,456 @@ function crearGrafico1() {
     }
 }
 
-function crearGrafico2() {
+function crearGrafico2(categoria = 'all') {
     const ctx = document.getElementById('chart2');
     if (!ctx) return;
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Carnes', 'Verduras', 'Granos', 'Otros'],
-            datasets: [{
-                data: [35, 25, 30, 10],
-                backgroundColor: ['#ef4444', '#10b981', '#f59e0b', '#64748b']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true
-        }
-    });
+    
+    const data = dashboardData.comprasCategoria;
+    const labels = Object.keys(data);
+    const valores = Object.values(data).map(d => d.valor);
+    const montos = Object.values(data).map(d => d.monto);
+    const facturas = Object.values(data).map(d => d.facturas);
+    const colores = ['#ef4444', '#10b981', '#f59e0b', '#64748b'];
+    
+    try {
+        if (chartInstances.chart2) chartInstances.chart2.destroy();
+        
+        chartInstances.chart2 = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
+                datasets: [{
+                    data: valores,
+                    backgroundColor: colores,
+                    borderWidth: 3,
+                    borderColor: '#ffffff',
+                    hoverOffset: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                animation: {
+                    animateRotate: true,
+                    animateScale: true,
+                    duration: 2000
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: { size: 12, weight: '500' },
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        padding: 15,
+                        titleFont: { size: 16, weight: 'bold' },
+                        bodyFont: { size: 14 },
+                        borderColor: function(context) {
+                            return colores[context.dataIndex];
+                        },
+                        borderWidth: 2,
+                        cornerRadius: 10,
+                        callbacks: {
+                            label: function(context) {
+                                const index = context.dataIndex;
+                                const label = labels[index];
+                                const categoriaData = data[label];
+                                return [
+                                    `Porcentaje: ${context.parsed}%`,
+                                    `Monto Total: $${categoriaData.monto.toLocaleString()}`,
+                                    `Facturas: ${categoriaData.facturas}`,
+                                    `Promedio por factura: $${Math.round(categoriaData.monto / categoriaData.facturas).toLocaleString()}`
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error al crear gráfico 2:', error);
+    }
 }
 
-function crearGrafico3() {
+function crearGrafico3(periodo = '7') {
     const ctx = document.getElementById('chart3');
     if (!ctx) return;
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-            datasets: [{
-                label: 'Comidas Servidas',
-                data: [320, 345, 310, 365, 342, 280, 250],
-                backgroundColor: '#10b981'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { display: false }
+    
+    const data = dashboardData.produccionDiaria[periodo] || dashboardData.produccionDiaria['7'];
+    
+    try {
+        if (chartInstances.chart3) chartInstances.chart3.destroy();
+        
+        chartInstances.chart3 = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.dia),
+                datasets: [{
+                    label: 'Comidas Servidas',
+                    data: data.map(d => d.comidas),
+                    backgroundColor: '#10b981',
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    barThickness: 40
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutBounce'
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        padding: 15,
+                        titleFont: { size: 16, weight: 'bold' },
+                        bodyFont: { size: 14 },
+                        borderColor: '#10b981',
+                        borderWidth: 2,
+                        cornerRadius: 10,
+                        displayColors: false,
+                        callbacks: {
+                            title: function(context) {
+                                const dataPoint = data[context[0].dataIndex];
+                                return `${dataPoint.dia} - ${dataPoint.fecha}`;
+                            },
+                            label: function(context) {
+                                const dataPoint = data[context.dataIndex];
+                                return [
+                                    `🍽️ Comidas Servidas: ${context.parsed.y}`,
+                                    `📦 Charolas: ${dataPoint.charolas}`,
+                                    `📊 Merma: ${dataPoint.merma} kg`,
+                                    `📈 Eficiencia: ${((dataPoint.comidas / (dataPoint.comidas + dataPoint.merma * 10)) * 100).toFixed(1)}%`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value;
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
             }
-        }
-    });
+        });
+    } catch (error) {
+        console.error('Error al crear gráfico 3:', error);
+    }
 }
 
 function crearGrafico4() {
     const ctx = document.getElementById('chart4');
     if (!ctx) return;
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Arroz', 'Frijoles', 'Papa', 'Carne', 'Pollo'],
-            datasets: [{
-                label: 'Uso (kg)',
-                data: [180, 150, 200, 120, 90],
-                backgroundColor: '#2563eb'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            indexAxis: 'y',
-            plugins: {
-                legend: { display: false }
+    
+    const data = dashboardData.topProductos;
+    
+    try {
+        if (chartInstances.chart4) chartInstances.chart4.destroy();
+        
+        chartInstances.chart4 = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.nombre),
+                datasets: [{
+                    label: 'Uso (kg)',
+                    data: data.map(d => d.uso),
+                    backgroundColor: function(context) {
+                        const item = data[context.dataIndex];
+                        return item.tendencia === 'up' ? '#10b981' : '#ef4444';
+                    },
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    barThickness: 35
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                indexAxis: 'y',
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        padding: 15,
+                        titleFont: { size: 16, weight: 'bold' },
+                        bodyFont: { size: 14 },
+                        borderColor: function(context) {
+                            const item = data[context.dataIndex];
+                            return item.tendencia === 'up' ? '#10b981' : '#ef4444';
+                        },
+                        borderWidth: 2,
+                        cornerRadius: 10,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                const item = data[context.dataIndex];
+                                const tendenciaIcon = item.tendencia === 'up' ? '📈' : '📉';
+                                return [
+                                    `Uso Total: ${context.parsed.x} kg`,
+                                    `Categoría: ${item.categoria}`,
+                                    `${tendenciaIcon} Variación: ${item.variacion}`,
+                                    `Tendencia: ${item.tendencia === 'up' ? 'En aumento' : 'En disminución'}`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' kg';
+                            }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
             }
-        }
-    });
+        });
+    } catch (error) {
+        console.error('Error al crear gráfico 4:', error);
+    }
 }
 
 function crearGrafico5() {
     const ctx = document.getElementById('chart5');
     if (!ctx) return;
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
-            datasets: [{
-                label: 'Satisfacción',
-                data: [4.2, 4.4, 4.5, 4.6],
-                borderColor: '#f59e0b',
-                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            scales: {
-                y: {
-                    min: 3,
-                    max: 5
+    
+    const data = dashboardData.satisfaccion;
+    
+    try {
+        if (chartInstances.chart5) chartInstances.chart5.destroy();
+        
+        chartInstances.chart5 = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => d.semana),
+                datasets: [{
+                    label: 'Satisfacción',
+                    data: data.map(d => d.valor),
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 7,
+                    pointHoverRadius: 10,
+                    pointBackgroundColor: '#f59e0b',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 3,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        padding: 15,
+                        titleFont: { size: 16, weight: 'bold' },
+                        bodyFont: { size: 14 },
+                        borderColor: '#f59e0b',
+                        borderWidth: 2,
+                        cornerRadius: 10,
+                        displayColors: false,
+                        callbacks: {
+                            title: function(context) {
+                                const dataPoint = data[context[0].dataIndex];
+                                return `${dataPoint.semana} - ${dataPoint.fecha}`;
+                            },
+                            label: function(context) {
+                                const dataPoint = data[context.dataIndex];
+                                const estrellas = '⭐'.repeat(Math.round(dataPoint.valor));
+                                return [
+                                    `Calificación: ${context.parsed.y}/5 ${estrellas}`,
+                                    `📝 Respuestas: ${dataPoint.respuestas}`,
+                                    `💬 Comentarios: ${dataPoint.comentarios}`,
+                                    `📊 Tasa de respuesta: ${((dataPoint.comentarios / dataPoint.respuestas) * 100).toFixed(1)}%`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 3,
+                        max: 5,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toFixed(1);
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
                 }
             }
-        }
-    });
+        });
+    } catch (error) {
+        console.error('Error al crear gráfico 5:', error);
+    }
 }
 
 function crearGrafico6() {
     const ctx = document.getElementById('chart6');
     if (!ctx) return;
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'],
-            datasets: [{
-                label: 'Planificado (kg)',
-                data: [50, 55, 52, 58, 54],
-                backgroundColor: '#10b981'
-            }, {
-                label: 'Merma (kg)',
-                data: [5, 6, 4, 7, 5],
-                backgroundColor: '#ef4444'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true
-        }
-    });
+    
+    const data = dashboardData.mermaVsPlanificado;
+    
+    try {
+        if (chartInstances.chart6) chartInstances.chart6.destroy();
+        
+        chartInstances.chart6 = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.dia),
+                datasets: [{
+                    label: 'Planificado (kg)',
+                    data: data.map(d => d.planificado),
+                    backgroundColor: '#10b981',
+                    borderRadius: 6,
+                    borderSkipped: false
+                }, {
+                    label: 'Merma (kg)',
+                    data: data.map(d => d.merma),
+                    backgroundColor: '#ef4444',
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            padding: 15,
+                            font: { size: 12, weight: '500' },
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        padding: 15,
+                        titleFont: { size: 16, weight: 'bold' },
+                        bodyFont: { size: 14 },
+                        borderColor: '#64748b',
+                        borderWidth: 2,
+                        cornerRadius: 10,
+                        callbacks: {
+                            title: function(context) {
+                                const dataPoint = data[context[0].dataIndex];
+                                return `${dataPoint.dia}`;
+                            },
+                            label: function(context) {
+                                const dataPoint = data[context[0].dataIndex];
+                                if (context.datasetIndex === 0) {
+                                    return `📋 Planificado: ${context.parsed.y} kg`;
+                                } else {
+                                    return [
+                                        `⚠️ Merma: ${context.parsed.y} kg`,
+                                        `📊 Eficiencia: ${dataPoint.eficiencia}%`,
+                                        '',
+                                        'Desglose de merma:',
+                                        ...dataPoint.productos.map(p => `  • ${p}`)
+                                    ];
+                                }
+                            },
+                            footer: function(tooltipItems) {
+                                const dataPoint = data[tooltipItems[0].dataIndex];
+                                return `\n💡 Diferencia: ${(dataPoint.planificado - dataPoint.merma).toFixed(1)} kg`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' kg';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error al crear gráfico 6:', error);
+    }
 }
 
 // Compras
@@ -383,10 +945,54 @@ function actualizarKPIsCompras() {
     document.getElementById('promedioFactura').textContent = `$${Math.round(promedio).toLocaleString()}`;
 }
 
-function filtrarCompras() {
-    // Implementación básica de filtros
-    alert('Filtros aplicados (funcionalidad de demo)');
-}
+window.filtrarCompras = function() {
+    const fechaDesde = document.getElementById('fechaDesde').value;
+    const fechaHasta = document.getElementById('fechaHasta').value;
+    const proveedor = document.getElementById('filtroProveedor').value;
+    
+    let comprasFiltradas = [...mockData.compras];
+    
+    if (fechaDesde) {
+        comprasFiltradas = comprasFiltradas.filter(c => c.fecha >= fechaDesde);
+    }
+    
+    if (fechaHasta) {
+        comprasFiltradas = comprasFiltradas.filter(c => c.fecha <= fechaHasta);
+    }
+    
+    if (proveedor) {
+        comprasFiltradas = comprasFiltradas.filter(c => c.proveedor === proveedor);
+    }
+    
+    const tbody = document.getElementById('tablaCompras');
+    if (!tbody) return;
+    
+    if (comprasFiltradas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">No se encontraron facturas con los filtros aplicados</td></tr>';
+        ToastNotification.show('No se encontraron resultados', 'info');
+    } else {
+        tbody.innerHTML = comprasFiltradas.map(compra => `
+            <tr>
+                <td>${compra.fecha}</td>
+                <td>${compra.proveedor}</td>
+                <td>${compra.factura}</td>
+                <td>${compra.productos}</td>
+                <td>$${compra.monto.toLocaleString()}</td>
+                <td><span class="badge ${compra.estado === 'Procesada' ? 'badge-success' : 'badge-warning'}">${compra.estado}</span></td>
+            </tr>
+        `).join('');
+        
+        ToastNotification.show(`${comprasFiltradas.length} factura(s) encontrada(s)`, 'success');
+    }
+    
+    // Actualizar KPIs con datos filtrados
+    const montoTotal = comprasFiltradas.reduce((sum, c) => sum + c.monto, 0);
+    const promedio = comprasFiltradas.length > 0 ? montoTotal / comprasFiltradas.length : 0;
+    
+    document.getElementById('totalFacturas').textContent = comprasFiltradas.length;
+    document.getElementById('montoTotal').textContent = `$${montoTotal.toLocaleString()}`;
+    document.getElementById('promedioFactura').textContent = `$${Math.round(promedio).toLocaleString()}`;
+};
 
 // Inventario
 function cargarProductosEnSelects() {
@@ -408,36 +1014,66 @@ function ocultarFormularioInventario() {
     document.getElementById('formularioInventario').querySelector('form').reset();
 }
 
-function procesarMovimientoInventario(event) {
+window.procesarMovimientoInventario = function(event) {
     event.preventDefault();
+    const form = event.target;
+    const button = form.querySelector('button[type="submit"]');
+    
+    if (!FormValidator.validateForm(form)) {
+        ToastNotification.show('Por favor, completa todos los campos requeridos', 'error');
+        return false;
+    }
+    
     const productoId = parseInt(document.getElementById('productoInventario').value);
     const tipo = document.getElementById('tipoMovimiento').value;
     const cantidad = parseFloat(document.getElementById('cantidadInventario').value);
     const observaciones = document.getElementById('observacionesInventario').value;
     
     const producto = mockData.productos.find(p => p.id === productoId);
-    if (!producto) return;
-    
-    if (tipo === 'entrada') {
-        producto.stock += cantidad;
-    } else {
-        producto.stock -= cantidad;
-        if (producto.stock < 0) producto.stock = 0;
+    if (!producto) {
+        ToastNotification.show('Producto no encontrado', 'error');
+        return false;
     }
     
-    mockData.movimientosInventario.push({
-        id: mockData.movimientosInventario.length + 1,
-        fecha: new Date().toISOString(),
-        producto: producto.nombre,
-        tipo,
-        cantidad,
-        observaciones
-    });
+    // Validar salida
+    if (tipo === 'salida' && producto.stock < cantidad) {
+        ToastNotification.show(`Stock insuficiente. Disponible: ${producto.stock} ${producto.unidad}`, 'warning');
+        return false;
+    }
     
-    mostrarModalWhatsApp('Movimiento de Inventario', `Se registró ${tipo === 'entrada' ? 'entrada' : 'salida'} de ${cantidad} ${producto.unidad} de ${producto.nombre}`);
-    cargarInventario();
-    ocultarFormularioInventario();
-}
+    LoadingState.setLoading(button, 'Procesando...');
+    
+    // Simular delay de procesamiento
+    setTimeout(() => {
+        if (tipo === 'entrada') {
+            producto.stock += cantidad;
+        } else {
+            producto.stock -= cantidad;
+            if (producto.stock < 0) producto.stock = 0;
+        }
+        
+        mockData.movimientosInventario.push({
+            id: mockData.movimientosInventario.length + 1,
+            fecha: new Date().toISOString(),
+            producto: producto.nombre,
+            tipo,
+            cantidad,
+            observaciones
+        });
+        
+        ToastNotification.show(
+            `${tipo === 'entrada' ? 'Entrada' : 'Salida'} registrada: ${cantidad} ${producto.unidad} de ${producto.nombre}. Stock actual: ${producto.stock} ${producto.unidad}`,
+            'success'
+        );
+        
+        mostrarModalWhatsApp('Movimiento de Inventario', `Se registró ${tipo === 'entrada' ? 'entrada' : 'salida'} de ${cantidad} ${producto.unidad} de ${producto.nombre}`);
+        cargarInventario();
+        ocultarFormularioInventario();
+        LoadingState.removeLoading(button);
+    }, 600);
+    
+    return false;
+};
 
 function cargarInventario() {
     const tbody = document.getElementById('tablaInventario');
@@ -514,14 +1150,23 @@ function agregarMaterial(btn) {
     cargarProductosEnSelects();
 }
 
-function guardarMenu(event) {
+window.guardarMenu = function(event) {
     event.preventDefault();
+    const form = event.target.closest('form');
+    const button = form.querySelector('button[type="submit"]');
     const fecha = document.getElementById('fechaMenuForm').value;
     const recetasItems = document.querySelectorAll('.receta-item');
     const recetas = [];
     
+    if (!fecha) {
+        ToastNotification.show('Selecciona una fecha para el menú', 'error');
+        return false;
+    }
+    
     recetasItems.forEach((item, index) => {
         const nombre = item.querySelector('.nombre-receta').value;
+        if (!nombre) return;
+        
         const materiales = [];
         item.querySelectorAll('.material-item').forEach(matItem => {
             const productoId = matItem.querySelector('.material-select').value;
@@ -533,21 +1178,36 @@ function guardarMenu(event) {
                 }
             }
         });
-        recetas.push({ nombre, materiales });
+        
+        if (materiales.length > 0) {
+            recetas.push({ nombre, materiales });
+        }
     });
     
-    const menu = {
-        id: mockData.menus.length + 1,
-        fecha,
-        recetas,
-        fechaCreacion: new Date().toISOString()
-    };
+    if (recetas.length === 0) {
+        ToastNotification.show('Agrega al menos una receta con materiales', 'error');
+        return false;
+    }
     
-    mockData.menus.push(menu);
-    cargarMenus();
-    cancelarMenu();
-    alert('Menú guardado exitosamente');
-}
+    LoadingState.setLoading(button, 'Guardando...');
+    
+    setTimeout(() => {
+        const menu = {
+            id: mockData.menus.length + 1,
+            fecha,
+            recetas,
+            fechaCreacion: new Date().toISOString()
+        };
+        
+        mockData.menus.push(menu);
+        cargarMenus();
+        cancelarMenu();
+        LoadingState.removeLoading(button);
+        ToastNotification.show(`Menú del ${new Date(fecha).toLocaleDateString()} guardado exitosamente con ${recetas.length} receta(s)`, 'success');
+    }, 600);
+    
+    return false;
+};
 
 function cancelarMenu() {
     document.getElementById('formularioMenu').style.display = 'none';
@@ -600,9 +1260,9 @@ function cargarMenus() {
     `).join('');
 }
 
-function generarCompras() {
+window.generarCompras = function() {
     if (mockData.menus.length === 0) {
-        alert('No hay menús planificados para generar compras');
+        ToastNotification.show('No hay menús planificados para generar compras', 'warning');
         return;
     }
     
@@ -632,13 +1292,31 @@ function generarCompras() {
     });
     
     if (pedidos.length === 0) {
-        alert('El inventario actual es suficiente para los menús planificados');
+        ToastNotification.show('✅ El inventario actual es suficiente para los menús planificados', 'success');
         return;
     }
     
-    const pedidoTexto = pedidos.map(p => `${p.producto}: ${p.cantidad.toFixed(2)} ${p.unidad}`).join('\n');
-    alert(`Pedido de compra generado:\n\n${pedidoTexto}\n\nSe ha enviado al departamento de compras`);
-}
+    const pedidoTexto = pedidos.map(p => `• ${p.producto}: ${p.cantidad.toFixed(2)} ${p.unidad}`).join('\n');
+    
+    // Mostrar modal con detalles
+    const modal = document.createElement('div');
+    modal.className = 'whatsapp-modal';
+    modal.innerHTML = `
+        <div class="whatsapp-modal-content">
+            <div class="whatsapp-icon">📋</div>
+            <h3>Pedido de Compra Generado</h3>
+            <div style="margin: 1.5rem 0; padding: 1rem; background: #f0f0f0; border-radius: 0.5rem; text-align: left; max-height: 300px; overflow-y: auto;">
+                <p><strong>Productos a comprar:</strong></p>
+                <pre style="white-space: pre-wrap; font-family: inherit; margin-top: 0.5rem;">${pedidoTexto}</pre>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Se ha enviado al departamento de compras</p>
+            <button class="btn-primary" onclick="this.closest('.whatsapp-modal').remove(); ToastNotification.show('Pedido enviado correctamente', 'success');">Aceptar</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    ToastNotification.show(`Pedido generado con ${pedidos.length} producto(s)`, 'success');
+};
 
 function cargarMenusEnProduccion() {
     const select = document.getElementById('menuProduccion');
@@ -673,8 +1351,16 @@ function ocultarFormularioProduccion() {
     document.getElementById('formularioProduccion').querySelector('form').reset();
 }
 
-function reportarProduccion(event) {
+window.reportarProduccion = function(event) {
     event.preventDefault();
+    const form = event.target;
+    const button = form.querySelector('button[type="submit"]');
+    
+    if (!FormValidator.validateForm(form)) {
+        ToastNotification.show('Por favor, completa todos los campos requeridos', 'error');
+        return false;
+    }
+    
     const menuId = parseInt(document.getElementById('menuProduccion').value);
     const recetaIndex = parseInt(document.getElementById('recetaProduccion').value);
     const cantidad = parseInt(document.getElementById('cantidadReceta').value);
@@ -683,35 +1369,50 @@ function reportarProduccion(event) {
     const observaciones = document.getElementById('observacionesProduccion').value;
     
     const menu = mockData.menus.find(m => m.id === menuId);
-    if (!menu) return;
+    if (!menu) {
+        ToastNotification.show('Menú no encontrado', 'error');
+        return false;
+    }
     
     const receta = menu.recetas[recetaIndex];
+    if (!receta) {
+        ToastNotification.show('Receta no encontrada', 'error');
+        return false;
+    }
     
-    const reporte = {
-        id: mockData.produccion.length + 1,
-        fecha: new Date().toISOString(),
-        menuId,
-        receta: receta.nombre,
-        cantidad,
-        charolas,
-        merma,
-        observaciones,
-        estado: 'Reportado'
-    };
+    LoadingState.setLoading(button, 'Enviando...');
     
-    mockData.produccion.push(reporte);
+    setTimeout(() => {
+        const reporte = {
+            id: mockData.produccion.length + 1,
+            fecha: new Date().toISOString(),
+            menuId,
+            receta: receta.nombre,
+            cantidad,
+            charolas,
+            merma,
+            observaciones,
+            estado: 'Reportado'
+        };
+        
+        mockData.produccion.push(reporte);
+        
+        const mensaje = `📊 Reporte de Producción\n\n` +
+            `Receta: ${receta.nombre}\n` +
+            `Cantidad: ${cantidad} porciones\n` +
+            `Charolas: ${charolas}\n` +
+            `Merma: ${merma} kg\n` +
+            `Observaciones: ${observaciones || 'Ninguna'}`;
+        
+        mostrarModalWhatsApp('Reporte Enviado', mensaje);
+        cargarProduccion();
+        ocultarFormularioProduccion();
+        LoadingState.removeLoading(button);
+        ToastNotification.show(`Reporte de producción registrado: ${receta.nombre}`, 'success');
+    }, 800);
     
-    const mensaje = `📊 Reporte de Producción\n\n` +
-        `Receta: ${receta.nombre}\n` +
-        `Cantidad: ${cantidad} porciones\n` +
-        `Charolas: ${charolas}\n` +
-        `Merma: ${merma} kg\n` +
-        `Observaciones: ${observaciones || 'Ninguna'}`;
-    
-    mostrarModalWhatsApp('Reporte Enviado', mensaje);
-    cargarProduccion();
-    ocultarFormularioProduccion();
-}
+    return false;
+};
 
 function cargarProduccion() {
     const tbody = document.getElementById('tablaProduccion');
