@@ -353,9 +353,8 @@ function crearGrafico3() {
     const ctx = document.getElementById('chart3');
     if (!ctx || typeof Chart === 'undefined') return;
     
-    const data = [320, 345, 330, 360, 340];
-    const labels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
     const charolas = [64, 69, 66, 72, 68];
+    const labels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'];
     const merma = [12, 14, 13, 15, 14];
     
     chartInstances.chart3 = new Chart(ctx, {
@@ -363,8 +362,8 @@ function crearGrafico3() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Comidas Servidas',
-                data: data,
+                label: 'Charolas',
+                data: charolas,
                 backgroundColor: '#10b981',
                 borderRadius: 8,
                 borderSkipped: false,
@@ -402,12 +401,13 @@ function crearGrafico3() {
                         },
                         label: function(context) {
                             const index = context.dataIndex;
-                            const eficiencia = ((data[index] / (data[index] + merma[index] * 10)) * 100).toFixed(1);
+                            const promedio = (charolas.reduce((a, b) => a + b, 0) / charolas.length).toFixed(1);
+                            const diferencia = (charolas[index] - promedio).toFixed(1);
                             return [
-                                `🍽️ Comidas: ${data[index]}`,
-                                `📦 Charolas: ${charolas[index]}`,
-                                `📊 Merma: ${merma[index]} kg`,
-                                `📈 Eficiencia: ${eficiencia}%`
+                                `📦 Producción: ${charolas[index]} charolas`,
+                                `📊 Promedio semanal: ${promedio} charolas`,
+                                diferencia >= 0 ? `↑ +${diferencia} charolas` : `↓ ${diferencia} charolas`,
+                                `📉 Merma: ${merma[index]} kg`
                             ];
                         }
                     }
@@ -423,6 +423,9 @@ function crearGrafico3() {
                     ticks: {
                         font: {
                             size: 12
+                        },
+                        callback: function(value) {
+                            return value + ' charolas';
                         }
                     }
                 },
