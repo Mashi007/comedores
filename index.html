@@ -582,10 +582,12 @@
                     </div>
                 </div>
                 <div class="chat-suggestions">
-                    <button class="suggestion-btn" onclick="enviarMensajeAI('¿Cómo puedo optimizar el consumo de arroz?')">💡 Optimizar consumo</button>
-                    <button class="suggestion-btn" onclick="enviarMensajeAI('Sugiere un menú para mañana')">📅 Sugerir menú</button>
                     <button class="suggestion-btn" onclick="enviarMensajeAI('Analiza el inventario actual')">📦 Analizar inventario</button>
-                    <button class="suggestion-btn" onclick="enviarMensajeAI('¿Qué productos debo comprar?')">🛒 Recomendaciones de compra</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('¿Qué consumos están fuera de lo planificado?')">📊 Consumos fuera de plan</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('¿Cuál es la receta con mayor merma y en qué fecha?')">📉 Mayor merma</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('Sugiere un menú para mañana')">📅 Sugerir menú</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('¿Qué productos están críticos?')">🚨 Productos críticos</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('Dame un reporte ejecutivo')">📋 Reporte ejecutivo</button>
                 </div>
                 <div class="chat-input-container">
                     <input type="text" id="chatInput" class="chat-input" placeholder="Escribe tu pregunta..." onkeypress="if(event.key === 'Enter') enviarMensajeAI()">

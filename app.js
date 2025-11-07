@@ -1524,7 +1524,116 @@ function actualizarContadorNotificaciones() {
     }
 }
 
-// Chat AI
+// Chat AI - Base de datos de ejemplos precargados
+const ejemplosAI = [
+    {
+        keywords: ['inventario', 'stock', 'nivel', 'cantidad'],
+        mensaje: '📊 **Análisis de Inventario Actual:**\n\n✅ **Niveles Óptimos:**\n• Arroz: 450 kg (300% del mínimo)\n• Pollo: 280 kg (280% del mínimo)\n• Sal: 350 kg (350% del mínimo)\n\n⚠️ **Atención Requerida:**\n• Frijoles: 35 kg (70% del mínimo) - 🔴 CRÍTICO\n• Lechuga: 20 kg (67% del mínimo) - 🔴 CRÍTICO\n• Cebolla: 40 kg (80% del mínimo) - 🟡 ATENCIÓN\n\n📋 **Recomendación:** Generar orden de compra urgente para frijoles (50 kg) y lechuga (30 kg).',
+        tiempo: 2000
+    },
+    {
+        keywords: ['consumo', 'planificado', 'fuera', 'diferencia', 'variación'],
+        mensaje: '📈 **Análisis de Consumos vs Planificado:**\n\n🔴 **Consumos por Encima del Planificado:**\n• Arroz: +15% (520 kg vs 450 kg planificado) - 15/01/2025\n• Pollo: +22% (122 kg vs 100 kg planificado) - 18/01/2025\n• Aceite: +18% (47 kg vs 40 kg planificado) - 20/01/2025\n\n🟢 **Consumos por Debajo del Planificado:**\n• Frijoles: -12% (40 kg vs 45 kg planificado) - 16/01/2025\n• Tomates: -8% (32 kg vs 35 kg planificado) - 19/01/2025\n\n💡 **Recomendación:** Ajustar planificación semanal considerando estas variaciones.',
+        tiempo: 2200
+    },
+    {
+        keywords: ['merma', 'desperdicio', 'sobrante', 'pérdida'],
+        mensaje: '📉 **Análisis de Merma por Receta:**\n\n🔴 **Mayor Merma:**\n• **Carne Asada:** 15.2 kg (19% del planificado) - Fecha: 17/01/2025\n• **Pollo a la Plancha:** 12.3 kg (13% del planificado) - Fecha: 19/01/2025\n• **Pasta al Pesto:** 9.4 kg (17% del planificado) - Fecha: 21/01/2025\n\n🟢 **Menor Merma:**\n• **Ensalada Mixta:** 5.8 kg (9.7% del planificado) - Fecha: 18/01/2025\n• **Sopa de Verduras:** 7.1 kg (15.8% del planificado) - Fecha: 20/01/2025\n\n💡 **Recomendación:** Revisar porciones de Carne Asada y ajustar preparación para reducir merma.',
+        tiempo: 2300
+    },
+    {
+        keywords: ['receta', 'mayor', 'merma', 'fecha'],
+        mensaje: '🎯 **Receta con Mayor Merma:**\n\n**Carne Asada**\n📅 Fecha: 17/01/2025\n📊 Merma: 15.2 kg\n📋 Planificado: 80 kg\n📉 Porcentaje: 19%\n💰 Valor estimado pérdida: $456\n\n**Análisis:**\n• La merma supera el promedio del 12%\n• Posible causa: sobrecocción o porciones mal calculadas\n• Impacto: 3 días de inventario adicional requerido\n\n💡 **Acción recomendada:**\n1. Revisar proceso de cocción\n2. Ajustar cálculo de porciones\n3. Capacitar personal en manejo de carne',
+        tiempo: 2500
+    },
+    {
+        keywords: ['optimizar', 'mejorar', 'eficiencia'],
+        mensaje: '⚡ **Plan de Optimización:**\n\n📊 **Áreas de Mejora Identificadas:**\n\n1. **Reducción de Merma:**\n   • Carne Asada: Reducir 7% (de 19% a 12%)\n   • Ahorro estimado: $210/semana\n\n2. **Ajuste de Consumos:**\n   • Arroz: Reducir porciones en 8%\n   • Pollo: Optimizar preparación\n   • Ahorro estimado: $180/semana\n\n3. **Gestión de Inventario:**\n   • Implementar rotación FIFO\n   • Reducir stock excedente\n   • Ahorro estimado: $150/semana\n\n💰 **Ahorro Total Estimado: $540/semana**',
+        tiempo: 2400
+    },
+    {
+        keywords: ['menú', 'sugerir', 'mañana', 'día'],
+        mensaje: '🍽️ **Menú Sugerido para Mañana:**\n\n**🌅 Desayuno:**\n• Huevos revueltos con frijoles\n• Arroz blanco\n• Fruta fresca (papaya)\n• Café\n\n**🌞 Almuerzo:**\n• Pollo a la plancha\n• Ensalada mixta\n• Arroz integral\n• Postre (flan)\n\n**🌙 Cena:**\n• Sopa de verduras\n• Pan integral\n• Agua de frutas\n\n📊 **Análisis:**\n• Usa productos con buen stock\n• Balance nutricional óptimo\n• Costo estimado: $2,450\n• Merma estimada: 8%',
+        tiempo: 2000
+    },
+    {
+        keywords: ['comprar', 'pedido', 'orden'],
+        mensaje: '🛒 **Orden de Compra Recomendada:**\n\n🔴 **URGENTE (Comprar hoy):**\n• Frijoles: 50 kg × $25 = $1,250\n• Lechuga: 30 kg × $8 = $240\n• Cebolla: 25 kg × $6 = $150\n\n🟡 **PROGRAMADA (Esta semana):**\n• Arroz: 200 kg × $15 = $3,000\n• Pollo: 150 kg × $30 = $4,500\n• Carne: 100 kg × $50 = $5,000\n• Tomates: 80 kg × $12 = $960\n\n💰 **Total: $15,100**\n\n📅 **Entrega sugerida:** 2-3 días\n🏪 **Proveedor recomendado:** Distribuidora Alimentos S.A.',
+        tiempo: 2200
+    },
+    {
+        keywords: ['tendencia', 'semanal', 'análisis'],
+        mensaje: '📊 **Análisis de Tendencias Semanales:**\n\n**📈 Tendencias Alcistas:**\n• Consumo de pollo: +12% vs semana anterior\n• Consumo de arroz: +8% vs semana anterior\n• Producción de charolas: +5% vs semana anterior\n\n**📉 Tendencias Bajistas:**\n• Merma de ensaladas: -3% (mejora)\n• Consumo de frijoles: -5% (ajuste necesario)\n\n**🎯 Proyección Próxima Semana:**\n• Necesidad de arroz: 520 kg\n• Necesidad de pollo: 150 kg\n• Stock actual suficiente para 4 días\n\n💡 **Recomendación:** Programar compra para el viernes.',
+        tiempo: 2300
+    },
+    {
+        keywords: ['costo', 'precio', 'presupuesto'],
+        mensaje: '💰 **Análisis de Costos:**\n\n**📊 Costos Semanales:**\n• Materias primas: $18,500\n• Merma estimada: $1,200 (6.5%)\n• Costo por charola: $28.75\n• Costo por comida: $5.75\n\n**📈 Comparativa Mensual:**\n• Enero: $74,000 (promedio)\n• Diciembre: $71,500 (-3.4%)\n• Noviembre: $76,200 (+2.9%)\n\n**💡 Oportunidades de Ahorro:**\n• Reducir merma: -$480/mes\n• Optimizar compras: -$600/mes\n• Mejorar rotación: -$300/mes\n\n**🎯 Ahorro Potencial: $1,380/mes**',
+        tiempo: 2400
+    },
+    {
+        keywords: ['satisfacción', 'encuesta', 'cliente'],
+        mensaje: '⭐ **Análisis de Satisfacción:**\n\n**📊 Resultados Recientes:**\n• Calificación promedio: 4.7/5.0\n• Total respuestas: 127\n• Tasa de respuesta: 68%\n\n**👍 Aspectos Mejor Valorados:**\n• Sabor de la comida: 4.8/5\n• Variedad de menú: 4.6/5\n• Temperatura: 4.5/5\n\n**👎 Áreas de Mejora:**\n• Tiempo de espera: 3.9/5\n• Presentación: 4.2/5\n\n**💡 Recomendaciones:**\n• Optimizar proceso de servicio\n• Mejorar presentación de platos\n• Mantener calidad actual',
+        tiempo: 2000
+    },
+    {
+        keywords: ['producto', 'crítico', 'urgente'],
+        mensaje: '🚨 **Productos en Estado Crítico:**\n\n**🔴 CRÍTICO (Comprar hoy):**\n1. **Frijoles:** 35 kg (70% del mínimo)\n   • Días restantes: 0.8 días\n   • Compra necesaria: 50 kg\n   • Proveedor: Distribuidora Alimentos\n\n2. **Lechuga:** 20 kg (67% del mínimo)\n   • Días restantes: 0.8 días\n   • Compra necesaria: 30 kg\n   • Proveedor: Hortícolas del Valle\n\n**🟡 ATENCIÓN (Comprar esta semana):**\n• Cebolla: 40 kg (80% del mínimo)\n• Tomates: 80 kg (133% del mínimo)\n\n**💡 Acción Inmediata:** Generar orden de compra urgente.',
+        tiempo: 2200
+    },
+    {
+        keywords: ['eficiencia', 'rendimiento', 'productividad'],
+        mensaje: '⚡ **Análisis de Eficiencia:**\n\n**📊 Métricas Actuales:**\n• Eficiencia de producción: 87%\n• Tiempo promedio de preparación: 2.5 horas\n• Charolas producidas/día: 68\n• Merma promedio: 11.2%\n\n**🎯 Objetivos vs Realidad:**\n• Producción: ✅ 100% (68/68 charolas)\n• Merma: ⚠️ 11.2% (objetivo: 10%)\n• Tiempo: ✅ 2.5h (objetivo: 2.5h)\n\n**💡 Mejoras Implementadas:**\n• Rotación de inventario: +15%\n• Reducción de merma: -2.3%\n• Optimización de procesos: +8%\n\n**📈 Proyección:** Eficiencia puede llegar a 92% con ajustes menores.',
+        tiempo: 2300
+    },
+    {
+        keywords: ['planificación', 'menú', 'semana'],
+        mensaje: '📅 **Planificación Semanal Sugerida:**\n\n**Lunes:**\n• Desayuno: Huevos, frijoles, arroz\n• Almuerzo: Pollo, ensalada, arroz\n• Cena: Sopa de verduras\n\n**Martes:**\n• Desayuno: Avena, frutas\n• Almuerzo: Carne, pasta, vegetales\n• Cena: Sándwiches\n\n**Miércoles:**\n• Desayuno: Pancakes, huevos\n• Almuerzo: Pescado, arroz, ensalada\n• Cena: Pizza\n\n**📊 Análisis:**\n• Balance nutricional: ✅\n• Uso de inventario: ✅\n• Costo estimado: $18,200\n• Merma estimada: 9.5%',
+        tiempo: 2500
+    },
+    {
+        keywords: ['comparar', 'mes', 'anterior'],
+        mensaje: '📊 **Comparativa Mes Actual vs Anterior:**\n\n**📈 Incrementos:**\n• Producción: +8% (2,720 vs 2,520 charolas)\n• Consumo de pollo: +12%\n• Consumo de arroz: +15%\n• Satisfacción: +0.3 puntos (4.7 vs 4.4)\n\n**📉 Reducciones:**\n• Merma: -2.1% (11.2% vs 13.3%)\n• Costo por charola: -3% ($28.75 vs $29.65)\n• Tiempo de preparación: -5%\n\n**💰 Impacto Financiero:**\n• Ahorro por merma: $420\n• Incremento por producción: +$1,200\n• **Balance positivo: +$1,620**\n\n✅ **Tendencia: Mejora continua**',
+        tiempo: 2400
+    },
+    {
+        keywords: ['proveedor', 'mejor', 'recomendación'],
+        mensaje: '🏪 **Análisis de Proveedores:**\n\n**🥇 Mejor Proveedor (General):**\n• **Distribuidora Alimentos S.A.**\n• Calificación: 4.8/5\n• Entrega promedio: 1.8 días\n• Precio promedio: -5% vs mercado\n• Calidad: Excelente\n\n**📊 Ranking por Categoría:**\n\n**Carnes:**\n1. Carnes Premium (4.9/5)\n2. Distribuidora Alimentos (4.7/5)\n\n**Granos:**\n1. Distribuidora Alimentos (4.8/5)\n2. Granos del Norte (4.6/5)\n\n**Vegetales:**\n1. Hortícolas del Valle (4.7/5)\n2. Distribuidora Alimentos (4.5/5)\n\n💡 **Recomendación:** Consolidar compras con Distribuidora Alimentos para mejores precios.',
+        tiempo: 2200
+    },
+    {
+        keywords: ['alerta', 'notificación', 'aviso'],
+        mensaje: '🔔 **Alertas Activas:**\n\n**🚨 URGENTES:**\n1. Frijoles: Stock crítico (35 kg)\n   • Acción: Comprar 50 kg hoy\n\n2. Lechuga: Stock crítico (20 kg)\n   • Acción: Comprar 30 kg hoy\n\n**⚠️ IMPORTANTES:**\n3. Consumo de arroz: +15% vs planificado\n   • Fecha: 15/01/2025\n   • Acción: Ajustar planificación\n\n4. Merma de Carne Asada: 19%\n   • Fecha: 17/01/2025\n   • Acción: Revisar proceso\n\n**📋 PENDIENTES:**\n5. Menú del día pendiente\n6. 3 pedidos de compra por aprobar\n\n💡 **Total alertas:** 6 (2 urgentes, 2 importantes, 2 pendientes)',
+        tiempo: 2300
+    },
+    {
+        keywords: ['nutricional', 'balance', 'salud'],
+        mensaje: '🥗 **Análisis Nutricional del Menú:**\n\n**📊 Balance Actual:**\n• Proteínas: ✅ 25% (óptimo: 20-30%)\n• Carbohidratos: ✅ 50% (óptimo: 45-55%)\n• Grasas: ✅ 25% (óptimo: 20-30%)\n• Fibra: ⚠️ 18g (óptimo: 25g)\n• Calorías promedio: 650/charola\n\n**💡 Recomendaciones:**\n• Aumentar vegetales en 15%\n• Incluir más granos integrales\n• Reducir grasas saturadas en 5%\n• Agregar más frutas\n\n**✅ Fortalezas:**\n• Buen balance macro\n• Variedad adecuada\n• Calidad de ingredientes\n\n**📈 Objetivo:** Mejorar contenido de fibra y micronutrientes.',
+        tiempo: 2400
+    },
+    {
+        keywords: ['proyección', 'futuro', 'próximo'],
+        mensaje: '🔮 **Proyecciones para Próximas 2 Semanas:**\n\n**📊 Consumo Estimado:**\n• Arroz: 1,040 kg (520 kg/semana)\n• Pollo: 300 kg (150 kg/semana)\n• Frijoles: 90 kg (45 kg/semana)\n• Verduras: 140 kg (70 kg/semana)\n\n**💰 Costo Estimado:**\n• Semana 1: $18,500\n• Semana 2: $19,200\n• **Total: $37,700**\n\n**📈 Tendencias:**\n• Producción: +5% (tendencia alcista)\n• Satisfacción: Mantener 4.7+\n• Merma: Reducir a 10%\n\n**⚠️ Consideraciones:**\n• Aumento estacional esperado\n• Ajustar inventario de seguridad\n• Programar compras anticipadas',
+        tiempo: 2500
+    },
+    {
+        keywords: ['reporte', 'resumen', 'estadísticas'],
+        mensaje: '📋 **Reporte Ejecutivo Semanal:**\n\n**📊 Producción:**\n• Charolas servidas: 340\n• Promedio diario: 68\n• Variación: +5% vs semana anterior\n\n**💰 Financiero:**\n• Ingresos: $97,750\n• Costos: $18,500\n• Merma: $1,200\n• **Utilidad: $78,050**\n\n**⭐ Calidad:**\n• Satisfacción: 4.7/5\n• Quejas: 2 (0.6%)\n• Tiempo promedio servicio: 8 min\n\n**🎯 KPIs:**\n• Eficiencia: 87% ✅\n• Merma: 11.2% ⚠️\n• Rotación inventario: 4.2x ✅\n\n**💡 Resumen:** Semana positiva con oportunidades de mejora en merma.',
+        tiempo: 2400
+    },
+    {
+        keywords: ['recomendación', 'sugerencia', 'mejora'],
+        mensaje: '💡 **Recomendaciones Prioritarias:**\n\n**🔴 ALTA PRIORIDAD:**\n1. **Comprar frijoles y lechuga urgentemente**\n   • Impacto: Evitar desabastecimiento\n   • Acción: Orden de compra hoy\n\n2. **Reducir merma de Carne Asada**\n   • Impacto: Ahorro $210/semana\n   • Acción: Revisar proceso de cocción\n\n**🟡 MEDIA PRIORIDAD:**\n3. Ajustar planificación de arroz (+15%)\n4. Optimizar rotación de inventario\n5. Mejorar contenido de fibra en menús\n\n**🟢 BAJA PRIORIDAD:**\n6. Consolidar proveedores\n7. Implementar sistema de feedback\n\n**📊 Impacto Estimado:**\n• Ahorro: $540/semana\n• Mejora satisfacción: +0.2 puntos\n• Reducción merma: -2%',
+        tiempo: 2500
+    },
+    {
+        keywords: ['histórico', 'pasado', 'registro'],
+        mensaje: '📚 **Análisis Histórico (Últimos 3 Meses):**\n\n**📊 Tendencias:**\n• Producción: Crecimiento constante (+8%)\n• Merma: Reducción progresiva (-2.1%)\n• Satisfacción: Mejora continua (+0.3)\n• Costos: Estables con optimizaciones\n\n**📅 Eventos Destacados:**\n• **Enero:** Mayor merma en Carne Asada (17/01)\n• **Diciembre:** Mejor mes en satisfacción (4.7)\n• **Noviembre:** Pico de consumo de arroz\n\n**🎯 Lecciones Aprendidas:**\n• Rotación FIFO reduce merma\n• Planificación semanal mejora eficiencia\n• Feedback continuo mejora calidad\n\n**📈 Proyección:** Mantener tendencia positiva con ajustes menores.',
+        tiempo: 2400
+    }
+];
+
+// Chat AI - Respuestas inteligentes
 const respuestasAI = {
     'optimizar': {
         mensaje: 'Basándome en el análisis de consumo, te recomiendo:\n\n• Reducir el consumo de arroz en 8% ajustando las porciones\n• Implementar rotación de menús para balancear ingredientes\n• Monitorear el consumo diario para ajustar compras\n\n¿Te gustaría que genere un plan detallado de optimización?',
@@ -1586,18 +1695,38 @@ function enviarMensajeAI(mensajeTexto) {
         chatMessages.appendChild(typingIndicator);
         chatMessages.scrollTop = chatMessages.scrollHeight;
         
-        // Determinar respuesta
-        let respuesta = respuestasAI.default;
+        // Buscar el mejor ejemplo que coincida con el mensaje
         const mensajeLower = mensaje.toLowerCase();
+        let mejorEjemplo = null;
+        let mejorPuntuacion = 0;
         
-        if (mensajeLower.includes('optimizar') || mensajeLower.includes('consumo')) {
-            respuesta = respuestasAI.optimizar;
-        } else if (mensajeLower.includes('sugiere') || mensajeLower.includes('menú') || mensajeLower.includes('menu')) {
-            respuesta = respuestasAI.sugiere;
-        } else if (mensajeLower.includes('analiza') || mensajeLower.includes('inventario')) {
-            respuesta = respuestasAI.analiza;
-        } else if (mensajeLower.includes('comprar') || mensajeLower.includes('compra') || mensajeLower.includes('productos')) {
-            respuesta = respuestasAI.comprar;
+        // Buscar en ejemplos precargados
+        ejemplosAI.forEach(ejemplo => {
+            let puntuacion = 0;
+            ejemplo.keywords.forEach(keyword => {
+                if (mensajeLower.includes(keyword)) {
+                    puntuacion += 1;
+                }
+            });
+            if (puntuacion > mejorPuntuacion) {
+                mejorPuntuacion = puntuacion;
+                mejorEjemplo = ejemplo;
+            }
+        });
+        
+        // Si no hay coincidencia, usar respuestas básicas
+        let respuesta = mejorEjemplo || respuestasAI.default;
+        
+        if (!mejorEjemplo) {
+            if (mensajeLower.includes('optimizar') || mensajeLower.includes('consumo')) {
+                respuesta = respuestasAI.optimizar;
+            } else if (mensajeLower.includes('sugiere') || mensajeLower.includes('menú') || mensajeLower.includes('menu')) {
+                respuesta = respuestasAI.sugiere;
+            } else if (mensajeLower.includes('analiza') || mensajeLower.includes('inventario')) {
+                respuesta = respuestasAI.analiza;
+            } else if (mensajeLower.includes('comprar') || mensajeLower.includes('compra') || mensajeLower.includes('productos')) {
+                respuesta = respuestasAI.comprar;
+            }
         }
         
         // Remover indicador de escritura y mostrar respuesta
@@ -1605,16 +1734,19 @@ function enviarMensajeAI(mensajeTexto) {
             typingIndicator.remove();
             const aiMessage = document.createElement('div');
             aiMessage.className = 'chat-message ai-message';
+            const mensajeFormateado = typeof respuesta.mensaje === 'string' 
+                ? respuesta.mensaje.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                : respuesta.mensaje;
             aiMessage.innerHTML = `
                 <div class="message-avatar">🤖</div>
                 <div class="message-content">
-                    <div class="message-text">${respuesta.mensaje.replace(/\n/g, '<br>')}</div>
+                    <div class="message-text">${mensajeFormateado}</div>
                     <div class="message-time">Ahora</div>
                 </div>
             `;
             chatMessages.appendChild(aiMessage);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-        }, respuesta.tiempo);
+        }, respuesta.tiempo || 2000);
     }, 500);
 }
 
