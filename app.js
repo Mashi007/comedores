@@ -1044,13 +1044,14 @@ function crearGrafico8() {
                             };
                             
                             return [
-                                `📦 Stock actual: ${stock} kg`,
-                                `📋 Punto de reorden: ${reorder} kg`,
-                                `📊 Stock vs Reorden: ${((stock / reorder) * 100).toFixed(1)}%`,
-                                `📈 Uso semanal: ${p.usage} kg`,
+                                `📦 Stock actual: ${stock.toFixed(1)} kg`,
+                                `📋 Punto de reorden: ${reorder.toFixed(1)} kg`,
+                                `📊 Ratio Stock/Reorden: ${((stock / reorder) * 100).toFixed(1)}%`,
+                                `📈 Uso semanal: ${p.usage.toFixed(1)} kg`,
+                                `⏱️ Días estimados: ${Math.floor(stock / (p.usage / 7))} días`,
                                 `🏷️ Categoría: ${p.category}`,
-                                `📍 Cuadrante: ${cuadranteNames[cuadrante]}`,
-                                cuadrante === 1 ? '⚠️ COMPRA URGENTE REQUERIDA' : ''
+                                `📍 Estado: ${cuadranteNames[cuadrante]}`,
+                                cuadrante === 1 ? '⚠️ ⚠️ COMPRA URGENTE REQUERIDA ⚠️' : (cuadrante === 2 ? '🟡 Atención: Monitorear stock' : '')
                             ].filter(Boolean);
                         }
                     }
@@ -1106,6 +1107,7 @@ function crearGrafico8() {
                         font: {
                             size: 12
                         },
+                        stepSize: Math.ceil(maxReorder / 10), // Dividir en 10 pasos
                         callback: function(value) {
                             return value + ' kg';
                         }
