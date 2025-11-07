@@ -946,11 +946,15 @@ function crearGrafico8() {
         { name: 'Conservas', stock: 300, reorder: 80, usage: 25, category: 'Enlatados', cuadrante: 4 }
     ];
     
-    // Calcular valores máximos para los ejes - Ajustar para mostrar en una fila
+    // Normalizar reorden para mostrar productos en una fila (mismo nivel de reorden)
+    const reordenBase = 70; // Valor base para alinear horizontalmente
+    productos.forEach(p => {
+        p.reorderNormalizado = reordenBase; // Todos con el mismo reorden para fila horizontal
+    });
+    
+    // Calcular valores máximos para los ejes
     const maxStock = Math.max(...productos.map(p => p.stock)) * 1.3;
-    // Fijar reorden en un rango más estrecho para alinear productos horizontalmente
-    const reordenPromedio = productos.reduce((sum, p) => sum + p.reorder, 0) / productos.length;
-    const maxReorder = reordenPromedio * 1.5;
+    const maxReorder = reordenBase * 2; // Rango fijo para mantener fila horizontal
     
     // Función para determinar el cuadrante
     function getCuadrante(stock, reorder) {
@@ -1048,32 +1052,6 @@ function crearGrafico8() {
                                 `📍 Cuadrante: ${cuadranteNames[cuadrante]}`,
                                 cuadrante === 1 ? '⚠️ COMPRA URGENTE REQUERIDA' : ''
                             ].filter(Boolean);
-                        }
-                    }
-                },
-                annotation: {
-                    annotations: {
-                        // Línea vertical para dividir cuadrantes (en reorden*2)
-                        line1: {
-                            type: 'line',
-                            xMin: maxStock / 2,
-                            xMax: maxStock / 2,
-                            yMin: 0,
-                            yMax: maxReorder,
-                            borderColor: 'rgba(100, 100, 100, 0.3)',
-                            borderWidth: 2,
-                            borderDash: [5, 5]
-                        },
-                        // Línea horizontal para dividir cuadrantes
-                        line2: {
-                            type: 'line',
-                            xMin: 0,
-                            xMax: maxStock,
-                            yMin: maxReorder / 2,
-                            yMax: maxReorder / 2,
-                            borderColor: 'rgba(100, 100, 100, 0.3)',
-                            borderWidth: 2,
-                            borderDash: [5, 5]
                         }
                     }
                 }
@@ -1226,8 +1204,11 @@ function agregarEtiquetasCuadrantes(chart, maxStock, maxReorder) {
         labelEl.style.zIndex = '10';
         
         // Calcular posición basada en el área del gráfico
-        const xPercent = (label.x / maxStock) * 100;
-        const yPercent = (label.y / maxReorder) * 100;
+        const chartArea = chart.chartArea;
+        if (!chartArea) return;
+        
+        const xPercent = ((label.x / maxStock) * 100);
+        const yPercent = ((label.y / maxReorder) * 100);
         
         labelEl.style.left = xPercent + '%';
         labelEl.style.top = yPercent + '%';
