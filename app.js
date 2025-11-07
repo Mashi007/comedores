@@ -219,21 +219,60 @@ function inicializarApp() {
 }
 
 function inicializarValidaciones() {
-    // Validación en tiempo real para todos los campos
+    // Validación en tiempo real para todos los campos usando delegación de eventos
     document.addEventListener('blur', function(e) {
-        if (e.target.matches('input[required], select[required], textarea[required]')) {
-            FormValidator.validateField(e.target);
+        const target = e.target;
+        // Verificar que target es un elemento DOM válido
+        if (target && target.nodeType === 1 && typeof target.matches === 'function') {
+            if (target.matches('input[required], select[required], textarea[required]')) {
+                FormValidator.validateField(target);
+            }
         }
     }, true);
     
     // Limpiar errores al escribir
     document.addEventListener('input', function(e) {
-        if (e.target.matches('input, select, textarea')) {
-            if (e.target.classList.contains('error')) {
-                FormValidator.removeError(e.target);
+        const target = e.target;
+        // Verificar que target es un elemento DOM válido
+        if (target && target.nodeType === 1 && typeof target.matches === 'function') {
+            if (target.matches('input, select, textarea')) {
+                if (target.classList && target.classList.contains('error')) {
+                    FormValidator.removeError(target);
+                }
             }
         }
     }, true);
+    
+    // También agregar validación cuando se crean nuevos campos dinámicamente
+    // Usar MutationObserver para campos agregados después de la carga inicial
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.nodeType === 1) {
+                    // Agregar listeners a los nuevos campos
+                    const fields = node.querySelectorAll ? node.querySelectorAll('input[required], select[required], textarea[required]') : [];
+                    fields.forEach(function(field) {
+                        field.addEventListener('blur', function() {
+                            FormValidator.validateField(field);
+                        });
+                        field.addEventListener('input', function() {
+                            if (field.classList && field.classList.contains('error')) {
+                                FormValidator.removeError(field);
+                            }
+                        });
+                    });
+                }
+            });
+        });
+    });
+    
+    // Observar cambios en el body para campos dinámicos
+    if (document.body) {
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
 }
 
 window.toggleSidebar = function() {
