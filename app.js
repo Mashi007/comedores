@@ -293,7 +293,6 @@ function inicializarGraficos() {
     scheduleWork(() => {
         try {
             crearGrafico7();
-            crearGrafico8();
             crearGrafico9();
         } catch (e) {
             // Silenciar errores
