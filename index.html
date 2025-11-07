@@ -4,193 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestión de Comedores Industriales</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍽️</text></svg>">
-    <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍽️</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍽️</text></svg>">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="utils.js"></script>
 </head>
 <body>
-    <!-- Toast Container -->
     <div id="toast-container"></div>
+    
     <!-- Portada -->
     <div id="portada" class="screen active">
-        <div class="portada-background">
-            <div class="gradient-orb orb-1"></div>
-            <div class="gradient-orb orb-2"></div>
-            <div class="gradient-orb orb-3"></div>
-        </div>
         <div class="portada-container">
-            <div class="logo-wrapper">
-                <div class="logo-icon">
-                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="2" opacity="0.3"/>
-                        <path d="M30 50 L45 65 L70 40" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <div class="logo">
-                    <h1 class="logo-title">
-                        <span class="logo-main">Sistema de Gestión</span>
-                        <span class="logo-accent">Comedores Industriales</span>
-                    </h1>
-                </div>
-            </div>
-            <p class="subtitle">Plataforma integral para la gestión de inventarios, producción y servicio al cliente</p>
-            <div class="features-preview">
-                <div class="feature-item">
-                    <div class="feature-icon">📊</div>
-                    <span>Dashboard Inteligente</span>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">🤖</div>
-                    <span>IA & Automatización</span>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">📱</div>
-                    <span>Integración WhatsApp</span>
-                </div>
-            </div>
-            <div class="cta-section">
-                <button id="btnIniciarSesion" class="btn-hero" type="button" style="cursor: pointer !important; pointer-events: auto !important; z-index: 9999 !important; position: relative;">
-                    <span>Ingresar al Sistema</span>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-                <p class="demo-hint">Demo interactivo • Sin registro requerido</p>
-            </div>
+            <h1>Sistema de Gestión de Comedores Industriales</h1>
+            <p>Gestión integral para comedores industriales</p>
+            <button id="btnIniciar" class="btn-hero">Ingresar al Sistema</button>
         </div>
     </div>
 
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">
-                <div class="logo-icon-small">🍽️</div>
-                <div class="sidebar-title">
-                    <h2>Sistema</h2>
-                    <p>Comedores</p>
-                </div>
-            </div>
-            <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            <button class="close-sidebar" onclick="toggleSidebar()">×</button>
+            <h2>Menú</h2>
         </div>
         <nav class="sidebar-nav">
-            <a href="#" class="nav-item" onclick="navegar('dashboard'); return false;" data-section="dashboard">
-                <div class="nav-icon">📊</div>
-                <span class="nav-text">Dashboard</span>
-                <div class="nav-badge">6</div>
-            </a>
-            <a href="#" class="nav-item" onclick="navegar('compras'); return false;" data-section="compras">
-                <div class="nav-icon">🛒</div>
-                <span class="nav-text">Compras</span>
-                <div class="nav-badge new">Nuevo</div>
-            </a>
-            <a href="#" class="nav-item" onclick="navegar('inventario'); return false;" data-section="inventario">
-                <div class="nav-icon">📦</div>
-                <span class="nav-text">Inventario</span>
-            </a>
-            <a href="#" class="nav-item" onclick="navegar('planificacion'); return false;" data-section="planificacion">
-                <div class="nav-icon">📅</div>
-                <span class="nav-text">Planificación</span>
-            </a>
-            <a href="#" class="nav-item" onclick="navegar('produccion'); return false;" data-section="produccion">
-                <div class="nav-icon">👨‍🍳</div>
-                <span class="nav-text">Producción</span>
-            </a>
-            <a href="#" class="nav-item" onclick="navegar('servicio'); return false;" data-section="servicio">
-                <div class="nav-icon">⭐</div>
-                <span class="nav-text">Servicio</span>
-            </a>
-            <a href="#" class="nav-item" onclick="navegar('notificaciones'); return false;" data-section="notificaciones">
-                <div class="nav-icon">🔔</div>
-                <span class="nav-text">Notificaciones</span>
-                <div class="nav-badge alert">3</div>
-            </a>
-            <a href="#" class="nav-item" onclick="navegar('configuracion'); return false;" data-section="configuracion">
-                <div class="nav-icon">⚙️</div>
-                <span class="nav-text">Configuración</span>
-            </a>
+            <a href="#" class="nav-item" onclick="navegar('menu'); return false;">🏠 Menú Principal</a>
+            <a href="#" class="nav-item" onclick="navegar('dashboard'); return false;">📊 Dashboard</a>
+            <a href="#" class="nav-item" onclick="navegar('compras'); return false;">🛒 Compras</a>
+            <a href="#" class="nav-item" onclick="navegar('inventario'); return false;">📦 Inventario</a>
+            <a href="#" class="nav-item" onclick="navegar('planificacion'); return false;">📅 Planificación</a>
+            <a href="#" class="nav-item" onclick="navegar('produccion'); return false;">👨‍🍳 Producción</a>
+            <a href="#" class="nav-item" onclick="navegar('servicio'); return false;">💬 Servicio al Cliente</a>
+            <a href="#" class="nav-item" onclick="navegar('notificaciones'); return false;">🔔 Notificaciones</a>
+            <a href="#" class="nav-item" onclick="navegar('configuracion'); return false;">⚙️ Configuración</a>
         </nav>
         <div class="sidebar-footer">
-            <div class="user-profile">
-                <div class="user-avatar">
-                    <span id="userInitial">A</span>
-                </div>
-                <div class="user-details">
-                    <div class="user-name" id="sidebarUserName">Administrador</div>
-                    <div class="user-role">Admin</div>
-                </div>
-            </div>
-            <button class="nav-item logout-btn" onclick="cerrarSesion()">
-                <div class="nav-icon">🚪</div>
-                <span class="nav-text">Cerrar Sesión</span>
-            </button>
+            <button class="nav-item logout-btn" onclick="cerrarSesion(); return false;">Cerrar Sesión</button>
         </div>
     </div>
 
-    <!-- Overlay para móvil -->
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <!-- Menú Principal -->
     <div id="menu" class="screen">
-        <div class="menu-container">
-            <header class="menu-header">
-                <button class="hamburger-btn" onclick="toggleSidebar()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+        <div class="page-container">
+            <div class="page-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
                 <h1>Menú Principal</h1>
-                <div class="user-info">
-                    <span id="userName">Usuario</span>
-                    <button class="btn-secondary" onclick="cerrarSesion()">Cerrar Sesión</button>
-                </div>
-            </header>
+            </div>
             <div class="menu-grid">
                 <div class="menu-card" onclick="navegar('dashboard')">
                     <div class="menu-icon">📊</div>
                     <h3>Dashboard</h3>
-                    <p>Vista general y métricas</p>
+                    <p>Visualización de métricas y KPIs</p>
                 </div>
                 <div class="menu-card" onclick="navegar('compras')">
                     <div class="menu-icon">🛒</div>
-                    <h3>Ingreso de Compras</h3>
-                    <p>OCR y facturas por WhatsApp</p>
+                    <h3>Compras</h3>
+                    <p>Gestión de compras y facturas</p>
                 </div>
                 <div class="menu-card" onclick="navegar('inventario')">
                     <div class="menu-icon">📦</div>
                     <h3>Inventario</h3>
-                    <p>Entradas y salidas</p>
+                    <p>Control de inventario</p>
                 </div>
                 <div class="menu-card" onclick="navegar('planificacion')">
                     <div class="menu-icon">📅</div>
-                    <h3>Planificación de Menús</h3>
-                    <p>Menús diarios y recetas</p>
+                    <h3>Planificación</h3>
+                    <p>Planificación de menús</p>
                 </div>
                 <div class="menu-card" onclick="navegar('produccion')">
                     <div class="menu-icon">👨‍🍳</div>
                     <h3>Producción</h3>
-                    <p>Reportes y control</p>
+                    <p>Reporte de producción</p>
                 </div>
                 <div class="menu-card" onclick="navegar('servicio')">
-                    <div class="menu-icon">⭐</div>
+                    <div class="menu-icon">💬</div>
                     <h3>Servicio al Cliente</h3>
-                    <p>Encuestas y QR</p>
-                </div>
-                <div class="menu-card" onclick="navegar('notificaciones')">
-                    <div class="menu-icon">🔔</div>
-                    <h3>Notificaciones</h3>
-                    <p>Alertas inteligentes</p>
-                </div>
-                <div class="menu-card" onclick="navegar('configuracion')">
-                    <div class="menu-icon">⚙️</div>
-                    <h3>Configuración</h3>
-                    <p>Ajustes del sistema</p>
+                    <p>Encuestas y feedback</p>
                 </div>
             </div>
         </div>
@@ -199,65 +89,17 @@
     <!-- Dashboard -->
     <div id="dashboard" class="screen">
         <div class="page-container">
-            <header class="page-header">
-                <button class="hamburger-btn" onclick="toggleSidebar()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+            <div class="page-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
                 <h1>Dashboard</h1>
-            </header>
-            <div class="dashboard-filters">
-                <div class="filter-group">
-                    <label>Período:</label>
-                    <select id="filtroPeriodo" class="filter-select" onchange="aplicarFiltros()">
-                        <option value="7">Últimos 7 días</option>
-                        <option value="15">Últimos 15 días</option>
-                        <option value="30" selected>Últimos 30 días</option>
-                        <option value="90">Últimos 90 días</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Categoría:</label>
-                    <select id="filtroCategoria" class="filter-select" onchange="aplicarFiltros()">
-                        <option value="all">Todas</option>
-                        <option value="carnes">Carnes</option>
-                        <option value="verduras">Verduras</option>
-                        <option value="granos">Granos</option>
-                        <option value="otros">Otros</option>
-                    </select>
-                </div>
-                <button class="btn-secondary" onclick="resetearFiltros()">Resetear</button>
-            </div>
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <h3>Inventario Total</h3>
-                    <div class="kpi-value">1,245 kg</div>
-                    <div class="kpi-change positive">↑ 5.2%</div>
-                </div>
-                <div class="kpi-card">
-                    <h3>Comidas Servidas Hoy</h3>
-                    <div class="kpi-value">342</div>
-                    <div class="kpi-change positive">↑ 12%</div>
-                </div>
-                <div class="kpi-card">
-                    <h3>Compras del Mes</h3>
-                    <div class="kpi-value">$45,230</div>
-                    <div class="kpi-change neutral">→ 0%</div>
-                </div>
-                <div class="kpi-card">
-                    <h3>Satisfacción</h3>
-                    <div class="kpi-value">4.6/5</div>
-                    <div class="kpi-change positive">↑ 0.3</div>
-                </div>
             </div>
             <div class="charts-grid">
                 <div class="chart-card">
-                    <h3>Consumo de Inventario (Últimos 7 días)</h3>
+                    <h3>Consumo de Inventario</h3>
                     <canvas id="chart1" width="400" height="250"></canvas>
                 </div>
                 <div class="chart-card">
-                    <h3>Distribución de Compras por Categoría</h3>
+                    <h3>Distribución de Compras</h3>
                     <canvas id="chart2" width="400" height="250"></canvas>
                 </div>
                 <div class="chart-card">
@@ -265,11 +107,11 @@
                     <canvas id="chart3" width="400" height="250"></canvas>
                 </div>
                 <div class="chart-card">
-                    <h3>Top 5 Productos Más Usados</h3>
+                    <h3>Top Productos</h3>
                     <canvas id="chart4" width="400" height="250"></canvas>
                 </div>
                 <div class="chart-card">
-                    <h3>Tendencias de Satisfacción</h3>
+                    <h3>Satisfacción</h3>
                     <canvas id="chart5" width="400" height="250"></canvas>
                 </div>
                 <div class="chart-card">
@@ -280,465 +122,77 @@
         </div>
     </div>
 
-    <!-- Ingreso de Compras -->
+    <!-- Otras pantallas básicas -->
     <div id="compras" class="screen">
         <div class="page-container">
-            <header class="page-header">
-                <button class="hamburger-btn" onclick="toggleSidebar()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <h1>Ingreso de Compras</h1>
-            </header>
-            <div class="compras-actions">
-                <button class="btn-whatsapp" onclick="simularOCRWhatsApp()">
-                    📱 Simular Ingreso por WhatsApp (OCR)
-                </button>
+            <div class="page-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <h1>Compras</h1>
             </div>
-            <div class="compras-filters">
-                <input type="date" id="fechaDesde" class="filter-input">
-                <input type="date" id="fechaHasta" class="filter-input">
-                <select id="filtroProveedor" class="filter-input">
-                    <option value="">Todos los proveedores</option>
-                    <option value="Proveedor A">Proveedor A</option>
-                    <option value="Proveedor B">Proveedor B</option>
-                    <option value="Proveedor C">Proveedor C</option>
-                </select>
-                <button class="btn-primary" onclick="filtrarCompras()">Filtrar</button>
-            </div>
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <h3>Total Facturas</h3>
-                    <div class="kpi-value" id="totalFacturas">12</div>
-                </div>
-                <div class="kpi-card">
-                    <h3>Monto Total</h3>
-                    <div class="kpi-value" id="montoTotal">$45,230</div>
-                </div>
-                <div class="kpi-card">
-                    <h3>Promedio por Factura</h3>
-                    <div class="kpi-value" id="promedioFactura">$3,769</div>
-                </div>
-            </div>
-            <div class="search-box">
-                <input type="text" id="buscarCompras" placeholder="Buscar factura, proveedor, productos..." onkeyup="buscarEnTabla('tablaCompras', this.value)">
-            </div>
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Proveedor</th>
-                            <th>N° Factura</th>
-                            <th>Productos</th>
-                            <th>Monto</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaCompras">
-                        <!-- Datos mock se cargarán aquí -->
-                    </tbody>
-                </table>
-            </div>
+            <p>Módulo de compras</p>
         </div>
     </div>
 
-    <!-- Inventario -->
     <div id="inventario" class="screen">
         <div class="page-container">
-            <header class="page-header">
-                <button class="hamburger-btn" onclick="toggleSidebar()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+            <div class="page-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
                 <h1>Inventario</h1>
-            </header>
-            <div class="inventario-actions">
-                <button class="btn-whatsapp" onclick="mostrarFormularioInventario()">
-                    📱 Registrar Movimiento por WhatsApp
-                </button>
             </div>
-            <div id="formularioInventario" class="form-container" style="display: none;">
-                <h3>Registrar Movimiento de Inventario</h3>
-                <form onsubmit="return procesarMovimientoInventario(event)">
-                    <div class="form-group">
-                        <label for="productoInventario">Producto</label>
-                        <select id="productoInventario" required>
-                            <option value="">Seleccionar producto...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="tipoMovimiento">Tipo de Movimiento</label>
-                        <select id="tipoMovimiento" required>
-                            <option value="">Seleccionar...</option>
-                            <option value="entrada">Entrada</option>
-                            <option value="salida">Salida</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="cantidadInventario">Cantidad (kg)</label>
-                        <input type="number" id="cantidadInventario" step="0.01" required min="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label for="observacionesInventario">Observaciones</label>
-                        <textarea id="observacionesInventario" rows="3"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Procesar Movimiento</button>
-                        <button type="button" class="btn-secondary" onclick="ocultarFormularioInventario()">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-            <div class="search-box">
-                <input type="text" id="buscarInventario" placeholder="Buscar producto, categoría..." onkeyup="buscarEnTabla('tablaInventario', this.value)">
-            </div>
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Categoría</th>
-                            <th>Stock Actual</th>
-                            <th>Stock Mínimo</th>
-                            <th>Último Movimiento</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaInventario">
-                        <!-- Datos mock se cargarán aquí -->
-                    </tbody>
-                </table>
-            </div>
+            <p>Módulo de inventario</p>
         </div>
     </div>
 
-    <!-- Planificación de Menús -->
     <div id="planificacion" class="screen">
         <div class="page-container">
-            <header class="page-header">
-                <button class="hamburger-btn" onclick="toggleSidebar()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <h1>Planificación de Menús</h1>
-            </header>
-            <div class="planificacion-actions">
-                <input type="date" id="fechaMenu" class="filter-input" required>
-                <button class="btn-primary" onclick="nuevoMenu()">Nuevo Menú</button>
-                <button class="btn-secondary" onclick="sugerenciaIA()" title="IA sugiere menú basado en tendencias">
-                    🤖 Sugerencia IA
-                </button>
-                <label for="excelUpload" class="btn-secondary" style="cursor: pointer; margin: 0;">
-                    📄 Subir Template Excel
-                    <input type="file" id="excelUpload" accept=".xlsx,.xls" style="display: none;" onchange="subirExcel(event)">
-                </label>
-                <button class="btn-success" onclick="generarCompras()">Generar Compras</button>
+            <div class="page-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <h1>Planificación</h1>
             </div>
-            
-            <div id="formularioMenu" class="form-container" style="display: none;">
-                <h3>Planificar Menú Buffet del Día</h3>
-                <form onsubmit="return guardarMenu(event)">
-                    <div class="form-group">
-                        <label>Fecha</label>
-                        <input type="date" id="fechaMenuForm" required>
-                    </div>
-                    
-                    <div class="menu-tree" id="menuTree">
-                        <!-- Estructura de árbol: Desayuno, Almuerzo, Cena -->
-                        <div class="menu-categoria" data-categoria="desayuno">
-                            <div class="categoria-header" onclick="toggleCategoria(this)">
-                                <span class="categoria-icon">🌅</span>
-                                <h4>Desayuno</h4>
-                                <button type="button" class="btn-small" onclick="event.stopPropagation(); agregarRecetaCategoria('desayuno')">+ Receta</button>
-                            </div>
-                            <div class="categoria-content">
-                                <div class="subcategorias">
-                                    <div class="subcategoria" data-sub="huevos">
-                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
-                                            <span>🥚 Huevos</span>
-                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('desayuno', 'huevos')">+</button>
-                                        </div>
-                                        <div class="subcategoria-content"></div>
-                                    </div>
-                                    <div class="subcategoria" data-sub="bebidas">
-                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
-                                            <span>🥤 Bebidas</span>
-                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('desayuno', 'bebidas')">+</button>
-                                        </div>
-                                        <div class="subcategoria-content"></div>
-                                    </div>
-                                    <div class="subcategoria" data-sub="otros">
-                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
-                                            <span>🍞 Otros</span>
-                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('desayuno', 'otros')">+</button>
-                                        </div>
-                                        <div class="subcategoria-content"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="menu-categoria" data-categoria="almuerzo">
-                            <div class="categoria-header" onclick="toggleCategoria(this)">
-                                <span class="categoria-icon">🍽️</span>
-                                <h4>Almuerzo</h4>
-                                <button type="button" class="btn-small" onclick="event.stopPropagation(); agregarRecetaCategoria('almuerzo')">+ Receta</button>
-                            </div>
-                            <div class="categoria-content">
-                                <div class="subcategorias">
-                                    <div class="subcategoria" data-sub="principales">
-                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
-                                            <span>🍛 Platos Principales</span>
-                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('almuerzo', 'principales')">+</button>
-                                        </div>
-                                        <div class="subcategoria-content"></div>
-                                    </div>
-                                    <div class="subcategoria" data-sub="postres">
-                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
-                                            <span>🍰 Postres</span>
-                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('almuerzo', 'postres')">+</button>
-                                        </div>
-                                        <div class="subcategoria-content"></div>
-                                    </div>
-                                    <div class="subcategoria" data-sub="bebidas">
-                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
-                                            <span>🥤 Bebidas</span>
-                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('almuerzo', 'bebidas')">+</button>
-                                        </div>
-                                        <div class="subcategoria-content"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="menu-categoria" data-categoria="cena">
-                            <div class="categoria-header" onclick="toggleCategoria(this)">
-                                <span class="categoria-icon">🌙</span>
-                                <h4>Cena</h4>
-                                <button type="button" class="btn-small" onclick="event.stopPropagation(); agregarRecetaCategoria('cena')">+ Receta</button>
-                            </div>
-                            <div class="categoria-content">
-                                <div class="subcategorias">
-                                    <div class="subcategoria" data-sub="principales">
-                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
-                                            <span>🍛 Platos Principales</span>
-                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('cena', 'principales')">+</button>
-                                        </div>
-                                        <div class="subcategoria-content"></div>
-                                    </div>
-                                    <div class="subcategoria" data-sub="postres">
-                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
-                                            <span>🍰 Postres</span>
-                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('cena', 'postres')">+</button>
-                                        </div>
-                                        <div class="subcategoria-content"></div>
-                                    </div>
-                                    <div class="subcategoria" data-sub="bebidas">
-                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
-                                            <span>🥤 Bebidas</span>
-                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('cena', 'bebidas')">+</button>
-                                        </div>
-                                        <div class="subcategoria-content"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="generarEjemplosRecetas()">🎲 Generar Ejemplos</button>
-                        <button type="submit" class="btn-primary">Guardar Menú</button>
-                        <button type="button" class="btn-secondary" onclick="cancelarMenu()">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="menus-list" id="menusList">
-                <!-- Menús planificados se mostrarán aquí -->
-            </div>
+            <p>Módulo de planificación</p>
         </div>
     </div>
 
-    <!-- Producción -->
     <div id="produccion" class="screen">
         <div class="page-container">
-            <header class="page-header">
-                <button class="hamburger-btn" onclick="toggleSidebar()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+            <div class="page-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
                 <h1>Producción</h1>
-            </header>
-            <div class="produccion-actions">
-                <select id="menuProduccion" class="filter-input">
-                    <option value="">Seleccionar menú del día...</option>
-                </select>
-                <button class="btn-whatsapp" onclick="mostrarFormularioProduccion()">
-                    📱 Reportar Producción por WhatsApp
-                </button>
             </div>
-            <div id="formularioProduccion" class="form-container" style="display: none;">
-                <h3>Reporte de Producción</h3>
-                <form onsubmit="return reportarProduccion(event)">
-                    <div class="form-group">
-                        <label for="recetaProduccion">Receta</label>
-                        <select id="recetaProduccion" required>
-                            <option value="">Seleccionar receta...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="cantidadReceta">Cantidad Producida (porciones)</label>
-                        <input type="number" id="cantidadReceta" required min="1">
-                    </div>
-                    <div class="form-group">
-                        <label for="charolas">Número de Charolas</label>
-                        <input type="number" id="charolas" required min="1" placeholder="Charolas servidas">
-                    </div>
-                    <div class="form-group">
-                        <label for="merma">Merma/Desperdicio (kg)</label>
-                        <input type="number" id="merma" step="0.01" required min="0" placeholder="0.00">
-                    </div>
-                    <div class="form-group">
-                        <label for="observacionesProduccion">Observaciones</label>
-                        <textarea id="observacionesProduccion" rows="3"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Enviar Reporte</button>
-                        <button type="button" class="btn-secondary" onclick="ocultarFormularioProduccion()">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Receta</th>
-                            <th>Cantidad Producida</th>
-                            <th>Charolas</th>
-                            <th>Merma (kg)</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaProduccion">
-                        <!-- Datos mock se cargarán aquí -->
-                    </tbody>
-                </table>
-            </div>
+            <p>Módulo de producción</p>
         </div>
     </div>
 
-    <!-- Servicio al Cliente -->
     <div id="servicio" class="screen">
         <div class="page-container">
-            <header class="page-header">
-                <button class="hamburger-btn" onclick="toggleSidebar()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+            <div class="page-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
                 <h1>Servicio al Cliente</h1>
-            </header>
-            <div class="servicio-actions">
-                <button class="btn-primary" onclick="crearEncuesta()">Crear Nueva Encuesta</button>
             </div>
-            <div id="formularioEncuesta" class="form-container" style="display: none;">
-                <h3>Crear Encuesta</h3>
-                <form onsubmit="return guardarEncuesta(event)">
-                    <div class="form-group">
-                        <label for="tituloEncuesta">Título de la Encuesta</label>
-                        <input type="text" id="tituloEncuesta" required placeholder="Ej: Satisfacción del Menú de Hoy">
-                    </div>
-                    <div class="form-group">
-                        <label for="preguntasEncuesta">Preguntas (una por línea)</label>
-                        <textarea id="preguntasEncuesta" rows="5" required placeholder="¿Cómo calificaría la calidad de la comida?&#10;¿El servicio fue rápido?&#10;¿Recomendaría nuestro comedor?"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Generar Encuesta y QR</button>
-                        <button type="button" class="btn-secondary" onclick="cancelarEncuesta()">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-            <div class="encuestas-list" id="encuestasList">
-                <!-- Encuestas se mostrarán aquí -->
-            </div>
+            <p>Módulo de servicio al cliente</p>
         </div>
     </div>
 
-    <!-- Notificaciones -->
     <div id="notificaciones" class="screen">
         <div class="page-container">
-            <header class="page-header">
-                <button class="hamburger-btn" onclick="toggleSidebar()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <h1>Notificaciones Inteligentes</h1>
-            </header>
-            <div class="notificaciones-container" id="notificacionesContainer">
-                <!-- Notificaciones se cargarán aquí -->
+            <div class="page-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <h1>Notificaciones</h1>
             </div>
+            <p>Módulo de notificaciones</p>
         </div>
     </div>
 
-    <!-- Configuración -->
     <div id="configuracion" class="screen">
         <div class="page-container">
-            <header class="page-header">
-                <button class="hamburger-btn" onclick="toggleSidebar()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+            <div class="page-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
                 <h1>Configuración</h1>
-            </header>
-            <div class="config-container">
-                <div class="config-section">
-                    <h3>Parámetros del Sistema</h3>
-                    <div class="form-group">
-                        <label for="stockMinimoGlobal">Stock Mínimo Global (kg)</label>
-                        <input type="number" id="stockMinimoGlobal" value="50" min="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="porcionesCharola">Porciones por Charola</label>
-                        <input type="number" id="porcionesCharola" value="20" min="1" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="horarioServicio">Horario de Servicio</label>
-                        <input type="time" id="horarioServicio" value="12:00" required>
-                    </div>
-                </div>
-                <div class="config-section">
-                    <h3>Integraciones</h3>
-                    <div class="form-group">
-                        <label for="whatsappAPI">WhatsApp Business API</label>
-                        <input type="text" id="whatsappAPI" placeholder="Número de teléfono" value="+52 123 456 7890" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="ocrService">OCR Service</label>
-                        <select id="ocrService" required>
-                            <option value="google">Google Vision API</option>
-                            <option value="azure">Azure Computer Vision</option>
-                            <option value="aws">AWS Textract</option>
-                        </select>
-                    </div>
-                </div>
-                <form onsubmit="return guardarConfiguracion(event)">
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Guardar Configuración</button>
-                        <button type="button" class="btn-secondary" onclick="resetearConfiguracion()">Restaurar Valores</button>
-                    </div>
-                </form>
             </div>
+            <p>Módulo de configuración</p>
         </div>
     </div>
 
     <script src="app.js"></script>
 </body>
 </html>
-
