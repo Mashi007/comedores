@@ -999,27 +999,28 @@ function crearGrafico8() {
                     displayColors: true,
                     callbacks: {
                         title: function(context) {
+                            if (!context || context.length === 0 || !context[0]) return '';
                             const datasetIndex = context[0].datasetIndex;
+                            if (datasetIndex === undefined || !productos[datasetIndex]) return '';
                             return productos[datasetIndex].name;
                         },
                         label: function(context) {
+                            if (!context || context.length === 0 || !context[0]) return '';
                             const datasetIndex = context[0].datasetIndex;
+                            if (datasetIndex === undefined || !productos[datasetIndex]) return '';
+                            
                             const p = productos[datasetIndex];
                             const stock = p.stock;
                             const reorder = p.reorder;
                             const porcentaje = ((stock / reorder) * 100).toFixed(1);
                             
                             let estado = '';
-                            let estadoIcon = '';
                             if (stock <= reorder * 1.2) {
                                 estado = '🔴 Crítico';
-                                estadoIcon = '🔴';
                             } else if (stock <= reorder * 2) {
                                 estado = '🟡 Atención';
-                                estadoIcon = '🟡';
                             } else {
                                 estado = '🟢 Óptimo';
-                                estadoIcon = '🟢';
                             }
                             
                             return [

@@ -381,10 +381,9 @@ body {
 }
 
 /* Fix: Algunos navegadores no soportan :hover en scrollbar-thumb */
-@supports (scrollbar-width: thin) {
-    .sidebar-nav::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.3);
-    }
+/* Usar selector directo - navegadores que no lo soporten lo ignorarán */
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 /* Fix para navegadores que no soportan webkit-scrollbar */
