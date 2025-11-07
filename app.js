@@ -3377,9 +3377,184 @@ function crearEncuesta() {
     ToastNotification.show('Funcionalidad de creación de encuestas próximamente', 'info', 3000);
 }
 
+// ============================================
+// GENERACIÓN DE QR Y FORMULARIO DE ENCUESTA
+// ============================================
+
+// Generar QR para encuesta
+function generarQREncuesta() {
+    // Crear URL única para el formulario
+    const baseUrl = window.location.origin + window.location.pathname;
+    const encuestaUrl = baseUrl + '?encuesta=true';
+    
+    // Generar QR usando API de qrserver.com
+    const qrSize = 300;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(encuestaUrl)}`;
+    
+    // Mostrar QR
+    const qrImage = document.getElementById('qrCodeImage');
+    const qrPlaceholder = document.getElementById('qrPlaceholder');
+    const btnDescargar = document.getElementById('btnDescargarQR');
+    const qrLink = document.getElementById('qrLink');
+    
+    if (qrImage && qrPlaceholder) {
+        qrImage.src = qrUrl;
+        qrImage.style.display = 'block';
+        qrPlaceholder.style.display = 'none';
+        
+        if (btnDescargar) {
+            btnDescargar.style.display = 'inline-flex';
+        }
+        
+        if (qrLink) {
+            qrLink.value = encuestaUrl;
+        }
+        
+        ToastNotification.show('Código QR generado correctamente', 'success', 2000);
+    }
+}
+
+// Descargar QR
+function descargarQR() {
+    const qrImage = document.getElementById('qrCodeImage');
+    if (qrImage && qrImage.src) {
+        const link = document.createElement('a');
+        link.href = qrImage.src;
+        link.download = 'qr-encuesta-satisfaccion.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        ToastNotification.show('QR descargado correctamente', 'success', 2000);
+    }
+}
+
+// Copiar enlace
+function copiarEnlace() {
+    const qrLink = document.getElementById('qrLink');
+    if (qrLink && qrLink.value) {
+        qrLink.select();
+        qrLink.setSelectionRange(0, 99999); // Para móviles
+        document.execCommand('copy');
+        ToastNotification.show('Enlace copiado al portapapeles', 'success', 2000);
+    }
+}
+
+// Verificar si se debe mostrar el formulario (desde QR)
+function verificarParametroEncuesta() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('encuesta') === 'true') {
+        mostrarFormularioEncuesta();
+    }
+}
+
+// Mostrar formulario de encuesta
+function mostrarFormularioEncuesta() {
+    const formulario = document.getElementById('formulario-encuesta');
+    if (formulario) {
+        // Ocultar todas las pantallas
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+            screen.style.display = 'none';
+        });
+        
+        // Mostrar formulario
+        formulario.classList.add('active');
+        formulario.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Scroll al inicio
+        window.scrollTo(0, 0);
+    }
+}
+
+// Enviar encuesta del cliente
+function enviarEncuestaCliente(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    // Recopilar datos del formulario
+    const datosEncuesta = {
+        nombre: formData.get('nombre') || 'Anónimo',
+        email: formData.get('email') || '',
+        calificacionGeneral: parseInt(formData.get('calificacionGeneral')) || 0,
+        sabor: parseInt(formData.get('sabor')) || 0,
+        calidad: parseInt(formData.get('calidad')) || 0,
+        presentacion: parseInt(formData.get('presentacion')) || 0,
+        servicio: parseInt(formData.get('servicio')) || 0,
+        regresaria: formData.get('regresaria'),
+        recomendaria: formData.get('recomendaria'),
+        comentarios: formData.get('comentarios') || '',
+        fecha: new Date()
+    };
+    
+    // Validar que se haya seleccionado calificación general
+    if (datosEncuesta.calificacionGeneral === 0) {
+        ToastNotification.show('Por favor, califica tu experiencia general', 'warning', 3000);
+        return;
+    }
+    
+    // Agregar a datos de satisfacción (simulación)
+    if (typeof satisfaccionData !== 'undefined') {
+        const nuevaRespuesta = {
+            id: Date.now(),
+            fecha: datosEncuesta.fecha,
+            semana: Math.ceil((new Date().getDate()) / 7),
+            calificacionGeneral: datosEncuesta.calificacionGeneral,
+            variables: {
+                sabor: datosEncuesta.sabor || datosEncuesta.calificacionGeneral,
+                calidad: datosEncuesta.calidad || datosEncuesta.calificacionGeneral,
+                presentacion: datosEncuesta.presentacion || datosEncuesta.calificacionGeneral,
+                temperatura: datosEncuesta.calificacionGeneral,
+                variedad: datosEncuesta.calificacionGeneral,
+                servicio: datosEncuesta.servicio || datosEncuesta.calificacionGeneral,
+                limpieza: datosEncuesta.calificacionGeneral,
+                tiempo: datosEncuesta.calificacionGeneral,
+                precio: datosEncuesta.calificacionGeneral
+            },
+            regresaria: datosEncuesta.regresaria === 'si',
+            recomendaria: datosEncuesta.recomendaria === 'si',
+            comentarios: datosEncuesta.comentarios,
+            nombre: datosEncuesta.nombre,
+            email: datosEncuesta.email
+        };
+        
+        satisfaccionData.respuestas.push(nuevaRespuesta);
+    }
+    
+    // Mostrar mensaje de éxito
+    ToastNotification.show('¡Gracias por tu opinión! Tu encuesta ha sido enviada correctamente.', 'success', 4000);
+    
+    // Limpiar formulario
+    form.reset();
+    
+    // Cerrar formulario después de 2 segundos
+    setTimeout(() => {
+        const formulario = document.getElementById('formulario-encuesta');
+        if (formulario) {
+            formulario.classList.remove('active');
+            formulario.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Limpiar parámetro de URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, 2000);
+}
+
 // Exponer funciones globalmente
 window.crearEncuesta = crearEncuesta;
 window.inicializarModuloSatisfaccion = inicializarModuloSatisfaccion;
+window.generarQREncuesta = generarQREncuesta;
+window.descargarQR = descargarQR;
+window.copiarEnlace = copiarEnlace;
+window.enviarEncuestaCliente = enviarEncuestaCliente;
+
+// Verificar parámetro al cargar la página
+window.addEventListener('DOMContentLoaded', function() {
+    verificarParametroEncuesta();
+});
 
 // ============================================
 // MÓDULO DE INVENTARIO COMPLETO

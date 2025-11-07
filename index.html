@@ -890,6 +890,214 @@
                     <!-- Se llenará dinámicamente -->
                 </div>
             </div>
+
+            <!-- Compartir Encuesta con QR -->
+            <div class="qr-encuesta-section">
+                <div class="qr-card">
+                    <div class="qr-header">
+                        <h2>Compartir Encuesta</h2>
+                        <p>Escanea el código QR para acceder al formulario de satisfacción</p>
+                    </div>
+                    <div class="qr-content">
+                        <div class="qr-display">
+                            <div id="qrCodeContainer">
+                                <img id="qrCodeImage" src="" alt="Código QR de Encuesta" style="display: none; max-width: 300px; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                <div id="qrPlaceholder" class="qr-placeholder">
+                                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="3" y="3" width="7" height="7" fill="currentColor"/>
+                                        <rect x="14" y="3" width="7" height="7" fill="currentColor"/>
+                                        <rect x="3" y="14" width="7" height="7" fill="currentColor"/>
+                                        <rect x="14" y="14" width="7" height="7" fill="currentColor"/>
+                                        <rect x="6" y="6" width="12" height="12" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                    <p>Generar QR</p>
+                                </div>
+                            </div>
+                            <div class="qr-actions">
+                                <button class="btn-primary" onclick="generarQREncuesta()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                        <path d="M12 2V6M12 18V22M6 12H2M22 12H18M19.07 19.07L16.24 16.24M19.07 4.93L16.24 7.76M4.93 19.07L7.76 16.24M4.93 4.93L7.76 7.76" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                    Generar Código QR
+                                </button>
+                                <button class="btn-secondary" id="btnDescargarQR" onclick="descargarQR()" style="display: none;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Descargar QR
+                                </button>
+                            </div>
+                        </div>
+                        <div class="qr-info">
+                            <h3>Instrucciones</h3>
+                            <ul>
+                                <li>Haz clic en "Generar Código QR" para crear el código</li>
+                                <li>Comparte el código QR con tus clientes</li>
+                                <li>Al escanearlo, se abrirá el formulario de satisfacción</li>
+                                <li>Puedes descargar el QR para imprimirlo o compartirlo digitalmente</li>
+                            </ul>
+                            <div class="qr-link">
+                                <label>Enlace directo:</label>
+                                <div class="link-container">
+                                    <input type="text" id="qrLink" readonly value="">
+                                    <button class="btn-copy" onclick="copiarEnlace()" title="Copiar enlace">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Encuesta (se abre desde QR) -->
+    <div id="formulario-encuesta" class="screen formulario-encuesta-screen">
+        <div class="formulario-encuesta-container">
+            <div class="formulario-encuesta-header">
+                <h1>Encuesta de Satisfacción</h1>
+                <p>Tu opinión es muy importante para nosotros</p>
+            </div>
+            <form id="formEncuestaCliente" class="formulario-encuesta-form" onsubmit="enviarEncuestaCliente(event)">
+                <div class="form-section">
+                    <h3>Datos Personales</h3>
+                    <div class="form-group">
+                        <label for="nombreCliente">Nombre (opcional)</label>
+                        <input type="text" id="nombreCliente" name="nombre" placeholder="Tu nombre">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailCliente">Email (opcional)</label>
+                        <input type="email" id="emailCliente" name="email" placeholder="tu@email.com">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Calificación General</h3>
+                    <div class="form-group">
+                        <label>¿Cómo calificarías tu experiencia general?</label>
+                        <div class="rating-stars" id="ratingGeneral">
+                            <input type="radio" name="calificacionGeneral" id="star5" value="5">
+                            <label for="star5" class="star-label">★</label>
+                            <input type="radio" name="calificacionGeneral" id="star4" value="4">
+                            <label for="star4" class="star-label">★</label>
+                            <input type="radio" name="calificacionGeneral" id="star3" value="3">
+                            <label for="star3" class="star-label">★</label>
+                            <input type="radio" name="calificacionGeneral" id="star2" value="2">
+                            <label for="star2" class="star-label">★</label>
+                            <input type="radio" name="calificacionGeneral" id="star1" value="1">
+                            <label for="star1" class="star-label">★</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Evaluación por Aspectos</h3>
+                    <div class="aspectos-grid">
+                        <div class="aspecto-item">
+                            <label>Sabor de la Comida</label>
+                            <div class="rating-stars-small">
+                                <input type="radio" name="sabor" id="sabor5" value="5">
+                                <label for="sabor5">★</label>
+                                <input type="radio" name="sabor" id="sabor4" value="4">
+                                <label for="sabor4">★</label>
+                                <input type="radio" name="sabor" id="sabor3" value="3">
+                                <label for="sabor3">★</label>
+                                <input type="radio" name="sabor" id="sabor2" value="2">
+                                <label for="sabor2">★</label>
+                                <input type="radio" name="sabor" id="sabor1" value="1">
+                                <label for="sabor1">★</label>
+                            </div>
+                        </div>
+                        <div class="aspecto-item">
+                            <label>Calidad de Ingredientes</label>
+                            <div class="rating-stars-small">
+                                <input type="radio" name="calidad" id="calidad5" value="5">
+                                <label for="calidad5">★</label>
+                                <input type="radio" name="calidad" id="calidad4" value="4">
+                                <label for="calidad4">★</label>
+                                <input type="radio" name="calidad" id="calidad3" value="3">
+                                <label for="calidad3">★</label>
+                                <input type="radio" name="calidad" id="calidad2" value="2">
+                                <label for="calidad2">★</label>
+                                <input type="radio" name="calidad" id="calidad1" value="1">
+                                <label for="calidad1">★</label>
+                            </div>
+                        </div>
+                        <div class="aspecto-item">
+                            <label>Presentación</label>
+                            <div class="rating-stars-small">
+                                <input type="radio" name="presentacion" id="presentacion5" value="5">
+                                <label for="presentacion5">★</label>
+                                <input type="radio" name="presentacion" id="presentacion4" value="4">
+                                <label for="presentacion4">★</label>
+                                <input type="radio" name="presentacion" id="presentacion3" value="3">
+                                <label for="presentacion3">★</label>
+                                <input type="radio" name="presentacion" id="presentacion2" value="2">
+                                <label for="presentacion2">★</label>
+                                <input type="radio" name="presentacion" id="presentacion1" value="1">
+                                <label for="presentacion1">★</label>
+                            </div>
+                        </div>
+                        <div class="aspecto-item">
+                            <label>Atención al Cliente</label>
+                            <div class="rating-stars-small">
+                                <input type="radio" name="servicio" id="servicio5" value="5">
+                                <label for="servicio5">★</label>
+                                <input type="radio" name="servicio" id="servicio4" value="4">
+                                <label for="servicio4">★</label>
+                                <input type="radio" name="servicio" id="servicio3" value="3">
+                                <label for="servicio3">★</label>
+                                <input type="radio" name="servicio" id="servicio2" value="2">
+                                <label for="servicio2">★</label>
+                                <input type="radio" name="servicio" id="servicio1" value="1">
+                                <label for="servicio1">★</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Preguntas Adicionales</h3>
+                    <div class="form-group">
+                        <label for="regresaria">¿Volverías a comer aquí?</label>
+                        <select id="regresaria" name="regresaria" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="si">Sí, definitivamente</option>
+                            <option value="probablemente">Probablemente</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="recomendaria">¿Recomendarías este comedor a otros?</label>
+                        <select id="recomendaria" name="recomendaria" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="si">Sí, definitivamente</option>
+                            <option value="probablemente">Probablemente</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="comentarios">Comentarios adicionales (opcional)</label>
+                        <textarea id="comentarios" name="comentarios" rows="4" placeholder="Comparte tus comentarios, sugerencias o recomendaciones..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Enviar Encuesta
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

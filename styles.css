@@ -1202,6 +1202,404 @@ body.sidebar-open .page-container {
     }
 }
 
+/* ============================================
+   QR Y FORMULARIO DE ENCUESTA
+   ============================================ */
+
+/* Sección QR Encuesta */
+.qr-encuesta-section {
+    margin-top: 2rem;
+}
+
+.qr-card {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.qr-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.qr-header h2 {
+    color: var(--text-primary);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.qr-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.qr-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.qr-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+#qrCodeContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    width: 100%;
+    background: var(--bg-color);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 2px dashed var(--border-color);
+}
+
+.qr-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.qr-placeholder svg {
+    opacity: 0.3;
+}
+
+.qr-placeholder p {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.qr-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.qr-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.qr-info h3 {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.qr-info ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.qr-info li {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.qr-info li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.qr-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.qr-link label {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.link-container {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.link-container input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.btn-copy {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-copy:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Formulario de Encuesta */
+.formulario-encuesta-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 10000;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+.formulario-encuesta-screen.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.formulario-encuesta-container {
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2.5rem;
+    margin: auto;
+}
+
+.formulario-encuesta-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.formulario-encuesta-header h1 {
+    color: var(--text-primary);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.formulario-encuesta-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.formulario-encuesta-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-section h3 {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.2s;
+    background: var(--bg-color);
+    color: var(--text-primary);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Rating Stars */
+.rating-stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.rating-stars input[type="radio"] {
+    display: none;
+}
+
+.rating-stars .star-label {
+    font-size: 2.5rem;
+    color: #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.rating-stars input[type="radio"]:checked ~ .star-label,
+.rating-stars .star-label:hover,
+.rating-stars .star-label:hover ~ .star-label {
+    color: #fbbf24;
+}
+
+.rating-stars-small {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 0.25rem;
+}
+
+.rating-stars-small input[type="radio"] {
+    display: none;
+}
+
+.rating-stars-small label {
+    font-size: 1.5rem;
+    color: #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.rating-stars-small input[type="radio"]:checked ~ label,
+.rating-stars-small label:hover,
+.rating-stars-small label:hover ~ label {
+    color: #fbbf24;
+}
+
+.aspectos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.aspecto-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.aspecto-item label {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 1rem;
+    border-top: 2px solid var(--border-color);
+}
+
+.btn-submit {
+    padding: 1rem 2.5rem;
+    background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .qr-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .formulario-encuesta-container {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+    
+    .aspectos-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .rating-stars .star-label {
+        font-size: 2rem;
+    }
+}
+
 /* Chat AI */
 .chat-container {
     background: var(--card-bg);
