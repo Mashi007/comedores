@@ -192,6 +192,14 @@ window.cambiarPantalla = function(ocultar, mostrar) {
             sidebar.classList.remove('open');
             if (sidebarOverlay) sidebarOverlay.classList.remove('active');
             document.body.classList.remove('sidebar-open');
+            
+            // RE-INICIALIZAR el botón de inicio cuando se muestra la portada
+            if (mostrar === 'portada') {
+                setTimeout(function() {
+                    console.log('Re-inicializando botón de inicio al mostrar portada...');
+                    inicializarBotonInicio();
+                }, 100);
+            }
         } else if (pantallasConSidebar.includes(mostrar)) {
             // Mostrar sidebar solo en pantallas del sistema (después del login)
             sidebar.style.display = 'flex';
