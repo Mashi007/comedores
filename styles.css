@@ -474,6 +474,56 @@ body {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.sidebar-user:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.user-menu-arrow {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    transition: transform 0.3s ease;
+}
+
+.sidebar-user.active .user-menu-arrow {
+    transform: rotate(180deg);
+}
+
+.user-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.user-menu.open {
+    max-height: 200px;
+}
+
+.user-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    background: rgba(220, 38, 38, 0.1);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    margin-top: 0.5rem;
+}
+
+.user-menu-item:hover {
+    background: rgba(220, 38, 38, 0.2);
+    color: white;
+    border-color: rgba(220, 38, 38, 0.4);
 }
 
 .user-avatar {
