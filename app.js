@@ -260,7 +260,7 @@ function inicializarBotonInicio() {
     btnInicio.style.pointerEvents = 'auto';
     btnInicio.style.cursor = 'pointer';
     
-    // Función para manejar el click - SIMPLIFICADA Y DIRECTA
+    // Función para manejar el click - VA DIRECTO AL SISTEMA (SIN LOGIN)
     function manejarClick(e) {
         console.log('=== BOTÓN CLICKEADO ===', e.type);
         
@@ -269,30 +269,47 @@ function inicializarBotonInicio() {
         if (e && e.stopPropagation) e.stopPropagation();
         if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
         
-        // Navegación directa e inmediata
+        // Navegación directa al MENU (sistema) - SIN LOGIN
         const portada = document.getElementById('portada');
-        const login = document.getElementById('login');
+        const menu = document.getElementById('menu');
         
-        if (portada && login) {
-            console.log('Navegando directamente...');
-            portada.classList.remove('active');
-            login.classList.add('active');
+        if (portada && menu) {
+            console.log('Navegando directamente al sistema...');
             
-            // Asegurar que el sidebar esté oculto
+            // Configurar usuario demo
+            const nombre = mockData.usuario.nombre;
+            const userNameEl = document.getElementById('userName');
+            const sidebarUserNameEl = document.getElementById('sidebarUserName');
+            const userInitialEl = document.getElementById('userInitial');
+            
+            if (userNameEl) userNameEl.textContent = nombre;
+            if (sidebarUserNameEl) sidebarUserNameEl.textContent = nombre;
+            if (userInitialEl) userInitialEl.textContent = nombre.charAt(0).toUpperCase();
+            
+            // Cambiar pantalla
+            portada.classList.remove('active');
+            menu.classList.add('active');
+            
+            // Mostrar sidebar
             const sidebar = document.getElementById('sidebar');
             if (sidebar) {
-                sidebar.style.display = 'none';
-                sidebar.classList.remove('open');
+                sidebar.style.display = 'flex';
             }
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-            if (sidebarOverlay) {
-                sidebarOverlay.classList.remove('active');
-            }
-            document.body.classList.remove('sidebar-open');
             
-            console.log('✅ Navegación a login completada');
+            // Abrir sidebar automáticamente en desktop
+            if (window.innerWidth > 768) {
+                setTimeout(() => {
+                    if (sidebar) {
+                        sidebar.classList.add('open');
+                        document.body.classList.add('sidebar-open');
+                    }
+                }, 300);
+            }
+            
+            ToastNotification.show('¡Bienvenido al sistema!', 'success');
+            console.log('✅ Navegación al sistema completada');
         } else {
-            console.error('ERROR: No se encontraron portada o login');
+            console.error('ERROR: No se encontraron portada o menu');
         }
         
         return false;
