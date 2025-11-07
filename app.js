@@ -601,9 +601,38 @@ const dashboardData = {
             { dia: 'Vie', fecha: '2024-01-19', consumo: 55, productos: ['Arroz: 20kg', 'Frijoles: 18kg', 'Papa: 17kg'] },
             { dia: 'Sáb', fecha: '2024-01-20', consumo: 42, productos: ['Arroz: 15kg', 'Verduras: 15kg', 'Otros: 12kg'] },
             { dia: 'Dom', fecha: '2024-01-21', consumo: 38, productos: ['Arroz: 12kg', 'Frijoles: 10kg', 'Papa: 16kg'] }
+        ],
+        '15': [
+            { dia: 'Lun', fecha: '2024-01-08', consumo: 42, productos: ['Arroz: 14kg', 'Frijoles: 11kg', 'Papa: 17kg'] },
+            { dia: 'Mar', fecha: '2024-01-09', consumo: 48, productos: ['Arroz: 16kg', 'Carne: 18kg', 'Pollo: 14kg'] },
+            { dia: 'Mié', fecha: '2024-01-10', consumo: 44, productos: ['Frijoles: 14kg', 'Papa: 18kg', 'Verduras: 12kg'] },
+            { dia: 'Jue', fecha: '2024-01-11', consumo: 58, productos: ['Arroz: 20kg', 'Carne: 23kg', 'Pollo: 15kg'] },
+            { dia: 'Vie', fecha: '2024-01-12', consumo: 52, productos: ['Arroz: 18kg', 'Frijoles: 16kg', 'Papa: 18kg'] },
+            { dia: 'Sáb', fecha: '2024-01-13', consumo: 40, productos: ['Arroz: 14kg', 'Verduras: 14kg', 'Otros: 12kg'] },
+            { dia: 'Dom', fecha: '2024-01-14', consumo: 36, productos: ['Arroz: 11kg', 'Frijoles: 9kg', 'Papa: 16kg'] },
+            { dia: 'Lun', fecha: '2024-01-15', consumo: 45, productos: ['Arroz: 15kg', 'Frijoles: 12kg', 'Papa: 18kg'] },
+            { dia: 'Mar', fecha: '2024-01-16', consumo: 52, productos: ['Arroz: 18kg', 'Carne: 20kg', 'Pollo: 14kg'] },
+            { dia: 'Mié', fecha: '2024-01-17', consumo: 48, productos: ['Frijoles: 15kg', 'Papa: 20kg', 'Verduras: 13kg'] },
+            { dia: 'Jue', fecha: '2024-01-18', consumo: 61, productos: ['Arroz: 22kg', 'Carne: 25kg', 'Pollo: 14kg'] },
+            { dia: 'Vie', fecha: '2024-01-19', consumo: 55, productos: ['Arroz: 20kg', 'Frijoles: 18kg', 'Papa: 17kg'] },
+            { dia: 'Sáb', fecha: '2024-01-20', consumo: 42, productos: ['Arroz: 15kg', 'Verduras: 15kg', 'Otros: 12kg'] },
+            { dia: 'Dom', fecha: '2024-01-21', consumo: 38, productos: ['Arroz: 12kg', 'Frijoles: 10kg', 'Papa: 16kg'] },
+            { dia: 'Lun', fecha: '2024-01-22', consumo: 47, productos: ['Arroz: 16kg', 'Frijoles: 13kg', 'Papa: 18kg'] }
+        ],
+        '30': [
+            { dia: 'Sem 1', fecha: '2024-01-01', consumo: 320, productos: ['Arroz: 110kg', 'Frijoles: 85kg', 'Papa: 125kg'] },
+            { dia: 'Sem 2', fecha: '2024-01-08', consumo: 345, productos: ['Arroz: 120kg', 'Carne: 95kg', 'Pollo: 130kg'] },
+            { dia: 'Sem 3', fecha: '2024-01-15', consumo: 358, productos: ['Frijoles: 105kg', 'Papa: 140kg', 'Verduras: 113kg'] },
+            { dia: 'Sem 4', fecha: '2024-01-22', consumo: 372, productos: ['Arroz: 130kg', 'Carne: 125kg', 'Pollo: 117kg'] }
+        ],
+        '90': [
+            { dia: 'Mes 1', fecha: '2023-11', consumo: 1320, productos: ['Arroz: 450kg', 'Frijoles: 380kg', 'Papa: 490kg'] },
+            { dia: 'Mes 2', fecha: '2023-12', consumo: 1450, productos: ['Arroz: 500kg', 'Carne: 420kg', 'Pollo: 530kg'] },
+            { dia: 'Mes 3', fecha: '2024-01', consumo: 1395, productos: ['Frijoles: 410kg', 'Papa: 520kg', 'Verduras: 465kg'] }
         ]
     },
     comprasCategoria: {
+        all: { valor: 100, monto: 45230, facturas: 40 },
         carnes: { valor: 35, monto: 18500, facturas: 8 },
         verduras: { valor: 25, monto: 11200, facturas: 12 },
         granos: { valor: 30, monto: 13200, facturas: 15 },
@@ -618,6 +647,34 @@ const dashboardData = {
             { dia: 'Vie', fecha: '2024-01-19', comidas: 342, charolas: 18, merma: 3.6 },
             { dia: 'Sáb', fecha: '2024-01-20', comidas: 280, charolas: 14, merma: 2.5 },
             { dia: 'Dom', fecha: '2024-01-21', comidas: 250, charolas: 13, merma: 2.2 }
+        ],
+        '15': [
+            { dia: 'Lun', fecha: '2024-01-08', comidas: 315, charolas: 16, merma: 3.0 },
+            { dia: 'Mar', fecha: '2024-01-09', comidas: 340, charolas: 17, merma: 3.3 },
+            { dia: 'Mié', fecha: '2024-01-10', comidas: 305, charolas: 15, merma: 2.7 },
+            { dia: 'Jue', fecha: '2024-01-11', comidas: 360, charolas: 18, merma: 4.0 },
+            { dia: 'Vie', fecha: '2024-01-12', comidas: 338, charolas: 17, merma: 3.5 },
+            { dia: 'Sáb', fecha: '2024-01-13', comidas: 275, charolas: 14, merma: 2.4 },
+            { dia: 'Dom', fecha: '2024-01-14', comidas: 245, charolas: 12, merma: 2.1 },
+            { dia: 'Lun', fecha: '2024-01-15', comidas: 320, charolas: 16, merma: 3.2 },
+            { dia: 'Mar', fecha: '2024-01-16', comidas: 345, charolas: 18, merma: 3.5 },
+            { dia: 'Mié', fecha: '2024-01-17', comidas: 310, charolas: 16, merma: 2.8 },
+            { dia: 'Jue', fecha: '2024-01-18', comidas: 365, charolas: 19, merma: 4.1 },
+            { dia: 'Vie', fecha: '2024-01-19', comidas: 342, charolas: 18, merma: 3.6 },
+            { dia: 'Sáb', fecha: '2024-01-20', comidas: 280, charolas: 14, merma: 2.5 },
+            { dia: 'Dom', fecha: '2024-01-21', comidas: 250, charolas: 13, merma: 2.2 },
+            { dia: 'Lun', fecha: '2024-01-22', comidas: 325, charolas: 16, merma: 3.3 }
+        ],
+        '30': [
+            { dia: 'Sem 1', fecha: '2024-01-01', comidas: 2240, charolas: 112, merma: 22.4 },
+            { dia: 'Sem 2', fecha: '2024-01-08', comidas: 2415, charolas: 121, merma: 24.5 },
+            { dia: 'Sem 3', fecha: '2024-01-15', comidas: 2506, charolas: 125, merma: 21.0 },
+            { dia: 'Sem 4', fecha: '2024-01-22', comidas: 2604, charolas: 130, merma: 25.2 }
+        ],
+        '90': [
+            { dia: 'Mes 1', fecha: '2023-11', comidas: 9240, charolas: 462, merma: 98.4 },
+            { dia: 'Mes 2', fecha: '2023-12', comidas: 10150, charolas: 508, merma: 108.5 },
+            { dia: 'Mes 3', fecha: '2024-01', comidas: 9765, charolas: 488, merma: 91.5 }
         ]
     },
     topProductos: [
@@ -671,6 +728,9 @@ function aplicarFiltros() {
     const periodo = document.getElementById('filtroPeriodo').value;
     const categoria = document.getElementById('filtroCategoria').value;
     
+    // Mostrar feedback visual
+    ToastNotification.show(`Aplicando filtros: ${document.getElementById('filtroPeriodo').options[document.getElementById('filtroPeriodo').selectedIndex].text} - ${categoria === 'all' ? 'Todas las categorías' : categoria}`, 'info', 2000);
+    
     // Recrear gráficos con nuevos filtros
     if (chartInstances.chart1) chartInstances.chart1.destroy();
     if (chartInstances.chart2) chartInstances.chart2.destroy();
@@ -679,17 +739,22 @@ function aplicarFiltros() {
     if (chartInstances.chart5) chartInstances.chart5.destroy();
     if (chartInstances.chart6) chartInstances.chart6.destroy();
     
-    crearGrafico1(periodo);
-    crearGrafico2(categoria);
-    crearGrafico3(periodo);
-    crearGrafico4();
-    crearGrafico5();
-    crearGrafico6();
+    // Pequeño delay para mejor UX
+    setTimeout(() => {
+        crearGrafico1(periodo);
+        crearGrafico2(categoria);
+        crearGrafico3(periodo);
+        crearGrafico4();
+        crearGrafico5();
+        crearGrafico6();
+        ToastNotification.show('Filtros aplicados correctamente', 'success', 1500);
+    }, 300);
 }
 
 function resetearFiltros() {
     document.getElementById('filtroPeriodo').value = '30';
     document.getElementById('filtroCategoria').value = 'all';
+    ToastNotification.show('Filtros reseteados a valores por defecto', 'info', 2000);
     aplicarFiltros();
 }
 
