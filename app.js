@@ -93,8 +93,15 @@ function cambiarPantalla(ocultar, mostrar) {
     }
 }
 
-// Hacer función global
+// Hacer funciones globales
 window.cambiarPantalla = cambiarPantalla;
+window.navegar = navegar;
+window.toggleSidebar = toggleSidebar;
+window.cerrarSesion = cerrarSesion;
+window.marcarLeida = marcarLeida;
+window.marcarTodasLeidas = marcarTodasLeidas;
+window.gestionarNotificacion = gestionarNotificacion;
+window.enviarMensajeAI = enviarMensajeAI;
 
 // Sidebar
 function toggleSidebar() {
