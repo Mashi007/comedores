@@ -126,6 +126,13 @@ function cambiarPantalla(ocultar, mostrar) {
             }, 300);
         }
         
+        // Inicializar módulo de Planificación si es planificacion
+        if (mostrar === 'planificacion') {
+            setTimeout(() => {
+                inicializarModuloPlanificacion();
+            }, 300);
+        }
+        
         console.log('✅ Cambio de pantalla completado');
     } catch (error) {
         console.error('❌ Error al cambiar pantalla:', error);
@@ -4824,3 +4831,714 @@ if (typeof window !== 'undefined') {
     window.actualizarCostos = actualizarCostos;
     window.filtrarCostos = filtrarCostos;
 }
+
+// ============================================
+// MÓDULO DE PLANIFICACIÓN EJECUTIVO
+// ============================================
+
+// Estructura de datos de planificación
+const planificacionData = {
+    menus: {}, // { '2025-01-15': { desayuno: [], almuerzo: [], cena: [] } }
+    recetas: [], // Recetas maestras
+    fechaActual: new Date(),
+    vistaActual: 'mes'
+};
+
+// Recetas maestras con productos
+const recetasMaestras = [
+    {
+        id: 1,
+        nombre: 'Arroz con Frijoles',
+        categoria: 'plato-principal',
+        rendimiento: 10,
+        productos: [
+            { producto: 'Arroz Premium', cantidad: 0.2, unidad: 'kg' },
+            { producto: 'Frijoles Negros', cantidad: 0.15, unidad: 'kg' },
+            { producto: 'Aceite', cantidad: 0.05, unidad: 'L' },
+            { producto: 'Sal', cantidad: 0.01, unidad: 'kg' }
+        ],
+        costoPorcion: 8.50
+    },
+    {
+        id: 2,
+        nombre: 'Pollo Asado',
+        categoria: 'plato-principal',
+        rendimiento: 8,
+        productos: [
+            { producto: 'Pollo', cantidad: 0.3, unidad: 'kg' },
+            { producto: 'Aceite', cantidad: 0.03, unidad: 'L' },
+            { producto: 'Sal', cantidad: 0.01, unidad: 'kg' },
+            { producto: 'Cebolla', cantidad: 0.1, unidad: 'kg' }
+        ],
+        costoPorcion: 12.00
+    },
+    {
+        id: 3,
+        nombre: 'Jugo de Sandía',
+        categoria: 'bebida',
+        rendimiento: 15,
+        productos: [
+            { producto: 'Sandía', cantidad: 0.5, unidad: 'kg' },
+            { producto: 'Azúcar', cantidad: 0.05, unidad: 'kg' }
+        ],
+        costoPorcion: 2.50
+    },
+    {
+        id: 4,
+        nombre: 'Flan de Vainilla',
+        categoria: 'postre',
+        rendimiento: 12,
+        productos: [
+            { producto: 'Huevos', cantidad: 0.5, unidad: 'kg' },
+            { producto: 'Leche', cantidad: 0.5, unidad: 'L' },
+            { producto: 'Azúcar', cantidad: 0.1, unidad: 'kg' },
+            { producto: 'Vainilla', cantidad: 0.01, unidad: 'L' }
+        ],
+        costoPorcion: 3.00
+    },
+    {
+        id: 5,
+        nombre: 'Ensalada Mixta',
+        categoria: 'ensalada',
+        rendimiento: 12,
+        productos: [
+            { producto: 'Lechuga', cantidad: 0.1, unidad: 'kg' },
+            { producto: 'Tomates', cantidad: 0.08, unidad: 'kg' },
+            { producto: 'Cebolla', cantidad: 0.05, unidad: 'kg' },
+            { producto: 'Aceite', cantidad: 0.02, unidad: 'L' }
+        ],
+        costoPorcion: 3.50
+    },
+    {
+        id: 6,
+        nombre: 'Sopa de Verduras',
+        categoria: 'sopa',
+        rendimiento: 15,
+        productos: [
+            { producto: 'Papa', cantidad: 0.2, unidad: 'kg' },
+            { producto: 'Cebolla', cantidad: 0.1, unidad: 'kg' },
+            { producto: 'Zanahoria', cantidad: 0.1, unidad: 'kg' },
+            { producto: 'Sal', cantidad: 0.01, unidad: 'kg' }
+        ],
+        costoPorcion: 4.00
+    }
+];
+
+// Inicializar módulo de planificación
+function inicializarModuloPlanificacion() {
+    console.log('📅 Inicializando módulo de planificación ejecutivo...');
+    
+    // Cargar recetas maestras
+    planificacionData.recetas = [...recetasMaestras];
+    
+    // Generar datos mock de planificación
+    generarDatosMockPlanificacion();
+    
+    // Renderizar calendario
+    renderizarCalendario();
+    
+    // Cargar vista actual
+    cambiarVista(planificacionData.vistaActual);
+    
+    // Actualizar resumen
+    actualizarResumenPlanificacion();
+}
+
+// Generar datos mock de planificación
+function generarDatosMockPlanificacion() {
+    const hoy = new Date();
+    const fechaInicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const fechaFin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+    
+    for (let d = new Date(fechaInicio); d <= fechaFin; d.setDate(d.getDate() + 1)) {
+        const fechaStr = d.toISOString().split('T')[0];
+        const diaSemana = d.getDay();
+        
+        // Solo planificar días laborables (lunes a viernes)
+        if (diaSemana >= 1 && diaSemana <= 5) {
+            planificacionData.menus[fechaStr] = {
+                desayuno: [
+                    { recetaId: 1, cantidad: 1, nombre: 'Arroz con Frijoles' },
+                    { recetaId: 3, cantidad: 1, nombre: 'Jugo de Sandía' }
+                ],
+                almuerzo: [
+                    { recetaId: 2, cantidad: 1, nombre: 'Pollo Asado' },
+                    { recetaId: 5, cantidad: 1, nombre: 'Ensalada Mixta' },
+                    { recetaId: 4, cantidad: 1, nombre: 'Flan de Vainilla' }
+                ],
+                cena: [
+                    { recetaId: 6, cantidad: 1, nombre: 'Sopa de Verduras' },
+                    { recetaId: 1, cantidad: 1, nombre: 'Arroz con Frijoles' }
+                ]
+            };
+        }
+    }
+}
+
+// Renderizar calendario mensual
+function renderizarCalendario() {
+    const calendarioDias = document.getElementById('calendarioDias');
+    const mesActual = document.getElementById('mesActual');
+    if (!calendarioDias || !mesActual) return;
+    
+    const fecha = planificacionData.fechaActual;
+    const año = fecha.getFullYear();
+    const mes = fecha.getMonth();
+    
+    // Actualizar mes en header
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    mesActual.textContent = `${meses[mes]} ${año}`;
+    
+    // Primer día del mes
+    const primerDia = new Date(año, mes, 1);
+    const ultimoDia = new Date(año, mes + 1, 0);
+    const diasEnMes = ultimoDia.getDate();
+    const diaInicioSemana = primerDia.getDay() === 0 ? 6 : primerDia.getDay() - 1; // Lunes = 0
+    
+    let html = '';
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
+    // Días vacíos al inicio
+    for (let i = 0; i < diaInicioSemana; i++) {
+        html += '<div class="cal-dia empty"></div>';
+    }
+    
+    // Días del mes
+    for (let dia = 1; dia <= diasEnMes; dia++) {
+        const fechaDia = new Date(año, mes, dia);
+        const fechaStr = fechaDia.toISOString().split('T')[0];
+        const esHoy = fechaDia.getTime() === hoy.getTime();
+        const menu = planificacionData.menus[fechaStr] || { desayuno: [], almuerzo: [], cena: [] };
+        const totalRecetas = menu.desayuno.length + menu.almuerzo.length + menu.cena.length;
+        
+        html += `
+            <div class="cal-dia ${esHoy ? 'hoy' : ''}" onclick="seleccionarDia('${fechaStr}')">
+                <div class="cal-dia-numero">${dia}</div>
+                <div class="cal-dia-recetas">
+                    ${totalRecetas > 0 ? `
+                        <span class="receta-badge desayuno">${menu.desayuno.length}</span>
+                        <span class="receta-badge almuerzo">${menu.almuerzo.length}</span>
+                        <span class="receta-badge cena">${menu.cena.length}</span>
+                    ` : '<span class="sin-recetas">Sin planificar</span>'}
+                </div>
+            </div>
+        `;
+    }
+    
+    calendarioDias.innerHTML = html;
+}
+
+// Seleccionar día
+function seleccionarDia(fechaStr) {
+    planificacionData.fechaSeleccionada = fechaStr;
+    cambiarVista('dia');
+    cargarVistaDia(fechaStr);
+}
+
+// Cambiar vista
+function cambiarVista(vista) {
+    planificacionData.vistaActual = vista;
+    
+    // Ocultar todas las vistas
+    document.querySelectorAll('.vista-calendario').forEach(v => {
+        v.style.display = 'none';
+        v.classList.remove('active');
+    });
+    
+    // Mostrar vista seleccionada
+    const vistaEl = document.getElementById(`vista${vista.charAt(0).toUpperCase() + vista.slice(1)}`);
+    if (vistaEl) {
+        vistaEl.style.display = 'block';
+        vistaEl.classList.add('active');
+    }
+    
+    // Actualizar botones
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.vista === vista) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Cargar datos según vista
+    if (vista === 'mes') {
+        renderizarCalendario();
+    } else if (vista === 'semana') {
+        cargarVistaSemana();
+    } else if (vista === 'dia') {
+        const fecha = planificacionData.fechaSeleccionada || planificacionData.fechaActual.toISOString().split('T')[0];
+        cargarVistaDia(fecha);
+    }
+    
+    actualizarResumenPlanificacion();
+}
+
+// Cargar vista día
+function cargarVistaDia(fechaStr) {
+    const fecha = new Date(fechaStr);
+    const diaActual = document.getElementById('diaActual');
+    if (diaActual) {
+        const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        diaActual.textContent = `${diasSemana[fecha.getDay()]}, ${fecha.getDate()} de ${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
+    }
+    
+    const menu = planificacionData.menus[fechaStr] || { desayuno: [], almuerzo: [], cena: [] };
+    
+    // Guardar fecha seleccionada
+    planificacionData.fechaSeleccionada = fechaStr;
+    
+    // Cargar recetas por comida
+    cargarRecetasComida('desayuno', menu.desayuno, fechaStr);
+    cargarRecetasComida('almuerzo', menu.almuerzo, fechaStr);
+    cargarRecetasComida('cena', menu.cena, fechaStr);
+}
+
+// Cargar recetas de una comida
+function cargarRecetasComida(comida, recetas, fechaStr) {
+    const container = document.getElementById(`recetas${comida.charAt(0).toUpperCase() + comida.slice(1)}`);
+    if (!container) return;
+    
+    if (recetas.length === 0) {
+        container.innerHTML = `
+            <div class="receta-empty">
+                <p>No hay recetas planificadas</p>
+                <button class="btn-add-small" onclick="abrirModalReceta('${comida}')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Agregar Receta
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = recetas.map((rec, index) => {
+        const receta = planificacionData.recetas.find(r => r.id === rec.recetaId) || recetasMaestras.find(r => r.id === rec.recetaId);
+        return `
+            <div class="receta-item-exec" data-receta-id="${rec.recetaId}" data-index="${index}">
+                <div class="receta-item-header">
+                    <div class="receta-info">
+                        <h4>${rec.nombre || receta?.nombre || 'Receta'}</h4>
+                        <span class="receta-categoria">${receta?.categoria || 'plato-principal'}</span>
+                    </div>
+                    <div class="receta-actions">
+                        <button class="btn-icon-small" onclick="editarRecetaPlanificacion('${fechaStr}', '${comida}', ${index})" title="Editar">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.5 2.5C18.8978 2.10218 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10218 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10218 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="btn-icon-small" onclick="eliminarRecetaPlanificacion('${fechaStr}', '${comida}', ${index})" title="Eliminar">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="receta-details">
+                    <div class="receta-detail-item">
+                        <span class="detail-label">Rendimiento:</span>
+                        <span class="detail-value">${receta?.rendimiento || 10} porciones</span>
+                    </div>
+                    <div class="receta-detail-item">
+                        <span class="detail-label">Costo:</span>
+                        <span class="detail-value">$${(receta?.costoPorcion || 0).toFixed(2)}/porción</span>
+                    </div>
+                    <div class="receta-productos">
+                        <span class="detail-label">Productos:</span>
+                        <div class="productos-tags">
+                            ${(receta?.productos || []).map(p => `<span class="producto-tag">${p.producto} (${p.cantidad} ${p.unidad})</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Abrir modal de receta
+function abrirModalReceta(comida) {
+    const modal = document.getElementById('modalReceta');
+    const titulo = document.getElementById('modalRecetaTitulo');
+    if (modal && titulo) {
+        titulo.textContent = `Agregar Receta - ${comida.charAt(0).toUpperCase() + comida.slice(1)}`;
+        modal.style.display = 'flex';
+        planificacionData.comidaActual = comida;
+        
+        // Limpiar formulario
+        document.getElementById('formReceta').reset();
+        document.getElementById('productosRecetaList').innerHTML = '';
+        document.getElementById('costoReceta').value = '0.00';
+    }
+}
+
+// Cerrar modal de receta
+function cerrarModalReceta() {
+    const modal = document.getElementById('modalReceta');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Agregar producto a receta
+function agregarProductoReceta() {
+    const container = document.getElementById('productosRecetaList');
+    if (!container) return;
+    
+    const productosDisponibles = ['Arroz Premium', 'Frijoles Negros', 'Pollo', 'Aceite', 'Sal', 'Cebolla', 'Tomates', 'Lechuga', 'Papa', 'Zanahoria', 'Sandía', 'Azúcar', 'Huevos', 'Leche', 'Vainilla'];
+    
+    const productoItem = document.createElement('div');
+    productoItem.className = 'producto-receta-item';
+    productoItem.innerHTML = `
+        <select class="producto-select" onchange="actualizarCostoReceta()">
+            <option value="">Seleccionar producto...</option>
+            ${productosDisponibles.map(p => `<option value="${p}">${p}</option>`).join('')}
+        </select>
+        <input type="number" class="producto-cantidad" placeholder="Cantidad" step="0.01" min="0" onchange="actualizarCostoReceta()">
+        <select class="producto-unidad" onchange="actualizarCostoReceta()">
+            <option value="kg">kg</option>
+            <option value="L">L</option>
+            <option value="unidad">unidad</option>
+        </select>
+        <button type="button" class="btn-remove-producto" onclick="this.parentElement.remove(); actualizarCostoReceta();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    `;
+    
+    container.appendChild(productoItem);
+}
+
+// Actualizar costo de receta
+function actualizarCostoReceta() {
+    // Esta función calcularía el costo basado en productos e inventario
+    // Por ahora es un placeholder
+    const costoInput = document.getElementById('costoReceta');
+    if (costoInput) {
+        costoInput.value = '8.50'; // Mock
+    }
+}
+
+// Guardar receta
+function guardarReceta(event) {
+    event.preventDefault();
+    
+    const nombre = document.getElementById('nombreReceta').value;
+    const categoria = document.getElementById('categoriaReceta').value;
+    const rendimiento = parseInt(document.getElementById('rendimientoReceta').value);
+    const productos = [];
+    
+    // Recopilar productos
+    document.querySelectorAll('.producto-receta-item').forEach(item => {
+        const producto = item.querySelector('.producto-select').value;
+        const cantidad = parseFloat(item.querySelector('.producto-cantidad').value);
+        const unidad = item.querySelector('.producto-unidad').value;
+        
+        if (producto && cantidad > 0) {
+            productos.push({ producto, cantidad, unidad });
+        }
+    });
+    
+    if (productos.length === 0) {
+        ToastNotification.show('Debe agregar al menos un producto', 'warning', 3000);
+        return;
+    }
+    
+    // Crear nueva receta maestra
+    const nuevaReceta = {
+        id: Date.now(),
+        nombre,
+        categoria,
+        rendimiento,
+        productos,
+        costoPorcion: parseFloat(document.getElementById('costoReceta').value) || 0
+    };
+    
+    planificacionData.recetas.push(nuevaReceta);
+    
+    // Agregar a menú del día
+    const fecha = planificacionData.fechaSeleccionada || planificacionData.fechaActual.toISOString().split('T')[0];
+    const comida = planificacionData.comidaActual || 'almuerzo';
+    
+    if (!planificacionData.menus[fecha]) {
+        planificacionData.menus[fecha] = { desayuno: [], almuerzo: [], cena: [] };
+    }
+    
+    planificacionData.menus[fecha][comida].push({
+        recetaId: nuevaReceta.id,
+        cantidad: 1,
+        nombre: nuevaReceta.nombre
+    });
+    
+    // Guardar en memoria
+    guardarPlanificacionEnMemoria();
+    
+    // Recargar vista
+    cargarVistaDia(fecha);
+    actualizarResumenPlanificacion();
+    
+    // Cerrar modal
+    cerrarModalReceta();
+    
+    ToastNotification.show('Receta agregada correctamente', 'success', 2000);
+}
+
+// Eliminar receta de planificación
+function eliminarRecetaPlanificacion(fecha, comida, index) {
+    if (planificacionData.menus[fecha] && planificacionData.menus[fecha][comida]) {
+        planificacionData.menus[fecha][comida].splice(index, 1);
+        guardarPlanificacionEnMemoria();
+        cargarVistaDia(fecha);
+        actualizarResumenPlanificacion();
+        ToastNotification.show('Receta eliminada', 'success', 2000);
+    }
+}
+
+// Editar receta de planificación
+function editarRecetaPlanificacion(fecha, comida, index) {
+    const menu = planificacionData.menus[fecha];
+    if (menu && menu[comida] && menu[comida][index]) {
+        const recetaPlan = menu[comida][index];
+        const receta = planificacionData.recetas.find(r => r.id === recetaPlan.recetaId);
+        
+        if (receta) {
+            // Llenar formulario con datos de receta
+            document.getElementById('nombreReceta').value = receta.nombre;
+            document.getElementById('categoriaReceta').value = receta.categoria;
+            document.getElementById('rendimientoReceta').value = receta.rendimiento;
+            document.getElementById('costoReceta').value = receta.costoPorcion.toFixed(2);
+            
+            // Cargar productos
+            const productosList = document.getElementById('productosRecetaList');
+            productosList.innerHTML = '';
+            receta.productos.forEach(prod => {
+                agregarProductoReceta();
+                const lastItem = productosList.lastElementChild;
+                lastItem.querySelector('.producto-select').value = prod.producto;
+                lastItem.querySelector('.producto-cantidad').value = prod.cantidad;
+                lastItem.querySelector('.producto-unidad').value = prod.unidad;
+            });
+            
+            // Abrir modal
+            planificacionData.comidaActual = comida;
+            planificacionData.recetaEditando = { fecha, comida, index };
+            abrirModalReceta(comida);
+        }
+    }
+}
+
+// Actualizar resumen de planificación
+function actualizarResumenPlanificacion() {
+    let totalRecetas = 0;
+    const productosAcumulados = {};
+    let costoTotal = 0;
+    
+    Object.keys(planificacionData.menus).forEach(fecha => {
+        const menu = planificacionData.menus[fecha];
+        ['desayuno', 'almuerzo', 'cena'].forEach(comida => {
+            menu[comida].forEach(recPlan => {
+                totalRecetas++;
+                const receta = planificacionData.recetas.find(r => r.id === recPlan.recetaId);
+                if (receta) {
+                    costoTotal += receta.costoPorcion * receta.rendimiento;
+                    receta.productos.forEach(prod => {
+                        if (!productosAcumulados[prod.producto]) {
+                            productosAcumulados[prod.producto] = { cantidad: 0, unidad: prod.unidad };
+                        }
+                        productosAcumulados[prod.producto].cantidad += prod.cantidad;
+                    });
+                }
+            });
+        });
+    });
+    
+    // Actualizar UI
+    document.getElementById('totalRecetas').textContent = totalRecetas;
+    document.getElementById('totalProductos').textContent = Object.keys(productosAcumulados).length;
+    document.getElementById('costoEstimado').textContent = `$${costoTotal.toFixed(2)}`;
+    
+    // Actualizar lista de productos
+    const productosList = document.getElementById('productosRequeridos');
+    if (productosList) {
+        productosList.innerHTML = Object.keys(productosAcumulados).map(producto => {
+            const prod = productosAcumulados[producto];
+            return `
+                <div class="producto-item-sidebar">
+                    <span class="producto-nombre">${producto}</span>
+                    <span class="producto-cantidad">${prod.cantidad.toFixed(2)} ${prod.unidad}</span>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+// Generar lista de compras
+function generarListaCompras() {
+    const productosAcumulados = {};
+    let costoTotal = 0;
+    
+    // Acumular productos de todas las recetas planificadas
+    Object.keys(planificacionData.menus).forEach(fecha => {
+        const menu = planificacionData.menus[fecha];
+        ['desayuno', 'almuerzo', 'cena'].forEach(comida => {
+            menu[comida].forEach(recPlan => {
+                const receta = planificacionData.recetas.find(r => r.id === recPlan.recetaId);
+                if (receta) {
+                    costoTotal += receta.costoPorcion * receta.rendimiento;
+                    receta.productos.forEach(prod => {
+                        if (!productosAcumulados[prod.producto]) {
+                            productosAcumulados[prod.producto] = { cantidad: 0, unidad: prod.unidad };
+                        }
+                        productosAcumulados[prod.producto].cantidad += prod.cantidad;
+                    });
+                }
+            });
+        });
+    });
+    
+    // Contrastar con inventario
+    const listaCompras = [];
+    Object.keys(productosAcumulados).forEach(producto => {
+        const necesario = productosAcumulados[producto];
+        let stockActual = 0;
+        
+        // Buscar en inventario
+        if (typeof inventarioData !== 'undefined' && inventarioData.productos) {
+            const prodInventario = inventarioData.productos.find(p => p.nombre === producto);
+            if (prodInventario) {
+                stockActual = prodInventario.stockActual || 0;
+            }
+        }
+        
+        const diferencia = necesario.cantidad - stockActual;
+        if (diferencia > 0) {
+            listaCompras.push({
+                producto,
+                cantidad: diferencia,
+                unidad: necesario.unidad,
+                stockActual,
+                necesario: necesario.cantidad
+            });
+        }
+    });
+    
+    // Mostrar lista de compras
+    if (listaCompras.length === 0) {
+        ToastNotification.show('No se requieren compras adicionales', 'info', 3000);
+        return;
+    }
+    
+    // Navegar a módulo de compras con lista generada
+    navegar('compras');
+    ToastNotification.show(`Lista de compras generada: ${listaCompras.length} productos`, 'success', 3000);
+    
+    // Guardar lista en memoria para que esté disponible en compras
+    if (typeof MEMORIA_TEMPORAL !== 'undefined') {
+        MEMORIA_TEMPORAL.guardar('listaComprasPlanificacion', listaCompras, 1);
+    }
+}
+
+// Vista anterior
+function vistaAnterior() {
+    if (planificacionData.vistaActual === 'mes') {
+        planificacionData.fechaActual.setMonth(planificacionData.fechaActual.getMonth() - 1);
+        renderizarCalendario();
+    } else if (planificacionData.vistaActual === 'semana') {
+        planificacionData.fechaActual.setDate(planificacionData.fechaActual.getDate() - 7);
+        cargarVistaSemana();
+    } else if (planificacionData.vistaActual === 'dia') {
+        const fecha = new Date(planificacionData.fechaSeleccionada || planificacionData.fechaActual);
+        fecha.setDate(fecha.getDate() - 1);
+        planificacionData.fechaSeleccionada = fecha.toISOString().split('T')[0];
+        cargarVistaDia(planificacionData.fechaSeleccionada);
+    }
+}
+
+// Vista siguiente
+function vistaSiguiente() {
+    if (planificacionData.vistaActual === 'mes') {
+        planificacionData.fechaActual.setMonth(planificacionData.fechaActual.getMonth() + 1);
+        renderizarCalendario();
+    } else if (planificacionData.vistaActual === 'semana') {
+        planificacionData.fechaActual.setDate(planificacionData.fechaActual.getDate() + 7);
+        cargarVistaSemana();
+    } else if (planificacionData.vistaActual === 'dia') {
+        const fecha = new Date(planificacionData.fechaSeleccionada || planificacionData.fechaActual);
+        fecha.setDate(fecha.getDate() + 1);
+        planificacionData.fechaSeleccionada = fecha.toISOString().split('T')[0];
+        cargarVistaDia(planificacionData.fechaSeleccionada);
+    }
+}
+
+// Cargar vista semana
+function cargarVistaSemana() {
+    // Implementación básica de vista semana
+    ToastNotification.show('Vista semana en desarrollo', 'info', 2000);
+}
+
+// Agregar receta día
+function agregarRecetaDia() {
+    const comida = prompt('Seleccione comida:\n1. Desayuno\n2. Almuerzo\n3. Cena', '2');
+    const comidas = ['', 'desayuno', 'almuerzo', 'cena'];
+    if (comida && comidas[parseInt(comida)]) {
+        abrirModalReceta(comidas[parseInt(comida)]);
+    }
+}
+
+// Exportar planificación
+function exportarPlanificacion() {
+    ToastNotification.show('Exportando planificación...', 'info', 2000);
+    // Aquí se implementaría la exportación a Excel/PDF
+}
+
+// Duplicar semana
+function duplicarSemana() {
+    ToastNotification.show('Función de duplicar semana en desarrollo', 'info', 2000);
+}
+
+// Guardar planificación en memoria
+function guardarPlanificacionEnMemoria() {
+    if (typeof MEMORIA_TEMPORAL !== 'undefined') {
+        MEMORIA_TEMPORAL.guardar('planificacionMenus', planificacionData.menus, 15);
+        MEMORIA_TEMPORAL.guardar('planificacionRecetas', planificacionData.recetas, 15);
+    }
+}
+
+// Recuperar planificación de memoria
+function recuperarPlanificacionDeMemoria() {
+    if (typeof MEMORIA_TEMPORAL !== 'undefined') {
+        const menus = MEMORIA_TEMPORAL.recuperar('planificacionMenus');
+        const recetas = MEMORIA_TEMPORAL.recuperar('planificacionRecetas');
+        if (menus) planificacionData.menus = menus;
+        if (recetas) planificacionData.recetas = recetas;
+    }
+}
+
+// Exponer funciones globalmente
+if (typeof window !== 'undefined') {
+    window.inicializarModuloPlanificacion = inicializarModuloPlanificacion;
+    window.cambiarVista = cambiarVista;
+    window.seleccionarDia = seleccionarDia;
+    window.abrirModalReceta = abrirModalReceta;
+    window.cerrarModalReceta = cerrarModalReceta;
+    window.agregarProductoReceta = agregarProductoReceta;
+    window.guardarReceta = guardarReceta;
+    window.eliminarRecetaPlanificacion = eliminarRecetaPlanificacion;
+    window.editarRecetaPlanificacion = editarRecetaPlanificacion;
+    window.generarListaCompras = generarListaCompras;
+    window.vistaAnterior = vistaAnterior;
+    window.vistaSiguiente = vistaSiguiente;
+    window.agregarRecetaDia = agregarRecetaDia;
+    window.exportarPlanificacion = exportarPlanificacion;
+    window.duplicarSemana = duplicarSemana;
+    window.actualizarCostoReceta = actualizarCostoReceta;
+}
+
+// Recuperar datos al cargar
+window.addEventListener('DOMContentLoaded', function() {
+    recuperarPlanificacionDeMemoria();
+});
