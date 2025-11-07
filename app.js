@@ -3118,7 +3118,6 @@ const MEMORIA_TEMPORAL = {
             }
             
             const diasRestantes = Math.ceil((item.expira - Date.now()) / (24 * 60 * 60 * 1000));
-            console.log(`📦 Dato recuperado: ${clave} (${diasRestantes} días restantes)`);
             return item.dato;
         } catch (error) {
             console.error('❌ Error al recuperar de memoria temporal:', error);
