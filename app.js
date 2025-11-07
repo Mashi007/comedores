@@ -273,10 +273,7 @@ function inicializarBotonInicio() {
         svg.style.pointerEvents = 'none';
     }
     
-    // Agregar onclick directamente al HTML (más confiable)
-    if (!btnInicio.getAttribute('onclick')) {
-        btnInicio.setAttribute('onclick', 'window.mostrarLogin(); return false;');
-    }
+    // El botón ya no necesita onclick inline, usa el event listener
     
     // Agregar listeners de forma simple y directa
     // 1. Click principal (bubbling phase)
