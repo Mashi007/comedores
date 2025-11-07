@@ -5887,3 +5887,467 @@ if (typeof window !== 'undefined') {
 window.addEventListener('DOMContentLoaded', function() {
     recuperarPlanificacionDeMemoria();
 });
+
+// ============================================
+// GRÁFICOS INNOVADORES DEL DASHBOARD
+// ============================================
+
+// Gráfico Principal: Tendencia de Producción y Costos
+function crearGraficoTendenciaPrincipal() {
+    const ctx = document.getElementById('chartTendenciaPrincipal');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chartTendenciaPrincipal) {
+        chartInstances.chartTendenciaPrincipal.destroy();
+    }
+    
+    // Generar datos de los últimos 30 días
+    const dias = [];
+    const produccion = [];
+    const costos = [];
+    const hoy = new Date();
+    
+    for (let i = 29; i >= 0; i--) {
+        const fecha = new Date(hoy);
+        fecha.setDate(fecha.getDate() - i);
+        dias.push(fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }));
+        
+        // Datos mock con variación realista
+        produccion.push(Math.floor(Math.random() * 30) + 60);
+        costos.push(Math.floor(Math.random() * 500) + 800);
+    }
+    
+    chartInstances.chartTendenciaPrincipal = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dias,
+            datasets: [{
+                label: 'Producción (Charolas)',
+                data: produccion,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#3b82f6',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                yAxisID: 'y'
+            }, {
+                label: 'Costos ($)',
+                data: costos,
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: { size: 12, weight: '600' }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: { size: 14, weight: '700' },
+                    bodyFont: { size: 13 },
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            if (context.datasetIndex === 0) {
+                                return `Producción: ${context.parsed.y} charolas`;
+                            } else {
+                                return `Costos: $${context.parsed.y.toLocaleString('es-ES')}`;
+                            }
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: { size: 11 }
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Producción (Charolas)',
+                        font: { size: 12, weight: '600' },
+                        color: '#3b82f6'
+                    },
+                    grid: {
+                        color: 'rgba(59, 130, 246, 0.1)'
+                    },
+                    ticks: {
+                        color: '#3b82f6',
+                        font: { size: 11 }
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Costos ($)',
+                        font: { size: 12, weight: '600' },
+                        color: '#10b981'
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    },
+                    ticks: {
+                        color: '#10b981',
+                        font: { size: 11 },
+                        callback: function(value) {
+                            return '$' + value.toLocaleString('es-ES');
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+}
+
+// Gráfico de Eficiencia por Módulo (Radar Chart)
+function crearGraficoEficienciaModulos() {
+    const ctx = document.getElementById('chartEficienciaModulos');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chartEficienciaModulos) {
+        chartInstances.chartEficienciaModulos.destroy();
+    }
+    
+    chartInstances.chartEficienciaModulos = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Compras', 'Inventario', 'Producción', 'Calidad', 'Costos', 'Satisfacción'],
+            datasets: [{
+                label: 'Eficiencia Actual',
+                data: [92, 88, 87, 94, 85, 91],
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                borderWidth: 3,
+                pointBackgroundColor: '#3b82f6',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 8
+            }, {
+                label: 'Objetivo',
+                data: [95, 90, 90, 95, 90, 93],
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: { size: 12, weight: '600' }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.r}%`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        stepSize: 20,
+                        font: { size: 11 },
+                        color: '#6b7280'
+                    },
+                    grid: {
+                        color: 'rgba(107, 114, 128, 0.1)'
+                    },
+                    pointLabels: {
+                        font: { size: 12, weight: '600' },
+                        color: '#374151'
+                    }
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+}
+
+// Heatmap de Actividad Semanal
+function crearGraficoHeatmap() {
+    const ctx = document.getElementById('chartHeatmap');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chartHeatmap) {
+        chartInstances.chartHeatmap.destroy();
+    }
+    
+    const dias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    const comidas = ['Desayuno', 'Almuerzo', 'Cena'];
+    
+    // Generar datos mock para heatmap
+    const datasets = comidas.map((comida, idx) => {
+        return {
+            label: comida,
+            data: dias.map(() => Math.floor(Math.random() * 50) + 30),
+            backgroundColor: idx === 0 ? 'rgba(245, 158, 11, 0.8)' : idx === 1 ? 'rgba(59, 130, 246, 0.8)' : 'rgba(99, 102, 241, 0.8)',
+            borderColor: idx === 0 ? '#d97706' : idx === 1 ? '#2563eb' : '#4f46e5',
+            borderWidth: 2
+        };
+    });
+    
+    chartInstances.chartHeatmap = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dias,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'x',
+            scales: {
+                x: {
+                    stacked: true,
+                    grid: { display: false }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Intensidad de Producción (%)',
+                        font: { size: 12, weight: '600' }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y}% intensidad`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+}
+
+// Gráfico de Desviaciones
+function crearGraficoDesviaciones() {
+    const ctx = document.getElementById('chartDesviaciones');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chartDesviaciones) {
+        chartInstances.chartDesviaciones.destroy();
+    }
+    
+    const categorias = ['Costos', 'Producción', 'Merma', 'Inventario', 'Satisfacción'];
+    const desviaciones = categorias.map(() => (Math.random() * 20 - 10).toFixed(1));
+    
+    chartInstances.chartDesviaciones = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: categorias,
+            datasets: [{
+                label: 'Desviación (%)',
+                data: desviaciones,
+                backgroundColor: (ctx) => {
+                    const value = ctx.parsed.y;
+                    if (value > 5) return 'rgba(239, 68, 68, 0.8)';
+                    if (value < -5) return 'rgba(16, 185, 129, 0.8)';
+                    return 'rgba(59, 130, 246, 0.8)';
+                },
+                borderColor: (ctx) => {
+                    const value = ctx.parsed.y;
+                    if (value > 5) return '#dc2626';
+                    if (value < -5) return '#059669';
+                    return '#2563eb';
+                },
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const valor = parseFloat(context.parsed.x);
+                            const estado = valor > 5 ? '⚠️ Alta' : valor < -5 ? '✅ Favorable' : '✓ Normal';
+                            return `${estado}: ${valor > 0 ? '+' : ''}${valor}%`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(107, 114, 128, 0.1)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return (value > 0 ? '+' : '') + value + '%';
+                        }
+                    }
+                },
+                y: {
+                    grid: { display: false }
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+}
+
+// Gráfico de ROI por Categoría
+function crearGraficoROI() {
+    const ctx = document.getElementById('chartROI');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chartROI) {
+        chartInstances.chartROI.destroy();
+    }
+    
+    const categorias = ['Carnes', 'Verduras', 'Granos', 'Bebidas', 'Postres'];
+    const roi = categorias.map(() => (Math.random() * 30 + 10).toFixed(1));
+    
+    chartInstances.chartROI = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: categorias,
+            datasets: [{
+                data: roi,
+                backgroundColor: [
+                    'rgba(239, 68, 68, 0.8)',
+                    'rgba(16, 185, 129, 0.8)',
+                    'rgba(245, 158, 11, 0.8)',
+                    'rgba(59, 130, 246, 0.8)',
+                    'rgba(139, 92, 246, 0.8)'
+                ],
+                borderColor: [
+                    '#dc2626',
+                    '#059669',
+                    '#d97706',
+                    '#2563eb',
+                    '#7c3aed'
+                ],
+                borderWidth: 3,
+                hoverOffset: 15
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.parsed}% ROI`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: true,
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+}
+
+// Exponer funciones globalmente
+if (typeof window !== 'undefined') {
+    window.actualizarDashboard = actualizarDashboard;
+    window.exportarDashboard = exportarDashboard;
+    window.toggleChartView = toggleChartView;
+}
