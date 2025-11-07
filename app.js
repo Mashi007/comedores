@@ -6464,21 +6464,38 @@ function crearGraficoTendenciaPrincipal() {
         chartInstances.chartTendenciaPrincipal.destroy();
     }
     
-    // Generar datos de los últimos 30 días
+    // Generar datos de los últimos 30 días con tendencias más realistas
     const dias = [];
     const produccion = [];
     const costos = [];
     const hoy = new Date();
+    
+    // Base para tendencias más suaves
+    let baseProduccion = 75;
+    let baseCostos = 1000;
     
     for (let i = 29; i >= 0; i--) {
         const fecha = new Date(hoy);
         fecha.setDate(fecha.getDate() - i);
         dias.push(fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }));
         
-        // Datos mock con variación realista
-        produccion.push(Math.floor(Math.random() * 30) + 60);
-        costos.push(Math.floor(Math.random() * 500) + 800);
+        // Datos mock con variación suave y tendencia
+        const variacionProd = (Math.random() - 0.5) * 10;
+        baseProduccion += variacionProd * 0.1;
+        baseProduccion = Math.max(60, Math.min(90, baseProduccion));
+        produccion.push(Math.round(baseProduccion));
+        
+        const variacionCosto = (Math.random() - 0.5) * 200;
+        baseCostos += variacionCosto * 0.1;
+        baseCostos = Math.max(800, Math.min(1300, baseCostos));
+        costos.push(Math.round(baseCostos));
     }
+    
+    // Calcular rangos para escalas apropiadas
+    const minProd = Math.min(...produccion);
+    const maxProd = Math.max(...produccion);
+    const minCosto = Math.min(...costos);
+    const maxCosto = Math.max(...costos);
     
     chartInstances.chartTendenciaPrincipal = new Chart(ctx, {
         type: 'line',
@@ -6488,30 +6505,34 @@ function crearGraficoTendenciaPrincipal() {
                 label: 'Producción (Charolas)',
                 data: produccion,
                 borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                borderWidth: 3,
+                backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                borderWidth: 2.5,
                 fill: true,
                 tension: 0.4,
-                pointRadius: 4,
-                pointHoverRadius: 8,
+                pointRadius: 3,
+                pointHoverRadius: 6,
                 pointBackgroundColor: '#3b82f6',
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,
-                yAxisID: 'y'
+                pointHoverBorderWidth: 3,
+                yAxisID: 'y',
+                order: 1
             }, {
                 label: 'Costos ($)',
                 data: costos,
                 borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                borderWidth: 3,
+                backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                borderWidth: 2.5,
                 fill: true,
                 tension: 0.4,
-                pointRadius: 4,
-                pointHoverRadius: 8,
+                pointRadius: 3,
+                pointHoverRadius: 6,
                 pointBackgroundColor: '#10b981',
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,
-                yAxisID: 'y1'
+                pointHoverBorderWidth: 3,
+                yAxisID: 'y1',
+                order: 2
             }]
         },
         options: {
@@ -6525,20 +6546,28 @@ function crearGraficoTendenciaPrincipal() {
                 legend: {
                     display: true,
                     position: 'top',
+                    align: 'start',
                     labels: {
                         usePointStyle: true,
-                        padding: 15,
-                        font: { size: 12, weight: '600' }
+                        pointStyle: 'circle',
+                        padding: 20,
+                        font: { size: 13, weight: '600' },
+                        color: '#374151'
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    padding: 12,
+                    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                    padding: 14,
                     titleFont: { size: 14, weight: '700' },
                     bodyFont: { size: 13 },
                     borderColor: 'rgba(255, 255, 255, 0.1)',
                     borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: true,
                     callbacks: {
+                        title: function(context) {
+                            return context[0].label;
+                        },
                         label: function(context) {
                             if (context.datasetIndex === 0) {
                                 return `Producción: ${context.parsed.y} charolas`;
@@ -6552,48 +6581,67 @@ function crearGraficoTendenciaPrincipal() {
             scales: {
                 x: {
                     grid: {
-                        display: false
+                        display: true,
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
                     },
                     ticks: {
-                        maxRotation: 45,
-                        minRotation: 45,
-                        font: { size: 11 }
+                        maxRotation: 0,
+                        minRotation: 0,
+                        font: { size: 11 },
+                        color: '#6b7280',
+                        maxTicksLimit: 10
                     }
                 },
                 y: {
                     type: 'linear',
                     display: true,
                     position: 'left',
+                    beginAtZero: false,
+                    min: Math.max(0, minProd - 10),
+                    max: maxProd + 10,
                     title: {
                         display: true,
                         text: 'Producción (Charolas)',
                         font: { size: 12, weight: '600' },
-                        color: '#3b82f6'
+                        color: '#3b82f6',
+                        padding: { top: 10, bottom: 10 }
                     },
                     grid: {
-                        color: 'rgba(59, 130, 246, 0.1)'
+                        color: 'rgba(59, 130, 246, 0.1)',
+                        drawBorder: false
                     },
                     ticks: {
                         color: '#3b82f6',
-                        font: { size: 11 }
+                        font: { size: 11 },
+                        stepSize: 10,
+                        callback: function(value) {
+                            return value;
+                        }
                     }
                 },
                 y1: {
                     type: 'linear',
                     display: true,
                     position: 'right',
+                    beginAtZero: false,
+                    min: Math.max(0, minCosto - 100),
+                    max: maxCosto + 100,
                     title: {
                         display: true,
                         text: 'Costos ($)',
                         font: { size: 12, weight: '600' },
-                        color: '#10b981'
+                        color: '#10b981',
+                        padding: { top: 10, bottom: 10 }
                     },
                     grid: {
-                        drawOnChartArea: false
+                        drawOnChartArea: false,
+                        drawBorder: false
                     },
                     ticks: {
                         color: '#10b981',
                         font: { size: 11 },
+                        stepSize: 100,
                         callback: function(value) {
                             return '$' + value.toLocaleString('es-ES');
                         }
@@ -6601,7 +6649,7 @@ function crearGraficoTendenciaPrincipal() {
                 }
             },
             animation: {
-                duration: 2000,
+                duration: 1500,
                 easing: 'easeInOutQuart'
             }
         }
