@@ -679,6 +679,16 @@ body.sidebar-open .page-container {
     position: relative;
 }
 
+/* Gráfico de burbujas - más ancho para una sola fila */
+#chart8 {
+    min-height: 300px !important;
+    height: 300px !important;
+}
+
+.chart-card:has(#chart8) {
+    grid-column: 1 / -1; /* Ocupa todo el ancho disponible */
+}
+
 .chart-card canvas {
     width: 100% !important;
     height: 250px !important;

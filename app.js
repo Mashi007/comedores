@@ -1113,8 +1113,8 @@ function crearGrafico8() {
                         },
                         color: '#64748b'
                     },
-                    min: 0,
-                    max: maxReorder,
+                    min: reordenNormalizado - 20,
+                    max: reordenNormalizado + 20,
                     grid: {
                         color: 'rgba(0, 0, 0, 0.05)',
                         drawBorder: true,
@@ -1125,7 +1125,7 @@ function crearGrafico8() {
                         font: {
                             size: 12
                         },
-                        stepSize: Math.ceil(maxReorder / 10), // Dividir en 10 pasos
+                        stepSize: 10,
                         callback: function(value) {
                             return value + ' kg';
                         }
@@ -1139,7 +1139,7 @@ function crearGrafico8() {
             onResize: function(chart, size) {
                 // Agregar etiquetas de cuadrantes después de que el gráfico se renderice
                 setTimeout(() => {
-                    agregarEtiquetasCuadrantes(chart, maxStock, maxReorder);
+                    agregarEtiquetasCuadrantes(chart, maxStock, maxReorder, reordenNormalizado);
                 }, 100);
             }
         }
@@ -1147,7 +1147,7 @@ function crearGrafico8() {
     
     // Agregar etiquetas de cuadrantes después de la inicialización
     setTimeout(() => {
-        agregarEtiquetasCuadrantes(chartInstances.chart8, maxStock, maxReorder);
+        agregarEtiquetasCuadrantes(chartInstances.chart8, maxStock, maxReorder, reordenNormalizado);
     }, 500);
 }
 
