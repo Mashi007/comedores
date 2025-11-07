@@ -713,6 +713,7 @@ function crearGrafico3() {
                             };
                         }
                     }
+                }
             },
             scales: {
                 y: {
