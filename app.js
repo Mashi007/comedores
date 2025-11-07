@@ -1310,8 +1310,18 @@ function mostrarSimuladorOCR() {
     document.getElementById('fechaFactura').textContent = fecha.toLocaleDateString('es-ES');
 }
 
+// Exponer funciones de OCR después de su declaración
+if (typeof window !== 'undefined') {
+    window.mostrarSimuladorOCR = mostrarSimuladorOCR;
+}
+
 function cerrarSimuladorOCR() {
     document.getElementById('simuladorOCR').style.display = 'none';
+}
+
+// Exponer cerrarSimuladorOCR después de su declaración
+if (typeof window !== 'undefined') {
+    window.cerrarSimuladorOCR = cerrarSimuladorOCR;
 }
 
 function procesarFacturaOCR() {
