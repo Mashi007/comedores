@@ -1879,7 +1879,12 @@ function cargarKardex() {
         return;
     }
     
-    tbody.innerHTML = kardexFiltrado.map(mov => `
+    tbody.innerHTML = kardexFiltrado.map(mov => {
+        // Determinar clases CSS según estado
+        const estadoClase = mov.diasEstimados > 30 ? 'estado-optimo' : (mov.diasEstimados > 15 ? 'estado-atencion' : 'estado-critico');
+        const diasClase = mov.diasEstimados > 30 ? 'dias-optimo' : (mov.diasEstimados > 15 ? 'dias-atencion' : 'dias-critico');
+        
+        return `
         <tr>
             <td>${new Date(mov.fecha).toLocaleDateString('es-ES')}</td>
             <td><strong>${mov.producto}</strong></td>
@@ -1888,12 +1893,13 @@ function cargarKardex() {
             <td class="salida">${mov.salida > 0 ? '-' + mov.salida.toFixed(2) : '0.00'} kg</td>
             <td class="saldo-final"><strong>${mov.saldoFinal.toFixed(2)} kg</strong></td>
             <td>${mov.consumoPromedio.toFixed(2)} kg/día</td>
-            <td class="${mov.diasEstimados > 30 ? 'dias-optimo' : (mov.diasEstimados > 15 ? 'dias-atencion' : 'dias-critico')}">
+            <td class="${diasClase}">
                 <strong>${mov.diasEstimados} días</strong>
             </td>
-            <td>${mov.estado}</td>
+            <td class="${estadoClase}">${mov.estado || (mov.diasEstimados > 30 ? '🟢 Óptimo' : (mov.diasEstimados > 15 ? '🟡 Atención' : '🔴 Crítico'))}</td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function cargarProductosEnFiltro() {
@@ -1913,12 +1919,101 @@ if (typeof window !== 'undefined') {
     window.filtrarKardex = filtrarKardex;
 }
 
+// Generar datos mock iniciales del KARDEX con diferentes estados
+function generarDatosMockKardex() {
+    // Si ya hay datos en el KARDEX, no generar más
+    if (comprasData.kardex.length > 0) {
+        return;
+    }
+    
+    const productos = ['Arroz Premium', 'Frijoles Negros', 'Pollo Entero', 'Carne Res', 'Tomates', 'Lechuga', 'Aceite', 'Sal', 'Pasta', 'Cebolla'];
+    const hoy = new Date();
+    
+    // Generar movimientos para los últimos 10 días con diferentes estados
+    productos.forEach((producto, index) => {
+        const consumoPromedio = consumosPromedio[producto] || (50 + index * 10);
+        
+        // Generar 2-3 movimientos por producto con diferentes estados
+        const numMovimientos = Math.floor(Math.random() * 2) + 2;
+        
+        let saldoInicial = 0;
+        
+        for (let i = 0; i < numMovimientos; i++) {
+            const fecha = new Date(hoy);
+            fecha.setDate(fecha.getDate() - (Math.floor(Math.random() * 10) + i * 2));
+            
+            // Variar las cantidades para generar diferentes estados
+            let cantidadIngreso = 0;
+            let cantidadSalida = 0;
+            
+            if (i === 0) {
+                // Primer movimiento: ingreso grande para estado óptimo
+                cantidadIngreso = consumoPromedio * (35 + Math.random() * 10); // 35-45 días
+                cantidadSalida = 0;
+            } else if (i === 1) {
+                // Segundo movimiento: ingreso medio para estado atención
+                cantidadIngreso = consumoPromedio * (20 + Math.random() * 5); // 20-25 días
+                cantidadSalida = consumoPromedio * (5 + Math.random() * 3); // Consumo de 5-8 días
+            } else {
+                // Tercer movimiento: ingreso pequeño para estado crítico
+                cantidadIngreso = consumoPromedio * (5 + Math.random() * 5); // 5-10 días
+                cantidadSalida = consumoPromedio * (2 + Math.random() * 2); // Consumo de 2-4 días
+            }
+            
+            const saldoFinal = saldoInicial + cantidadIngreso - cantidadSalida;
+            const diasEstimados = Math.floor(saldoFinal / consumoPromedio);
+            
+            // Determinar estado basado en días estimados
+            let estado;
+            let estadoClase;
+            if (diasEstimados > 30) {
+                estado = '🟢 Óptimo';
+                estadoClase = 'estado-optimo';
+            } else if (diasEstimados > 15) {
+                estado = '🟡 Atención';
+                estadoClase = 'estado-atencion';
+            } else {
+                estado = '🔴 Crítico';
+                estadoClase = 'estado-critico';
+            }
+            
+            const movimiento = {
+                id: Date.now() + Math.random() + index * 1000 + i,
+                fecha: fecha.toISOString().split('T')[0],
+                producto,
+                saldoInicial: parseFloat(saldoInicial.toFixed(2)),
+                ingreso: parseFloat(cantidadIngreso.toFixed(2)),
+                salida: parseFloat(cantidadSalida.toFixed(2)),
+                saldoFinal: parseFloat(saldoFinal.toFixed(2)),
+                consumoPromedio: parseFloat(consumoPromedio.toFixed(2)),
+                diasEstimados,
+                estado,
+                estadoClase
+            };
+            
+            comprasData.kardex.push(movimiento);
+            saldoInicial = saldoFinal;
+        }
+    });
+    
+    // Ordenar por fecha descendente
+    comprasData.kardex.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    
+    // Guardar en memoria
+    guardarComprasEnMemoria();
+    
+    console.log(`📊 Generados ${comprasData.kardex.length} movimientos mock del KARDEX con diferentes estados`);
+}
+
 // Inicializar módulo de compras
 function inicializarModuloCompras() {
     console.log('🛒 Inicializando módulo de compras...');
     
     // Recuperar datos desde memoria
     recuperarComprasDeMemoria();
+    
+    // Generar datos mock del KARDEX si no hay datos
+    generarDatosMockKardex();
     
     // Cargar lista de compras
     cargarListaCompras();
