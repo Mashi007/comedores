@@ -448,41 +448,131 @@
             <div class="planificacion-actions">
                 <input type="date" id="fechaMenu" class="filter-input" required>
                 <button class="btn-primary" onclick="nuevoMenu()">Nuevo Menú</button>
+                <label for="excelUpload" class="btn-secondary" style="cursor: pointer; margin: 0;">
+                    📄 Subir Template Excel
+                    <input type="file" id="excelUpload" accept=".xlsx,.xls" style="display: none;" onchange="subirExcel(event)">
+                </label>
                 <button class="btn-success" onclick="generarCompras()">Generar Compras</button>
             </div>
+            
             <div id="formularioMenu" class="form-container" style="display: none;">
-                <h3>Planificar Menú del Día</h3>
+                <h3>Planificar Menú Buffet del Día</h3>
                 <form onsubmit="return guardarMenu(event)">
                     <div class="form-group">
                         <label>Fecha</label>
                         <input type="date" id="fechaMenuForm" required>
                     </div>
-                    <div id="recetasContainer">
-                        <div class="receta-item">
-                            <h4>Receta 1</h4>
-                            <div class="form-group">
-                                <label>Nombre del Plato</label>
-                                <input type="text" class="nombre-receta" placeholder="Ej: Arroz con Frijoles" required>
+                    
+                    <div class="menu-tree" id="menuTree">
+                        <!-- Estructura de árbol: Desayuno, Almuerzo, Cena -->
+                        <div class="menu-categoria" data-categoria="desayuno">
+                            <div class="categoria-header" onclick="toggleCategoria(this)">
+                                <span class="categoria-icon">🌅</span>
+                                <h4>Desayuno</h4>
+                                <button type="button" class="btn-small" onclick="event.stopPropagation(); agregarRecetaCategoria('desayuno')">+ Receta</button>
                             </div>
-                            <div class="materiales-receta">
-                                <h5>Materiales Estándar</h5>
-                                <div class="material-item">
-                                    <select class="material-select">
-                                        <option value="">Seleccionar material...</option>
-                                    </select>
-                                    <input type="number" class="cantidad-material" step="0.01" placeholder="Cantidad (kg)" min="0.01">
-                                    <button type="button" class="btn-small" onclick="agregarMaterial(this)">+</button>
+                            <div class="categoria-content">
+                                <div class="subcategorias">
+                                    <div class="subcategoria" data-sub="huevos">
+                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
+                                            <span>🥚 Huevos</span>
+                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('desayuno', 'huevos')">+</button>
+                                        </div>
+                                        <div class="subcategoria-content"></div>
+                                    </div>
+                                    <div class="subcategoria" data-sub="bebidas">
+                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
+                                            <span>🥤 Bebidas</span>
+                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('desayuno', 'bebidas')">+</button>
+                                        </div>
+                                        <div class="subcategoria-content"></div>
+                                    </div>
+                                    <div class="subcategoria" data-sub="otros">
+                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
+                                            <span>🍞 Otros</span>
+                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('desayuno', 'otros')">+</button>
+                                        </div>
+                                        <div class="subcategoria-content"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="menu-categoria" data-categoria="almuerzo">
+                            <div class="categoria-header" onclick="toggleCategoria(this)">
+                                <span class="categoria-icon">🍽️</span>
+                                <h4>Almuerzo</h4>
+                                <button type="button" class="btn-small" onclick="event.stopPropagation(); agregarRecetaCategoria('almuerzo')">+ Receta</button>
+                            </div>
+                            <div class="categoria-content">
+                                <div class="subcategorias">
+                                    <div class="subcategoria" data-sub="principales">
+                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
+                                            <span>🍛 Platos Principales</span>
+                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('almuerzo', 'principales')">+</button>
+                                        </div>
+                                        <div class="subcategoria-content"></div>
+                                    </div>
+                                    <div class="subcategoria" data-sub="postres">
+                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
+                                            <span>🍰 Postres</span>
+                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('almuerzo', 'postres')">+</button>
+                                        </div>
+                                        <div class="subcategoria-content"></div>
+                                    </div>
+                                    <div class="subcategoria" data-sub="bebidas">
+                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
+                                            <span>🥤 Bebidas</span>
+                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('almuerzo', 'bebidas')">+</button>
+                                        </div>
+                                        <div class="subcategoria-content"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="menu-categoria" data-categoria="cena">
+                            <div class="categoria-header" onclick="toggleCategoria(this)">
+                                <span class="categoria-icon">🌙</span>
+                                <h4>Cena</h4>
+                                <button type="button" class="btn-small" onclick="event.stopPropagation(); agregarRecetaCategoria('cena')">+ Receta</button>
+                            </div>
+                            <div class="categoria-content">
+                                <div class="subcategorias">
+                                    <div class="subcategoria" data-sub="principales">
+                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
+                                            <span>🍛 Platos Principales</span>
+                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('cena', 'principales')">+</button>
+                                        </div>
+                                        <div class="subcategoria-content"></div>
+                                    </div>
+                                    <div class="subcategoria" data-sub="postres">
+                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
+                                            <span>🍰 Postres</span>
+                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('cena', 'postres')">+</button>
+                                        </div>
+                                        <div class="subcategoria-content"></div>
+                                    </div>
+                                    <div class="subcategoria" data-sub="bebidas">
+                                        <div class="subcategoria-header" onclick="toggleSubcategoria(this)">
+                                            <span>🥤 Bebidas</span>
+                                            <button type="button" class="btn-tiny" onclick="event.stopPropagation(); agregarRecetaSubcategoria('cena', 'bebidas')">+</button>
+                                        </div>
+                                        <div class="subcategoria-content"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn-secondary" onclick="agregarReceta()">+ Agregar Receta</button>
+                    
                     <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="generarEjemplosRecetas()">🎲 Generar Ejemplos</button>
                         <button type="submit" class="btn-primary">Guardar Menú</button>
                         <button type="button" class="btn-secondary" onclick="cancelarMenu()">Cancelar</button>
                     </div>
                 </form>
             </div>
+            
             <div class="menus-list" id="menusList">
                 <!-- Menús planificados se mostrarán aquí -->
             </div>

@@ -15,7 +15,19 @@ const mockData = {
         { id: 7, nombre: 'Tomate', categoria: 'Verduras', stock: 45, stockMinimo: 15, unidad: 'kg' },
         { id: 8, nombre: 'Aceite', categoria: 'Aceites', stock: 35, stockMinimo: 10, unidad: 'L' },
         { id: 9, nombre: 'Sal', categoria: 'Condimentos', stock: 25, stockMinimo: 5, unidad: 'kg' },
-        { id: 10, nombre: 'Azúcar', categoria: 'Endulzantes', stock: 40, stockMinimo: 10, unidad: 'kg' }
+        { id: 10, nombre: 'Azúcar', categoria: 'Endulzantes', stock: 40, stockMinimo: 10, unidad: 'kg' },
+        { id: 11, nombre: 'Huevos', categoria: 'Proteínas', stock: 500, stockMinimo: 200, unidad: 'unidades' },
+        { id: 12, nombre: 'Café', categoria: 'Bebidas', stock: 15, stockMinimo: 5, unidad: 'kg' },
+        { id: 13, nombre: 'Leche', categoria: 'Lácteos', stock: 80, stockMinimo: 30, unidad: 'L' },
+        { id: 14, nombre: 'Pan', categoria: 'Panadería', stock: 50, stockMinimo: 20, unidad: 'kg' },
+        { id: 15, nombre: 'Avena', categoria: 'Cereales', stock: 30, stockMinimo: 10, unidad: 'kg' },
+        { id: 16, nombre: 'Naranjas', categoria: 'Frutas', stock: 100, stockMinimo: 40, unidad: 'kg' },
+        { id: 17, nombre: 'Pescado', categoria: 'Carnes', stock: 60, stockMinimo: 25, unidad: 'kg' },
+        { id: 18, nombre: 'Lechuga', categoria: 'Verduras', stock: 40, stockMinimo: 15, unidad: 'kg' },
+        { id: 19, nombre: 'Harina', categoria: 'Granos', stock: 70, stockMinimo: 25, unidad: 'kg' },
+        { id: 20, nombre: 'Refresco', categoria: 'Bebidas', stock: 200, stockMinimo: 80, unidad: 'L' },
+        { id: 21, nombre: 'Gelatina', categoria: 'Postres', stock: 20, stockMinimo: 8, unidad: 'kg' },
+        { id: 22, nombre: 'Té', categoria: 'Bebidas', stock: 10, stockMinimo: 4, unidad: 'kg' }
     ],
     compras: [
         { id: 1, fecha: '2024-01-15', proveedor: 'Proveedor A', factura: 'FAC-001', productos: 'Arroz, Frijoles, Papa', monto: 3500, estado: 'Procesada' },
@@ -1294,7 +1306,7 @@ function cargarInventario() {
     }).join('');
 }
 
-// Planificación de Menús
+// Planificación de Menús - Estructura de Árbol Buffet
 window.nuevoMenu = function() {
     const fecha = document.getElementById('fechaMenu').value;
     if (!fecha) {
@@ -1303,8 +1315,246 @@ window.nuevoMenu = function() {
     }
     document.getElementById('fechaMenuForm').value = fecha;
     document.getElementById('formularioMenu').style.display = 'block';
+    // Expandir todas las categorías por defecto
+    document.querySelectorAll('.categoria-content').forEach(content => {
+        content.classList.add('active');
+        content.closest('.menu-categoria').querySelector('.categoria-header').classList.add('active');
+    });
+    document.querySelectorAll('.subcategoria-content').forEach(content => {
+        content.classList.add('active');
+        content.closest('.subcategoria').querySelector('.subcategoria-header').classList.add('active');
+    });
     // Asegurar que los selects tengan datos
     setTimeout(() => cargarProductosEnSelects(), 100);
+};
+
+window.toggleCategoria = function(header) {
+    const content = header.nextElementSibling;
+    header.classList.toggle('active');
+    content.classList.toggle('active');
+};
+
+window.toggleSubcategoria = function(header) {
+    const content = header.nextElementSibling;
+    header.classList.toggle('active');
+    content.classList.toggle('active');
+};
+
+window.agregarRecetaCategoria = function(categoria) {
+    const categoriaEl = document.querySelector(`.menu-categoria[data-categoria="${categoria}"]`);
+    const subcategorias = categoriaEl.querySelector('.subcategorias');
+    const primeraSub = subcategorias.querySelector('.subcategoria');
+    const content = primeraSub.querySelector('.subcategoria-content');
+    agregarRecetaEnContenedor(content, categoria, 'general');
+};
+
+window.agregarRecetaSubcategoria = function(categoria, subcategoria) {
+    const categoriaEl = document.querySelector(`.menu-categoria[data-categoria="${categoria}"]`);
+    const subEl = categoriaEl.querySelector(`.subcategoria[data-sub="${subcategoria}"]`);
+    const content = subEl.querySelector('.subcategoria-content');
+    if (!content.classList.contains('active')) {
+        content.classList.add('active');
+        subEl.querySelector('.subcategoria-header').classList.add('active');
+    }
+    agregarRecetaEnContenedor(content, categoria, subcategoria);
+};
+
+function agregarRecetaEnContenedor(contenedor, categoria, subcategoria) {
+    const recetaId = Date.now();
+    const nuevaReceta = document.createElement('div');
+    nuevaReceta.className = 'receta-item';
+    nuevaReceta.dataset.recetaId = recetaId;
+    nuevaReceta.dataset.categoria = categoria;
+    nuevaReceta.dataset.subcategoria = subcategoria;
+    nuevaReceta.innerHTML = `
+        <h4>
+            <input type="text" class="nombre-receta" placeholder="Nombre del plato..." required style="flex: 1; border: none; background: transparent; font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">
+            <button type="button" class="btn-small" onclick="this.closest('.receta-item').remove()">🗑️</button>
+        </h4>
+        <div class="materiales-receta">
+            <h5>Materiales Estándar</h5>
+            <div class="material-item">
+                <select class="material-select">
+                    <option value="">Seleccionar material...</option>
+                </select>
+                <input type="number" class="cantidad-material" step="0.01" placeholder="Cantidad (kg)" min="0.01">
+                <button type="button" class="btn-small" onclick="agregarMaterial(this)">+</button>
+            </div>
+        </div>
+    `;
+    contenedor.appendChild(nuevaReceta);
+    cargarProductosEnSelects();
+    ToastNotification.show('Receta agregada', 'success');
+}
+
+window.generarEjemplosRecetas = function() {
+    const ejemplos = {
+        desayuno: {
+            huevos: [
+                { nombre: 'Huevos Revueltos', materiales: [{ producto: 'Huevos', cantidad: 5 }, { producto: 'Aceite', cantidad: 0.1 }] },
+                { nombre: 'Huevos Fritos', materiales: [{ producto: 'Huevos', cantidad: 4 }, { producto: 'Aceite', cantidad: 0.08 }] }
+            ],
+            bebidas: [
+                { nombre: 'Café', materiales: [{ producto: 'Café', cantidad: 0.5 }] },
+                { nombre: 'Jugo de Naranja', materiales: [{ producto: 'Naranjas', cantidad: 2 }] }
+            ],
+            otros: [
+                { nombre: 'Pan Tostado', materiales: [{ producto: 'Pan', cantidad: 0.3 }] },
+                { nombre: 'Avena', materiales: [{ producto: 'Avena', cantidad: 0.5 }, { producto: 'Leche', cantidad: 0.5 }] }
+            ]
+        },
+        almuerzo: {
+            principales: [
+                { nombre: 'Arroz con Pollo', materiales: [{ producto: 'Arroz', cantidad: 2 }, { producto: 'Pollo', cantidad: 1.5 }] },
+                { nombre: 'Carne Asada', materiales: [{ producto: 'Carne de Res', cantidad: 2 }] },
+                { nombre: 'Pescado Frito', materiales: [{ producto: 'Pescado', cantidad: 1.5 }, { producto: 'Aceite', cantidad: 0.2 }] }
+            ],
+            postres: [
+                { nombre: 'Flan', materiales: [{ producto: 'Huevos', cantidad: 6 }, { producto: 'Leche', cantidad: 1 }, { producto: 'Azúcar', cantidad: 0.3 }] },
+                { nombre: 'Arroz con Leche', materiales: [{ producto: 'Arroz', cantidad: 0.5 }, { producto: 'Leche', cantidad: 1 }, { producto: 'Azúcar', cantidad: 0.2 }] }
+            ],
+            bebidas: [
+                { nombre: 'Refresco', materiales: [{ producto: 'Refresco', cantidad: 1 }] },
+                { nombre: 'Agua de Horchata', materiales: [{ producto: 'Arroz', cantidad: 0.3 }, { producto: 'Azúcar', cantidad: 0.2 }] }
+            ]
+        },
+        cena: {
+            principales: [
+                { nombre: 'Sopa de Verduras', materiales: [{ producto: 'Papa', cantidad: 1 }, { producto: 'Cebolla', cantidad: 0.3 }, { producto: 'Tomate', cantidad: 0.5 }] },
+                { nombre: 'Ensalada César', materiales: [{ producto: 'Lechuga', cantidad: 0.5 }, { producto: 'Pollo', cantidad: 0.8 }] }
+            ],
+            postres: [
+                { nombre: 'Gelatina', materiales: [{ producto: 'Gelatina', cantidad: 0.2 }] }
+            ],
+            bebidas: [
+                { nombre: 'Té', materiales: [{ producto: 'Té', cantidad: 0.1 }] }
+            ]
+        }
+    };
+    
+    // Agregar ejemplos a cada subcategoría
+    Object.keys(ejemplos).forEach(categoria => {
+        Object.keys(ejemplos[categoria]).forEach(subcategoria => {
+            const subEl = document.querySelector(`.menu-categoria[data-categoria="${categoria}"] .subcategoria[data-sub="${subcategoria}"]`);
+            if (subEl) {
+                const content = subEl.querySelector('.subcategoria-content');
+                content.classList.add('active');
+                subEl.querySelector('.subcategoria-header').classList.add('active');
+                
+                ejemplos[categoria][subcategoria].forEach(ejemplo => {
+                    const recetaId = Date.now() + Math.random();
+                    const nuevaReceta = document.createElement('div');
+                    nuevaReceta.className = 'receta-item';
+                    nuevaReceta.dataset.recetaId = recetaId;
+                    nuevaReceta.dataset.categoria = categoria;
+                    nuevaReceta.dataset.subcategoria = subcategoria;
+                    
+                    const materialesHTML = ejemplo.materiales.map(m => {
+                        const producto = mockData.productos.find(p => p.nombre.toLowerCase().includes(m.producto.toLowerCase().split(' ')[0]));
+                        const productoId = producto ? producto.id : '';
+                        return `
+                            <div class="material-item">
+                                <select class="material-select">
+                                    <option value="">Seleccionar material...</option>
+                                </select>
+                                <input type="number" class="cantidad-material" step="0.01" value="${m.cantidad}" min="0.01">
+                                <button type="button" class="btn-small" onclick="this.parentElement.remove()">-</button>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    nuevaReceta.innerHTML = `
+                        <h4>
+                            <input type="text" class="nombre-receta" value="${ejemplo.nombre}" required style="flex: 1; border: none; background: transparent; font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">
+                            <button type="button" class="btn-small" onclick="this.closest('.receta-item').remove()">🗑️</button>
+                        </h4>
+                        <div class="materiales-receta">
+                            <h5>Materiales Estándar</h5>
+                            ${materialesHTML}
+                            <div class="material-item">
+                                <select class="material-select">
+                                    <option value="">Seleccionar material...</option>
+                                </select>
+                                <input type="number" class="cantidad-material" step="0.01" placeholder="Cantidad (kg)" min="0.01">
+                                <button type="button" class="btn-small" onclick="agregarMaterial(this)">+</button>
+                            </div>
+                        </div>
+                    `;
+                    content.appendChild(nuevaReceta);
+                });
+            }
+        });
+    });
+    
+    setTimeout(() => cargarProductosEnSelects(), 100);
+    ToastNotification.show('Ejemplos de recetas generados', 'success');
+};
+
+window.subirExcel = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (!file.name.match(/\.(xlsx|xls)$/)) {
+        ToastNotification.show('Por favor, seleccione un archivo Excel válido', 'error');
+        return;
+    }
+    
+    LoadingState.setLoading(event.target, 'Procesando...');
+    
+    // Simular procesamiento de Excel
+    setTimeout(() => {
+        // Simular datos del Excel
+        const datosExcel = {
+            desayuno: {
+                huevos: [{ nombre: 'Huevos Rancheros', materiales: [{ producto: 'Huevos', cantidad: 6 }, { producto: 'Tomate', cantidad: 0.5 }] }],
+                bebidas: [{ nombre: 'Café con Leche', materiales: [{ producto: 'Café', cantidad: 0.3 }, { producto: 'Leche', cantidad: 0.2 }] }]
+            },
+            almuerzo: {
+                principales: [{ nombre: 'Pollo al Curry', materiales: [{ producto: 'Pollo', cantidad: 2 }, { producto: 'Arroz', cantidad: 1.5 }] }],
+                postres: [{ nombre: 'Pastel de Chocolate', materiales: [{ producto: 'Harina', cantidad: 0.5 }, { producto: 'Azúcar', cantidad: 0.3 }] }]
+            }
+        };
+        
+        // Cargar datos del Excel
+        Object.keys(datosExcel).forEach(categoria => {
+            Object.keys(datosExcel[categoria]).forEach(subcategoria => {
+                const subEl = document.querySelector(`.menu-categoria[data-categoria="${categoria}"] .subcategoria[data-sub="${subcategoria}"]`);
+                if (subEl) {
+                    const content = subEl.querySelector('.subcategoria-content');
+                    content.classList.add('active');
+                    subEl.querySelector('.subcategoria-header').classList.add('active');
+                    
+                    datosExcel[categoria][subcategoria].forEach(receta => {
+                        agregarRecetaEnContenedor(content, categoria, subcategoria);
+                        const ultimaReceta = content.querySelector('.receta-item:last-child');
+                        if (ultimaReceta) {
+                            ultimaReceta.querySelector('.nombre-receta').value = receta.nombre;
+                            // Agregar materiales
+                            receta.materiales.forEach((mat, idx) => {
+                                if (idx > 0) {
+                                    agregarMaterial(ultimaReceta.querySelector('.material-item:last-child .btn-small'));
+                                }
+                                const materialItem = ultimaReceta.querySelectorAll('.material-item')[idx];
+                                if (materialItem) {
+                                    setTimeout(() => {
+                                        const producto = mockData.productos.find(p => p.nombre.toLowerCase().includes(mat.producto.toLowerCase().split(' ')[0]));
+                                        if (producto) {
+                                            materialItem.querySelector('.material-select').value = producto.id;
+                                        }
+                                        materialItem.querySelector('.cantidad-material').value = mat.cantidad;
+                                    }, 100);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
+        
+        LoadingState.removeLoading(event.target);
+        ToastNotification.show(`Template Excel "${file.name}" procesado exitosamente`, 'success');
+        event.target.value = ''; // Reset input
+    }, 1500);
 };
 
 window.agregarReceta = function() {
@@ -1354,7 +1604,7 @@ window.guardarMenu = function(event) {
     const form = event.target.closest('form');
     const button = form.querySelector('button[type="submit"]');
     const fecha = document.getElementById('fechaMenuForm').value;
-    const recetasItems = document.querySelectorAll('.receta-item');
+    const recetasItems = document.querySelectorAll('#menuTree .receta-item');
     const recetas = [];
     
     if (!fecha) {
@@ -1362,9 +1612,12 @@ window.guardarMenu = function(event) {
         return false;
     }
     
-    recetasItems.forEach((item, index) => {
+    recetasItems.forEach((item) => {
         const nombre = item.querySelector('.nombre-receta').value;
         if (!nombre) return;
+        
+        const categoria = item.dataset.categoria;
+        const subcategoria = item.dataset.subcategoria;
         
         const materiales = [];
         item.querySelectorAll('.material-item').forEach(matItem => {
@@ -1379,7 +1632,12 @@ window.guardarMenu = function(event) {
         });
         
         if (materiales.length > 0) {
-            recetas.push({ nombre, materiales });
+            recetas.push({ 
+                nombre, 
+                materiales,
+                categoria,
+                subcategoria
+            });
         }
     });
     
@@ -1395,14 +1653,15 @@ window.guardarMenu = function(event) {
             id: mockData.menus.length + 1,
             fecha,
             recetas,
-            fechaCreacion: new Date().toISOString()
+            fechaCreacion: new Date().toISOString(),
+            tipo: 'buffet'
         };
         
         mockData.menus.push(menu);
         cargarMenus();
         cancelarMenu();
         LoadingState.removeLoading(button);
-        ToastNotification.show(`Menú del ${new Date(fecha).toLocaleDateString()} guardado exitosamente con ${recetas.length} receta(s)`, 'success');
+        ToastNotification.show(`Menú Buffet del ${new Date(fecha).toLocaleDateString()} guardado exitosamente con ${recetas.length} receta(s)`, 'success');
     }, 600);
     
     return false;
@@ -1412,26 +1671,17 @@ window.cancelarMenu = function() {
     document.getElementById('formularioMenu').style.display = 'none';
     const form = document.getElementById('formularioMenu').querySelector('form');
     if (form) form.reset();
-    document.getElementById('recetasContainer').innerHTML = `
-        <div class="receta-item">
-            <h4>Receta 1</h4>
-            <div class="form-group">
-                <label>Nombre del Plato</label>
-                <input type="text" class="nombre-receta" placeholder="Ej: Arroz con Frijoles" required>
-            </div>
-            <div class="materiales-receta">
-                <h5>Materiales Estándar</h5>
-                <div class="material-item">
-                    <select class="material-select">
-                        <option value="">Seleccionar material...</option>
-                    </select>
-                    <input type="number" class="cantidad-material" step="0.01" placeholder="Cantidad (kg)" min="0.01">
-                    <button type="button" class="btn-small" onclick="agregarMaterial(this)">+</button>
-                </div>
-            </div>
-        </div>
-    `;
-    cargarProductosEnSelects();
+    // Limpiar todas las recetas del árbol
+    document.querySelectorAll('#menuTree .receta-item').forEach(item => item.remove());
+    // Colapsar todas las categorías
+    document.querySelectorAll('.categoria-content').forEach(content => {
+        content.classList.remove('active');
+        content.closest('.menu-categoria').querySelector('.categoria-header').classList.remove('active');
+    });
+    document.querySelectorAll('.subcategoria-content').forEach(content => {
+        content.classList.remove('active');
+        content.closest('.subcategoria').querySelector('.subcategoria-header').classList.remove('active');
+    });
 };
 
 function cargarMenus() {
@@ -1443,21 +1693,56 @@ function cargarMenus() {
         return;
     }
     
-    container.innerHTML = mockData.menus.map(menu => `
-        <div class="menu-item">
-            <h4>Menú del ${new Date(menu.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h4>
-            <div class="receta-list">
-                ${menu.recetas.map(receta => `
+    container.innerHTML = mockData.menus.map(menu => {
+        const categorias = {};
+        menu.recetas.forEach(receta => {
+            const cat = receta.categoria || 'general';
+            const sub = receta.subcategoria || 'general';
+            if (!categorias[cat]) categorias[cat] = {};
+            if (!categorias[cat][sub]) categorias[cat][sub] = [];
+            categorias[cat][sub].push(receta);
+        });
+        
+        const categoriasHTML = Object.keys(categorias).map(cat => {
+            const nombreCat = cat === 'desayuno' ? '🌅 Desayuno' : cat === 'almuerzo' ? '🍽️ Almuerzo' : cat === 'cena' ? '🌙 Cena' : cat;
+            const subcategoriasHTML = Object.keys(categorias[cat]).map(sub => {
+                const nombreSub = sub === 'huevos' ? '🥚 Huevos' : 
+                                 sub === 'bebidas' ? '🥤 Bebidas' :
+                                 sub === 'postres' ? '🍰 Postres' :
+                                 sub === 'principales' ? '🍛 Principales' :
+                                 sub === 'otros' ? '🍞 Otros' : sub;
+                const recetasHTML = categorias[cat][sub].map(receta => `
                     <div class="receta-list-item">
                         <strong>${receta.nombre}</strong>
                         <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
                             ${receta.materiales.map(m => `<li>${m.producto}: ${m.cantidad} kg</li>`).join('')}
                         </ul>
                     </div>
-                `).join('')}
+                `).join('');
+                return `
+                    <div style="margin-left: 1rem; margin-top: 0.5rem;">
+                        <strong style="color: var(--primary-color);">${nombreSub}</strong>
+                        ${recetasHTML}
+                    </div>
+                `;
+            }).join('');
+            return `
+                <div style="margin-bottom: 1rem;">
+                    <h5 style="color: var(--primary-color); font-size: 1.1rem; margin-bottom: 0.5rem;">${nombreCat}</h5>
+                    ${subcategoriasHTML}
+                </div>
+            `;
+        }).join('');
+        
+        return `
+            <div class="menu-item">
+                <h4>Menú Buffet del ${new Date(menu.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h4>
+                <div class="receta-list">
+                    ${categoriasHTML}
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 window.guardarConfiguracion = function(event) {
