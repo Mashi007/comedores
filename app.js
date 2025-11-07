@@ -97,33 +97,47 @@ const mockData = {
 // Login eliminado - ahora va directo al sistema desde portada
 
 window.cambiarPantalla = function(ocultar, mostrar) {
+    console.log('🟡 [DEBUG] cambiarPantalla() llamado:', 'ocultar:', ocultar, 'mostrar:', mostrar);
     try {
         const ocultarEl = document.getElementById(ocultar);
         const mostrarEl = document.getElementById(mostrar);
         
+        console.log('🟡 [DEBUG] Elemento a ocultar encontrado:', !!ocultarEl, ocultar);
+        console.log('🟡 [DEBUG] Elemento a mostrar encontrado:', !!mostrarEl, mostrar);
+        
         if (!ocultarEl) {
-            console.error('Elemento a ocultar no encontrado:', ocultar);
+            console.error('❌ [ERROR] Elemento a ocultar no encontrado:', ocultar);
             return;
         }
         
         if (!mostrarEl) {
-            console.error('Elemento a mostrar no encontrado:', mostrar);
+            console.error('❌ [ERROR] Elemento a mostrar no encontrado:', mostrar);
             return;
         }
         
         // Ocultar todas las pantallas primero
-        document.querySelectorAll('.screen').forEach(screen => {
+        const todasLasPantallas = document.querySelectorAll('.screen');
+        console.log('🟡 [DEBUG] Pantallas encontradas:', todasLasPantallas.length);
+        todasLasPantallas.forEach(screen => {
+            const wasActive = screen.classList.contains('active');
             screen.classList.remove('active');
+            if (wasActive) {
+                console.log('🟡 [DEBUG] Pantalla desactivada:', screen.id);
+            }
         });
         
         // Mostrar la pantalla deseada
         mostrarEl.classList.add('active');
+        console.log('🟡 [DEBUG] Pantalla activada:', mostrar);
         
         // Mostrar/ocultar sidebar según la pantalla
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const pantallasConSidebar = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'configuracion'];
         const pantallasPublicas = ['portada'];
+        
+        console.log('🟡 [DEBUG] Pantalla es pública:', pantallasPublicas.includes(mostrar));
+        console.log('🟡 [DEBUG] Pantalla tiene sidebar:', pantallasConSidebar.includes(mostrar));
         
         // Ocultar sidebar completamente en pantallas públicas
         if (pantallasPublicas.includes(mostrar)) {
@@ -508,20 +522,27 @@ window.toggleSidebar = function() {
 };
 
 window.cerrarSesion = function() {
+    console.log('🔴 [DEBUG] cerrarSesion() llamado');
     // Cerrar sidebar completamente
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     
+    console.log('🔴 [DEBUG] Sidebar encontrado:', !!sidebar);
+    console.log('🔴 [DEBUG] SidebarOverlay encontrado:', !!sidebarOverlay);
+    
     if (sidebar) {
         sidebar.classList.remove('open');
         sidebar.style.display = 'none';
+        console.log('🔴 [DEBUG] Sidebar cerrado');
     }
     if (sidebarOverlay) {
         sidebarOverlay.classList.remove('active');
+        console.log('🔴 [DEBUG] Overlay cerrado');
     }
     document.body.classList.remove('sidebar-open');
     
     // Volver a la portada
+    console.log('🔴 [DEBUG] Navegando a portada');
     cambiarPantalla('menu', 'portada');
     
     // RE-INICIALIZAR el botón de inicio cuando se cierra sesión
@@ -1668,7 +1689,17 @@ function cargarInventario() {
 
 // Planificación de Menús - Estructura de Árbol Buffet
 window.nuevoMenu = function() {
-    const fecha = document.getElementById('fechaMenu').value;
+    console.log('🟣 [DEBUG] nuevoMenu() llamado');
+    const fechaInput = document.getElementById('fechaMenu');
+    console.log('🟣 [DEBUG] Input fecha encontrado:', !!fechaInput);
+    
+    if (!fechaInput) {
+        console.error('❌ [ERROR] Input fecha no encontrado');
+        return;
+    }
+    
+    const fecha = fechaInput.value;
+    console.log('🟣 [DEBUG] Fecha seleccionada:', fecha);
     if (!fecha) {
         ToastNotification.show('Seleccione una fecha para el menú', 'warning');
         return;
@@ -2465,7 +2496,17 @@ function cargarProduccion() {
 
 // Servicio al Cliente
 window.crearEncuesta = function() {
-    document.getElementById('formularioEncuesta').style.display = 'block';
+    console.log('🟣 [DEBUG] crearEncuesta() llamado');
+    const formulario = document.getElementById('formularioEncuesta');
+    console.log('🟣 [DEBUG] Formulario encontrado:', !!formulario);
+    
+    if (!formulario) {
+        console.error('❌ [ERROR] Formulario de encuesta no encontrado');
+        return;
+    }
+    
+    formulario.style.display = 'block';
+    console.log('🟣 [DEBUG] Formulario de encuesta mostrado');
 };
 
 window.cancelarEncuesta = function() {
