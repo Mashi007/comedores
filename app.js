@@ -43,7 +43,10 @@ function cambiarPantalla(ocultar, mostrar) {
             // En desktop, abrir sidebar automáticamente
             if (window.innerWidth > 768) {
                 sidebar.classList.add('open');
+                document.body.classList.add('sidebar-open');
                 console.log('📋 Sidebar abierto en desktop');
+            } else {
+                document.body.classList.remove('sidebar-open');
             }
         }
     } else {
@@ -51,6 +54,7 @@ function cambiarPantalla(ocultar, mostrar) {
             sidebar.style.display = 'none';
             sidebar.classList.remove('open');
         }
+        document.body.classList.remove('sidebar-open');
         const overlay = document.getElementById('sidebarOverlay');
         if (overlay) overlay.classList.remove('active');
     }
@@ -99,6 +103,13 @@ function toggleSidebar() {
     
     sidebar.classList.toggle('open');
     overlay.classList.toggle('active');
+    
+    // Agregar/quitar clase al body
+    if (sidebar.classList.contains('open')) {
+        document.body.classList.add('sidebar-open');
+    } else {
+        document.body.classList.remove('sidebar-open');
+    }
 }
 
 // Cerrar sesión

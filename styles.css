@@ -547,12 +547,34 @@ body {
         left: -100%;
         width: 280px;
     }
+    
+    body.sidebar-open .screen.active:not(#portada) {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    body.sidebar-open .page-container {
+        max-width: 100%;
+    }
 }
 
 /* Page Container */
 .page-container {
     max-width: 1400px;
     margin: 0 auto;
+    width: 100%;
+    padding-bottom: 2rem;
+}
+
+/* Ajustar contenido cuando sidebar está abierto */
+body.sidebar-open .screen.active:not(#portada) {
+    margin-left: 320px;
+    width: calc(100% - 320px);
+}
+
+body.sidebar-open .page-container {
+    width: 100%;
+    max-width: calc(1400px - 320px);
 }
 
 .page-header {
