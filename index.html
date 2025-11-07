@@ -83,10 +83,88 @@
         </div>
     </div>
 
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="logo-icon-small">🍽️</div>
+                <div class="sidebar-title">
+                    <h2>Sistema</h2>
+                    <p>Comedores</p>
+                </div>
+            </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item" onclick="navegar('dashboard'); return false;" data-section="dashboard">
+                <div class="nav-icon">📊</div>
+                <span class="nav-text">Dashboard</span>
+                <div class="nav-badge">6</div>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('compras'); return false;" data-section="compras">
+                <div class="nav-icon">🛒</div>
+                <span class="nav-text">Compras</span>
+                <div class="nav-badge new">Nuevo</div>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('inventario'); return false;" data-section="inventario">
+                <div class="nav-icon">📦</div>
+                <span class="nav-text">Inventario</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('planificacion'); return false;" data-section="planificacion">
+                <div class="nav-icon">📅</div>
+                <span class="nav-text">Planificación</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('produccion'); return false;" data-section="produccion">
+                <div class="nav-icon">👨‍🍳</div>
+                <span class="nav-text">Producción</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('servicio'); return false;" data-section="servicio">
+                <div class="nav-icon">⭐</div>
+                <span class="nav-text">Servicio</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('notificaciones'); return false;" data-section="notificaciones">
+                <div class="nav-icon">🔔</div>
+                <span class="nav-text">Notificaciones</span>
+                <div class="nav-badge alert">3</div>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('configuracion'); return false;" data-section="configuracion">
+                <div class="nav-icon">⚙️</div>
+                <span class="nav-text">Configuración</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <span id="userInitial">A</span>
+                </div>
+                <div class="user-details">
+                    <div class="user-name" id="sidebarUserName">Administrador</div>
+                    <div class="user-role">Admin</div>
+                </div>
+            </div>
+            <button class="nav-item logout-btn" onclick="cerrarSesion()">
+                <div class="nav-icon">🚪</div>
+                <span class="nav-text">Cerrar Sesión</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Overlay para móvil -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <!-- Menú Principal -->
     <div id="menu" class="screen">
         <div class="menu-container">
             <header class="menu-header">
+                <button class="hamburger-btn" onclick="toggleSidebar()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <h1>Menú Principal</h1>
                 <div class="user-info">
                     <span id="userName">Usuario</span>
@@ -142,7 +220,11 @@
     <div id="dashboard" class="screen">
         <div class="page-container">
             <header class="page-header">
-                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <button class="hamburger-btn" onclick="toggleSidebar()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <h1>Dashboard</h1>
             </header>
             <div class="dashboard-filters">
@@ -222,7 +304,11 @@
     <div id="compras" class="screen">
         <div class="page-container">
             <header class="page-header">
-                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <button class="hamburger-btn" onclick="toggleSidebar()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <h1>Ingreso de Compras</h1>
             </header>
             <div class="compras-actions">
@@ -282,7 +368,11 @@
     <div id="inventario" class="screen">
         <div class="page-container">
             <header class="page-header">
-                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <button class="hamburger-btn" onclick="toggleSidebar()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <h1>Inventario</h1>
             </header>
             <div class="inventario-actions">
@@ -348,7 +438,11 @@
     <div id="planificacion" class="screen">
         <div class="page-container">
             <header class="page-header">
-                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <button class="hamburger-btn" onclick="toggleSidebar()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <h1>Planificación de Menús</h1>
             </header>
             <div class="planificacion-actions">
@@ -399,7 +493,11 @@
     <div id="produccion" class="screen">
         <div class="page-container">
             <header class="page-header">
-                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <button class="hamburger-btn" onclick="toggleSidebar()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <h1>Producción</h1>
             </header>
             <div class="produccion-actions">
@@ -465,7 +563,11 @@
     <div id="servicio" class="screen">
         <div class="page-container">
             <header class="page-header">
-                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <button class="hamburger-btn" onclick="toggleSidebar()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <h1>Servicio al Cliente</h1>
             </header>
             <div class="servicio-actions">
@@ -498,7 +600,11 @@
     <div id="notificaciones" class="screen">
         <div class="page-container">
             <header class="page-header">
-                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <button class="hamburger-btn" onclick="toggleSidebar()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <h1>Notificaciones Inteligentes</h1>
             </header>
             <div class="notificaciones-container" id="notificacionesContainer">
@@ -511,7 +617,11 @@
     <div id="configuracion" class="screen">
         <div class="page-container">
             <header class="page-header">
-                <button class="btn-back" onclick="navegar('menu')">← Volver</button>
+                <button class="hamburger-btn" onclick="toggleSidebar()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <h1>Configuración</h1>
             </header>
             <div class="config-container">

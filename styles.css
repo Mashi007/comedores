@@ -24,15 +24,31 @@ body {
     background: var(--bg-color);
     color: var(--text-primary);
     line-height: 1.6;
+    transition: margin-left 0.3s ease;
+}
+
+body.sidebar-open {
+    overflow: hidden;
 }
 
 .screen {
     display: none;
     min-height: 100vh;
+    transition: margin-left 0.3s ease;
 }
 
 .screen.active {
     display: block;
+}
+
+body.sidebar-open .screen.active {
+    margin-left: 280px;
+}
+
+@media (max-width: 768px) {
+    body.sidebar-open .screen.active {
+        margin-left: 0;
+    }
 }
 
 /* Portada - Diseño Premium */
