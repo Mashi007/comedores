@@ -1354,10 +1354,10 @@ window.mostrarFormularioInventario = function() {
     setTimeout(() => cargarProductosEnSelects(), 100);
 };
 
-function ocultarFormularioInventario() {
+window.ocultarFormularioInventario = function() {
     document.getElementById('formularioInventario').style.display = 'none';
     document.getElementById('formularioInventario').querySelector('form').reset();
-}
+};
 
 window.procesarMovimientoInventario = function(event) {
     event.preventDefault();
@@ -2150,10 +2150,10 @@ window.mostrarFormularioProduccion = function() {
     document.getElementById('formularioProduccion').style.display = 'block';
 };
 
-function ocultarFormularioProduccion() {
+window.ocultarFormularioProduccion = function() {
     document.getElementById('formularioProduccion').style.display = 'none';
     document.getElementById('formularioProduccion').querySelector('form').reset();
-}
+};
 
 window.reportarProduccion = function(event) {
     event.preventDefault();
