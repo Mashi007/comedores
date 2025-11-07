@@ -1169,6 +1169,10 @@ function crearGrafico8() {
     
     // Función para determinar el cuadrante
     function getCuadrante(stock, reorder) {
+        // Validar que stock y reorder sean números válidos
+        if (typeof stock !== 'number' || isNaN(stock) || typeof reorder !== 'number' || isNaN(reorder) || reorder <= 0) {
+            return 3; // Valor por defecto (Óptimo)
+        }
         if (stock < reorder) return 1; // Stock menor al inventario de seguridad
         if (stock < reorder * 2) return 2; // Dentro de inventario de seguridad
         if (stock < reorder * 3) return 3; // Inventario según menús planificados
@@ -1184,7 +1188,10 @@ function crearGrafico8() {
             3: '#22c55e', // Verde - Inventario según menús planificados (ÓPTIMO)
             4: '#3b82f6'  // Azul - Sobre stock (EXCELENTE)
         };
-        return colors[cuadrante] + opacity;
+        // Validar que el cuadrante sea válido, si no, usar color por defecto (gris)
+        const cuadranteValido = (cuadrante >= 1 && cuadrante <= 4) ? cuadrante : 3;
+        const colorBase = colors[cuadranteValido] || '#22c55e';
+        return colorBase + opacity;
     }
     
     chartInstances.chart8 = new Chart(ctx, {
