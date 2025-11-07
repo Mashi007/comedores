@@ -1185,6 +1185,9 @@ function agregarEtiquetasCuadrantes(chart, maxStock, maxReorder, reordenNormaliz
     const ctx = canvas.getContext('2d');
     const chartArea = chart.chartArea;
     
+    // Verificar que chartArea existe
+    if (!chartArea) return;
+    
     // Limpiar etiquetas anteriores
     const existingLabels = canvas.parentElement.querySelectorAll('.cuadrante-label');
     existingLabels.forEach(label => label.remove());
@@ -1206,8 +1209,6 @@ function agregarEtiquetasCuadrantes(chart, maxStock, maxReorder, reordenNormaliz
     
     // Calcular posiciones de cuadrantes para una sola fila horizontal
     // Las etiquetas se posicionan dentro del área del gráfico, en la parte superior
-    const chartArea = chart.chartArea;
-    if (!chartArea) return;
     
     // Calcular posiciones basadas en el área real del gráfico
     const chartWidth = chartArea.right - chartArea.left;
