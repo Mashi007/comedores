@@ -41,14 +41,12 @@ function cambiarPantalla(ocultar, mostrar) {
     const sidebar = document.getElementById('sidebar');
     
     if (pantallasSistema.includes(mostrar)) {
-        console.log('📋 Mostrando sidebar para:', mostrar);
         if (sidebar) {
             sidebar.style.display = 'flex';
             // En desktop, abrir sidebar automáticamente
             if (window.innerWidth > 768) {
                 sidebar.classList.add('open');
                 document.body.classList.add('sidebar-open');
-                console.log('📋 Sidebar abierto en desktop');
             } else {
                 document.body.classList.remove('sidebar-open');
             }
@@ -74,21 +72,22 @@ function cambiarPantalla(ocultar, mostrar) {
         // Verificar que la pantalla se muestre
         setTimeout(() => {
             const pantallaActiva = document.querySelector('.screen.active');
-            console.log('🔍 Pantalla activa después del cambio:', pantallaActiva?.id);
             if (pantallaActiva) {
                 const display = window.getComputedStyle(pantallaActiva).display;
-                console.log('🔍 Display de pantalla activa:', display);
                 if (display === 'none') {
-                    console.error('❌ La pantalla activa tiene display: none, forzando display: block');
                     pantallaActiva.style.display = 'block';
                     pantallaActiva.style.visibility = 'visible';
                 }
             }
-        }, 50);
+        }, 10);
         
-        // Inicializar gráficos si es dashboard
+        // Inicializar gráficos si es dashboard (resetear flag si cambia de pantalla)
         if (mostrar === 'dashboard') {
-            setTimeout(inicializarGraficos, 300);
+            graficosInicializados = false;
+            setTimeout(inicializarGraficos, 100);
+        } else {
+            // Resetear flag cuando se sale del dashboard
+            graficosInicializados = false;
         }
         
         // Inicializar módulo de Compras si es compras
@@ -212,27 +211,28 @@ function cerrarSesion() {
 // Gráficos
 let chartInstances = {};
 
+// Variable para controlar si los gráficos deben inicializarse
+let graficosInicializados = false;
+
 function inicializarGraficos() {
+    // Si ya están inicializados, no hacer nada
+    if (graficosInicializados) {
+        return;
+    }
+    
     if (typeof Chart === 'undefined') {
-        console.log('⏳ Esperando Chart.js...');
-        setTimeout(inicializarGraficos, 100);
+        setTimeout(inicializarGraficos, 50);
         return;
     }
     
     const dashboard = document.getElementById('dashboard');
-    if (!dashboard) {
-        console.log('⏳ Esperando elemento dashboard...');
-        setTimeout(inicializarGraficos, 100);
+    if (!dashboard || !dashboard.classList.contains('active')) {
+        setTimeout(inicializarGraficos, 50);
         return;
     }
     
-    if (!dashboard.classList.contains('active')) {
-        console.log('⏳ Dashboard no está activo, esperando...');
-        setTimeout(inicializarGraficos, 100);
-        return;
-    }
-    
-    console.log('📊 Inicializando gráficos del dashboard...');
+    // Marcar como inicializados para evitar múltiples llamadas
+    graficosInicializados = true;
     
     // Destruir gráficos existentes
     Object.keys(chartInstances).forEach(key => {
@@ -240,65 +240,73 @@ function inicializarGraficos() {
             try {
                 chartInstances[key].destroy();
             } catch (e) {
-                console.warn(`Error al destruir gráfico ${key}:`, e);
+                // Silenciar errores
             }
         }
     });
     chartInstances = {};
     
-    // Actualizar KPIs
+    // Actualizar KPIs primero (más rápido)
     actualizarKPIsDashboard();
     
-    // Crear gráficos principales con delay para asegurar que el DOM esté listo
-    setTimeout(() => {
+    // Crear gráficos principales de forma asíncrona
+    requestAnimationFrame(() => {
         try {
             crearGraficoTendenciaPrincipal();
-            console.log('✅ Gráfico Tendencia Principal creado');
         } catch (e) {
-            console.error('❌ Error creando gráfico Tendencia Principal:', e);
+            console.error('Error en gráfico principal:', e);
         }
-    }, 100);
+    });
     
-    setTimeout(() => {
+    requestAnimationFrame(() => {
         try {
             crearGraficoEficienciaModulos();
-            console.log('✅ Gráfico Eficiencia Módulos creado');
         } catch (e) {
-            console.error('❌ Error creando gráfico Eficiencia Módulos:', e);
+            console.error('Error en gráfico eficiencia:', e);
         }
-    }, 150);
+    });
     
-    // Crear gráficos secundarios
+    // Crear gráficos secundarios con lazy loading
     setTimeout(() => {
         try {
             crearGrafico1();
             crearGrafico2();
             crearGrafico3();
+        } catch (e) {
+            console.error('Error en gráficos secundarios 1-3:', e);
+        }
+    }, 50);
+    
+    setTimeout(() => {
+        try {
             crearGrafico4();
             crearGrafico5();
             crearGrafico6();
+        } catch (e) {
+            console.error('Error en gráficos secundarios 4-6:', e);
+        }
+    }, 100);
+    
+    setTimeout(() => {
+        try {
             crearGrafico7();
             crearGrafico8();
             crearGrafico9();
-            console.log('✅ Gráficos secundarios creados');
         } catch (e) {
-            console.error('❌ Error creando gráficos secundarios:', e);
+            console.error('Error en gráficos secundarios 7-9:', e);
         }
-    }, 200);
+    }, 150);
     
-    // Crear gráficos innovadores
+    // Crear gráficos innovadores al final
     setTimeout(() => {
         try {
             crearGraficoHeatmap();
             crearGraficoDesviaciones();
             crearGraficoROI();
-            console.log('✅ Gráficos innovadores creados');
         } catch (e) {
-            console.error('❌ Error creando gráficos innovadores:', e);
+            console.error('Error en gráficos innovadores:', e);
         }
-    }, 250);
-    
-    console.log('✅ Inicialización de gráficos completada');
+    }, 200);
 }
 
 // Actualizar KPIs del Dashboard
