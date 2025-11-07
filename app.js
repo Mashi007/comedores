@@ -716,8 +716,16 @@ function generarQR(encuesta) {
     
     const qrCodeDiv = document.createElement('div');
     qrCodeDiv.className = 'qr-code';
-    const canvas = document.createElement('canvas');
-    qrCodeDiv.appendChild(canvas);
+    
+    // Usar servicio online de QR directamente (más confiable)
+    const qrImage = document.createElement('img');
+    qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(encuesta.url)}`;
+    qrImage.alt = 'Código QR de la encuesta';
+    qrImage.style.width = '200px';
+    qrImage.style.height = '200px';
+    qrImage.style.border = '1px solid #e2e8f0';
+    qrImage.style.borderRadius = '0.5rem';
+    qrCodeDiv.appendChild(qrImage);
     
     const infoDiv = document.createElement('div');
     infoDiv.innerHTML = `
@@ -730,19 +738,6 @@ function generarQR(encuesta) {
     qrContainer.appendChild(qrCodeDiv);
     qrContainer.appendChild(infoDiv);
     
-    // Intentar generar QR con la librería
-    if (typeof QRCode !== 'undefined') {
-        QRCode.toCanvas(canvas, encuesta.url, { width: 200 }, (error) => {
-            if (error) {
-                console.error(error);
-                mostrarQRAlternativo(qrCodeDiv, encuesta);
-            }
-        });
-    } else {
-        // Si la librería no está cargada, mostrar alternativa
-        mostrarQRAlternativo(qrCodeDiv, encuesta);
-    }
-    
     // Agregar al contenedor de encuestas
     setTimeout(() => {
         const encuestaItem = document.querySelector(`[data-encuesta-id="${encuesta.id}"]`);
@@ -753,20 +748,6 @@ function generarQR(encuesta) {
             }
         }
     }, 100);
-}
-
-function mostrarQRAlternativo(qrDiv, encuesta) {
-    // Alternativa si QRCode no está disponible: mostrar URL y botón para generar QR online
-    qrDiv.innerHTML = `
-        <div style="padding: 1rem; text-align: center; background: #f0f0f0; border-radius: 0.5rem;">
-            <p style="margin-bottom: 0.5rem;">Código QR</p>
-            <a href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(encuesta.url)}" 
-               target="_blank" 
-               style="display: inline-block; padding: 0.5rem 1rem; background: #2563eb; color: white; text-decoration: none; border-radius: 0.25rem;">
-                Ver QR
-            </a>
-        </div>
-    `;
 }
 
 function copiarURL(url) {
