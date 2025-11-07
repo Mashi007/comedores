@@ -164,6 +164,8 @@ function cambiarPantalla(ocultar, mostrar) {
         }
         
         console.log('✅ Cambio de pantalla completado');
+        
+        console.log('✅ Cambio de pantalla completado');
     } catch (error) {
         console.error('❌ Error al cambiar pantalla:', error);
     }
@@ -8757,14 +8759,19 @@ if (typeof window !== 'undefined') {
 }
 
 // Inicializar cuando se navega a configuración
+// Extender cambiarPantalla para incluir inicialización de configuración
 if (typeof cambiarPantalla !== 'undefined') {
     const cambiarPantallaOriginal = cambiarPantalla;
-    cambiarPantalla = function(ocultar, mostrar) {
+    const cambiarPantallaExtendida = function(ocultar, mostrar) {
         cambiarPantallaOriginal(ocultar, mostrar);
         if (mostrar === 'configuracion') {
             setTimeout(() => {
-                inicializarModuloConfiguracion();
+                if (typeof inicializarModuloConfiguracion === 'function') {
+                    inicializarModuloConfiguracion();
+                }
             }, 300);
         }
     };
+    // Actualizar tanto la función local como la global
+    window.cambiarPantalla = cambiarPantallaExtendida;
 }
