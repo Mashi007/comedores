@@ -119,6 +119,13 @@ function cambiarPantalla(ocultar, mostrar) {
             }, 300);
         }
         
+        // Inicializar módulo de Notificaciones si es notificaciones
+        if (mostrar === 'notificaciones') {
+            setTimeout(() => {
+                inicializarModuloNotificaciones();
+            }, 300);
+        }
+        
         console.log('✅ Cambio de pantalla completado');
     } catch (error) {
         console.error('❌ Error al cambiar pantalla:', error);
@@ -1754,33 +1761,527 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// ============================================
+// MÓDULO DE NOTIFICACIONES MEJORADO
+// ============================================
+
+// Estructura de datos de notificaciones
+const notificacionesData = {
+    notificaciones: []
+};
+
+// Generar datos mock de notificaciones
+function generarDatosMockNotificaciones() {
+    const hoy = new Date();
+    
+    notificacionesData.notificaciones = [
+        {
+            id: 'notif-1',
+            categoria: 'urgente',
+            tipo: 'inventario',
+            titulo: 'Inventario Crítico - Frijoles',
+            descripcion: 'El inventario de Frijoles ha alcanzado el nivel mínimo crítico.',
+            detalle: {
+                producto: 'Frijoles',
+                stockActual: 8,
+                stockMinimo: 10,
+                unidad: 'kg',
+                diferencia: -2
+            },
+            icono: 'inventario',
+            tiempo: 'Hace 15 minutos',
+            fecha: new Date(hoy.getTime() - 15 * 60000),
+            leida: false,
+            accion: { texto: 'Gestionar Compra', tipo: 'inventario-frijoles' }
+        },
+        {
+            id: 'notif-2',
+            categoria: 'urgente',
+            tipo: 'inventario',
+            titulo: 'Inventario Crítico - Lechuga',
+            descripcion: 'El inventario de Lechuga está por debajo del nivel de seguridad.',
+            detalle: {
+                producto: 'Lechuga',
+                stockActual: 12,
+                stockMinimo: 15,
+                unidad: 'kg',
+                diferencia: -3
+            },
+            icono: 'inventario',
+            tiempo: 'Hace 45 minutos',
+            fecha: new Date(hoy.getTime() - 45 * 60000),
+            leida: false,
+            accion: { texto: 'Gestionar Compra', tipo: 'inventario-lechuga' }
+        },
+        {
+            id: 'notif-3',
+            categoria: 'desviacion',
+            tipo: 'consumo',
+            titulo: 'Desviación de Consumo - Arroz',
+            descripcion: 'Consumo superior al planificado en más del 15%.',
+            detalle: {
+                producto: 'Arroz',
+                consumoReal: 520,
+                consumoPlanificado: 450,
+                diferencia: 70,
+                porcentaje: 15.6,
+                unidad: 'kg'
+            },
+            icono: 'grafico',
+            tiempo: 'Hace 2 horas',
+            fecha: new Date(hoy.getTime() - 2 * 3600000),
+            leida: false,
+            accion: { texto: 'Ver Detalle', tipo: 'consumo-arroz' }
+        },
+        {
+            id: 'notif-4',
+            categoria: 'desviacion',
+            tipo: 'costo',
+            titulo: 'Desviación de Costos - Almuerzo',
+            descripcion: 'Los costos del almuerzo están 8.3% por encima del ideal.',
+            detalle: {
+                tipoComida: 'Almuerzo',
+                costoReal: 78.30,
+                costoIdeal: 75.00,
+                diferencia: 3.30,
+                porcentaje: 8.3
+            },
+            icono: 'dinero',
+            tiempo: 'Hace 3 horas',
+            fecha: new Date(hoy.getTime() - 3 * 3600000),
+            leida: false,
+            accion: { texto: 'Revisar Costos', tipo: 'costos-almuerzo' }
+        },
+        {
+            id: 'notif-5',
+            categoria: 'desviacion',
+            tipo: 'merma',
+            titulo: 'Merma Elevada - Pollo Asado',
+            descripcion: 'La merma del pollo asado está 12% por encima del objetivo.',
+            detalle: {
+                receta: 'Pollo Asado',
+                mermaReal: 14.2,
+                mermaObjetivo: 10.0,
+                diferencia: 4.2,
+                porcentaje: 12.0
+            },
+            icono: 'alerta',
+            tiempo: 'Hace 4 horas',
+            fecha: new Date(hoy.getTime() - 4 * 3600000),
+            leida: false,
+            accion: { texto: 'Ver Receta', tipo: 'merma-pollo' }
+        },
+        {
+            id: 'notif-6',
+            categoria: 'novedad',
+            tipo: 'compra',
+            titulo: 'Nuevo Pedido de Compra Generado',
+            descripcion: 'Se ha generado automáticamente un pedido de compra basado en diferencias de inventario.',
+            detalle: {
+                cantidadProductos: 5,
+                totalEstimado: 12450,
+                prioridad: 'Alta'
+            },
+            icono: 'compra',
+            tiempo: 'Hace 6 horas',
+            fecha: new Date(hoy.getTime() - 6 * 3600000),
+            leida: false,
+            accion: { texto: 'Revisar Pedidos', tipo: 'pedidos-pendientes' }
+        },
+        {
+            id: 'notif-7',
+            categoria: 'novedad',
+            tipo: 'satisfaccion',
+            titulo: 'Nuevas Respuestas de Encuesta',
+            descripcion: 'Se han recibido nuevas respuestas a la encuesta de satisfacción.',
+            detalle: {
+                nuevasRespuestas: 12,
+                calificacionPromedio: 4.7,
+                tendencia: 'positiva'
+            },
+            icono: 'estrella',
+            tiempo: 'Hace 1 día',
+            fecha: new Date(hoy.getTime() - 24 * 3600000),
+            leida: false,
+            accion: { texto: 'Ver Resultados', tipo: 'encuestas-nuevas' }
+        },
+        {
+            id: 'notif-8',
+            categoria: 'informativa',
+            tipo: 'planificacion',
+            titulo: 'Menú del Día Pendiente',
+            descripcion: 'El menú para mañana aún no ha sido planificado.',
+            detalle: {
+                fecha: 'Mañana',
+                horaRecomendada: '18:00'
+            },
+            icono: 'calendario',
+            tiempo: 'Hace 4 horas',
+            fecha: new Date(hoy.getTime() - 4 * 3600000),
+            leida: false,
+            accion: { texto: 'Planificar Menú', tipo: 'menu-pendiente' }
+        },
+        {
+            id: 'notif-9',
+            categoria: 'informativa',
+            tipo: 'sistema',
+            titulo: 'Actualización de Datos Completada',
+            descripcion: 'Los costos variables han sido actualizados correctamente desde las facturas.',
+            detalle: {
+                facturasProcesadas: 8,
+                recetasActualizadas: 12
+            },
+            icono: 'sistema',
+            tiempo: 'Hace 8 horas',
+            fecha: new Date(hoy.getTime() - 8 * 3600000),
+            leida: false,
+            accion: { texto: 'Ver Costos', tipo: 'costos-actualizados' }
+        },
+        {
+            id: 'notif-10',
+            categoria: 'desviacion',
+            tipo: 'consumo',
+            titulo: 'Desviación de Consumo - Pollo',
+            descripcion: 'Consumo de pollo 22% por encima de lo planificado.',
+            detalle: {
+                producto: 'Pollo',
+                consumoReal: 122,
+                consumoPlanificado: 100,
+                diferencia: 22,
+                porcentaje: 22.0,
+                unidad: 'kg'
+            },
+            icono: 'grafico',
+            tiempo: 'Hace 1 día',
+            fecha: new Date(hoy.getTime() - 24 * 3600000),
+            leida: false,
+            accion: { texto: 'Ver Detalle', tipo: 'consumo-pollo' }
+        }
+    ];
+}
+
+// Obtener icono SVG por tipo
+function obtenerIconoNotificacion(tipo) {
+    const iconos = {
+        inventario: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M9 9H15M9 12H15M9 15H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>`,
+        grafico: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`,
+        dinero: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`,
+        alerta: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.29 3.86L1.82 18C1.64534 18.3024 1.55299 18.6453 1.55201 18.9945C1.55103 19.3437 1.64151 19.6871 1.81445 19.9905C1.98738 20.2939 2.23675 20.5467 2.53773 20.7238C2.83871 20.9009 3.18082 20.9962 3.53 21H20.47C20.8192 20.9962 21.1613 20.9009 21.4623 20.7238C21.7633 20.5467 22.0126 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3547 18.3024 22.18 18L13.71 3.86C13.5322 3.56611 13.2807 3.32312 12.9812 3.15447C12.6817 2.98581 12.3438 2.89725 12 2.89725C11.6562 2.89725 11.3183 2.98581 11.0188 3.15447C10.7193 3.32312 10.4678 3.56611 10.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`,
+        compra: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
+            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
+            <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`,
+        estrella: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="1"/>
+        </svg>`,
+        calendario: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>`,
+        sistema: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 1V3M12 21V23M23 12H21M3 12H1M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M19.07 19.07L17.66 17.66M6.34 6.34L4.93 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>`
+    };
+    return iconos[tipo] || iconos.alerta;
+}
+
+// Renderizar notificación
+function renderizarNotificacion(notif) {
+    const categoriaClass = notif.categoria;
+    const icono = obtenerIconoNotificacion(notif.icono);
+    
+    let detalleHTML = '';
+    if (notif.tipo === 'inventario') {
+        detalleHTML = `
+            <div class="notificacion-metricas">
+                <div class="metrica-item">
+                    <span class="metrica-label">Stock Actual</span>
+                    <span class="metrica-valor critico">${notif.detalle.stockActual} ${notif.detalle.unidad}</span>
+                </div>
+                <div class="metrica-item">
+                    <span class="metrica-label">Mínimo Requerido</span>
+                    <span class="metrica-valor">${notif.detalle.stockMinimo} ${notif.detalle.unidad}</span>
+                </div>
+                <div class="metrica-item diferencia">
+                    <span class="metrica-label">Diferencia</span>
+                    <span class="metrica-valor negativo">${notif.detalle.diferencia} ${notif.detalle.unidad}</span>
+                </div>
+            </div>
+        `;
+    } else if (notif.tipo === 'consumo') {
+        detalleHTML = `
+            <div class="notificacion-metricas">
+                <div class="metrica-item">
+                    <span class="metrica-label">Consumo Real</span>
+                    <span class="metrica-valor critico">${notif.detalle.consumoReal} ${notif.detalle.unidad}</span>
+                </div>
+                <div class="metrica-item">
+                    <span class="metrica-label">Planificado</span>
+                    <span class="metrica-valor">${notif.detalle.consumoPlanificado} ${notif.detalle.unidad}</span>
+                </div>
+                <div class="metrica-item diferencia">
+                    <span class="metrica-label">Desviación</span>
+                    <span class="metrica-valor negativo">+${notif.detalle.porcentaje.toFixed(1)}%</span>
+                </div>
+            </div>
+        `;
+    } else if (notif.tipo === 'costo') {
+        detalleHTML = `
+            <div class="notificacion-metricas">
+                <div class="metrica-item">
+                    <span class="metrica-label">Costo Real</span>
+                    <span class="metrica-valor critico">$${notif.detalle.costoReal.toFixed(2)}</span>
+                </div>
+                <div class="metrica-item">
+                    <span class="metrica-label">Costo Ideal</span>
+                    <span class="metrica-valor">$${notif.detalle.costoIdeal.toFixed(2)}</span>
+                </div>
+                <div class="metrica-item diferencia">
+                    <span class="metrica-label">Desviación</span>
+                    <span class="metrica-valor negativo">+${notif.detalle.porcentaje.toFixed(1)}%</span>
+                </div>
+            </div>
+        `;
+    } else if (notif.tipo === 'merma') {
+        detalleHTML = `
+            <div class="notificacion-metricas">
+                <div class="metrica-item">
+                    <span class="metrica-label">Merma Real</span>
+                    <span class="metrica-valor critico">${notif.detalle.mermaReal.toFixed(1)}%</span>
+                </div>
+                <div class="metrica-item">
+                    <span class="metrica-label">Objetivo</span>
+                    <span class="metrica-valor">${notif.detalle.mermaObjetivo.toFixed(1)}%</span>
+                </div>
+                <div class="metrica-item diferencia">
+                    <span class="metrica-label">Diferencia</span>
+                    <span class="metrica-valor negativo">+${notif.detalle.porcentaje.toFixed(1)}%</span>
+                </div>
+            </div>
+        `;
+    } else if (notif.tipo === 'compra') {
+        detalleHTML = `
+            <div class="notificacion-metricas">
+                <div class="metrica-item">
+                    <span class="metrica-label">Productos</span>
+                    <span class="metrica-valor">${notif.detalle.cantidadProductos}</span>
+                </div>
+                <div class="metrica-item">
+                    <span class="metrica-label">Total Estimado</span>
+                    <span class="metrica-valor">$${notif.detalle.totalEstimado.toLocaleString()}</span>
+                </div>
+                <div class="metrica-item diferencia">
+                    <span class="metrica-label">Prioridad</span>
+                    <span class="metrica-valor alta">${notif.detalle.prioridad}</span>
+                </div>
+            </div>
+        `;
+    } else if (notif.tipo === 'satisfaccion') {
+        detalleHTML = `
+            <div class="notificacion-metricas">
+                <div class="metrica-item">
+                    <span class="metrica-label">Nuevas Respuestas</span>
+                    <span class="metrica-valor positivo">${notif.detalle.nuevasRespuestas}</span>
+                </div>
+                <div class="metrica-item">
+                    <span class="metrica-label">Calificación Promedio</span>
+                    <span class="metrica-valor positivo">${notif.detalle.calificacionPromedio}/5</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    return `
+        <div class="notificacion-card ${categoriaClass}" data-id="${notif.id}" data-categoria="${notif.categoria}">
+            <div class="notificacion-gradiente"></div>
+            <div class="notificacion-content">
+                <div class="notificacion-header">
+                    <div class="notificacion-icon-wrapper">
+                        ${icono}
+                    </div>
+                    <div class="notificacion-titulo-wrapper">
+                        <h3 class="notificacion-titulo">${notif.titulo}</h3>
+                        <span class="notificacion-badge ${categoriaClass}">${notif.categoria === 'urgente' ? 'Urgente' : notif.categoria === 'desviacion' ? 'Desviación' : notif.categoria === 'novedad' ? 'Novedad' : 'Informativa'}</span>
+                    </div>
+                    <button class="notificacion-close" onclick="marcarLeida('${notif.id}')" title="Marcar como leída">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="notificacion-body">
+                    <p class="notificacion-descripcion">${notif.descripcion}</p>
+                    ${detalleHTML}
+                </div>
+                <div class="notificacion-footer">
+                    <div class="notificacion-acciones">
+                        <button class="btn-notificacion" onclick="gestionarNotificacion('${notif.accion.tipo}')">
+                            ${notif.accion.texto}
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <span class="notificacion-tiempo">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        ${notif.tiempo}
+                    </span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Cargar notificaciones
+function cargarNotificaciones() {
+    if (notificacionesData.notificaciones.length === 0) {
+        generarDatosMockNotificaciones();
+    }
+    
+    // Ordenar por fecha (más recientes primero)
+    notificacionesData.notificaciones.sort((a, b) => b.fecha - a.fecha);
+    
+    // Agrupar por categoría
+    const porCategoria = {
+        urgente: [],
+        desviacion: [],
+        novedad: [],
+        informativa: []
+    };
+    
+    notificacionesData.notificaciones.forEach(notif => {
+        if (!notif.leida) {
+            porCategoria[notif.categoria].push(notif);
+        }
+    });
+    
+    // Renderizar cada categoría
+    Object.keys(porCategoria).forEach(categoria => {
+        const grid = document.getElementById(`grid${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`);
+        const count = document.getElementById(`countSeccion${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`);
+        const seccion = document.getElementById(`seccion${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`);
+        
+        if (grid && count && seccion) {
+            if (porCategoria[categoria].length === 0) {
+                seccion.style.display = 'none';
+            } else {
+                seccion.style.display = 'block';
+                grid.innerHTML = porCategoria[categoria].map(notif => renderizarNotificacion(notif)).join('');
+                count.textContent = porCategoria[categoria].length;
+            }
+        }
+    });
+    
+    // Actualizar contadores de filtros
+    actualizarContadoresFiltros();
+    actualizarContadorNotificaciones();
+}
+
+// Actualizar contadores de filtros
+function actualizarContadoresFiltros() {
+    const categorias = ['todas', 'urgente', 'desviacion', 'novedad', 'informativa'];
+    categorias.forEach(cat => {
+        const countEl = document.getElementById(`count${cat.charAt(0).toUpperCase() + cat.slice(1)}`);
+        if (countEl) {
+            let count = 0;
+            if (cat === 'todas') {
+                count = notificacionesData.notificaciones.filter(n => !n.leida).length;
+            } else {
+                count = notificacionesData.notificaciones.filter(n => !n.leida && n.categoria === cat).length;
+            }
+            countEl.textContent = count;
+            if (count === 0) {
+                countEl.style.display = 'none';
+            } else {
+                countEl.style.display = 'inline-flex';
+            }
+        }
+    });
+}
+
+// Filtrar notificaciones
+function filtrarNotificaciones(categoria) {
+    // Actualizar botones de filtro
+    document.querySelectorAll('.filtro-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.categoria === categoria) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Mostrar/ocultar secciones
+    const secciones = ['urgente', 'desviacion', 'novedad', 'informativa'];
+    secciones.forEach(sec => {
+        const seccion = document.getElementById(`seccion${sec.charAt(0).toUpperCase() + sec.slice(1)}`);
+        if (seccion) {
+            if (categoria === 'todas' || categoria === sec) {
+                seccion.style.display = 'block';
+            } else {
+                seccion.style.display = 'none';
+            }
+        }
+    });
+}
+
+// Inicializar módulo de notificaciones
+function inicializarModuloNotificaciones() {
+    console.log('🔔 Inicializando módulo de notificaciones...');
+    cargarNotificaciones();
+}
+
 // Notificaciones
 function marcarLeida(id) {
-    const notificacion = document.querySelector(`[onclick*="${id}"]`)?.closest('.notificacion-card');
+    const notificacion = notificacionesData.notificaciones.find(n => n.id === id);
     if (notificacion) {
-        notificacion.style.opacity = '0.6';
-        notificacion.style.transform = 'translateX(-20px)';
-        setTimeout(() => {
-            notificacion.remove();
-            actualizarContadorNotificaciones();
-        }, 300);
+        notificacion.leida = true;
+        const card = document.querySelector(`[data-id="${id}"]`);
+        if (card) {
+            card.style.opacity = '0.6';
+            card.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                card.remove();
+                cargarNotificaciones();
+            }, 300);
+        }
         ToastNotification.show('Notificación marcada como leída', 'success', 2000);
     }
 }
 
 function marcarTodasLeidas() {
-    const notificaciones = document.querySelectorAll('.notificacion-card');
-    notificaciones.forEach((notif, index) => {
-        setTimeout(() => {
-            notif.style.opacity = '0.6';
-            notif.style.transform = 'translateX(-20px)';
-            setTimeout(() => notif.remove(), 300);
-        }, index * 100);
+    notificacionesData.notificaciones.forEach(notif => {
+        notif.leida = true;
     });
+    
+    const cards = document.querySelectorAll('.notificacion-card');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '0.6';
+            card.style.transform = 'scale(0.95)';
+            setTimeout(() => card.remove(), 300);
+        }, index * 50);
+    });
+    
     setTimeout(() => {
-        actualizarContadorNotificaciones();
+        cargarNotificaciones();
         ToastNotification.show('Todas las notificaciones marcadas como leídas', 'success', 2000);
-    }, notificaciones.length * 100);
+    }, cards.length * 50);
 }
 
 function gestionarNotificacion(tipo) {
@@ -1794,16 +2295,20 @@ function gestionarNotificacion(tipo) {
         navegar('compras');
     } else if (tipo.includes('encuestas')) {
         navegar('servicio');
+    } else if (tipo.includes('costos')) {
+        navegar('costos');
     }
 }
 
 function actualizarContadorNotificaciones() {
     const contador = document.querySelector('[data-section="notificaciones"] .nav-badge');
-    const notificaciones = document.querySelectorAll('.notificacion-card').length;
+    const notificaciones = notificacionesData.notificaciones.filter(n => !n.leida).length;
     if (contador) {
         contador.textContent = notificaciones || '';
         if (notificaciones === 0) {
             contador.style.display = 'none';
+        } else {
+            contador.style.display = 'flex';
         }
     }
 }
@@ -1813,6 +2318,8 @@ if (typeof window !== 'undefined') {
     window.marcarLeida = marcarLeida;
     window.marcarTodasLeidas = marcarTodasLeidas;
     window.gestionarNotificacion = gestionarNotificacion;
+    window.filtrarNotificaciones = filtrarNotificaciones;
+    window.inicializarModuloNotificaciones = inicializarModuloNotificaciones;
 }
 
 // Chat AI - Base de datos de ejemplos precargados

@@ -893,130 +893,130 @@
         </div>
     </div>
 
-    <div id="notificaciones" class="screen">
-        <div class="page-container">
-            <div class="page-header">
-                <h1>Notificaciones</h1>
-            </div>
-            <p>Módulo de notificaciones</p>
-        </div>
-    </div>
-
     <!-- Notificaciones -->
     <div id="notificaciones" class="screen">
         <div class="page-container">
             <div class="page-header">
                 <h1>Notificaciones y Alertas</h1>
-                <button class="btn-primary" onclick="marcarTodasLeidas()">Marcar todas como leídas</button>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="filtrarNotificaciones('todas')">Todas</button>
+                    <button class="btn-primary" onclick="marcarTodasLeidas()">Marcar todas como leídas</button>
+                </div>
             </div>
-            <div class="notificaciones-grid">
-                <div class="notificacion-card urgente">
-                    <div class="notificacion-header">
-                        <span class="notificacion-icon">⚠️</span>
-                        <span class="notificacion-titulo">Inventario Crítico</span>
-                        <span class="notificacion-badge">Urgente</span>
-                    </div>
-                    <div class="notificacion-body">
-                        <p>El inventario de <strong>Frijoles</strong> ha alcanzado el nivel mínimo. Stock actual: <strong>8 kg</strong> (Mínimo: 10 kg)</p>
-                        <div class="notificacion-acciones">
-                            <button class="btn-small" onclick="gestionarNotificacion('inventario-frijoles')">Gestionar Compra</button>
-                            <button class="btn-small btn-secondary" onclick="marcarLeida('notif-1')">Marcar Leída</button>
+
+            <!-- Filtros por Categoría -->
+            <div class="notificaciones-filtros">
+                <button class="filtro-btn active" data-categoria="todas" onclick="filtrarNotificaciones('todas')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 12L12 15L22 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 12V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Todas
+                    <span class="filtro-count" id="countTodas">0</span>
+                </button>
+                <button class="filtro-btn" data-categoria="urgente" onclick="filtrarNotificaciones('urgente')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.29 3.86L1.82 18C1.64534 18.3024 1.55299 18.6453 1.55201 18.9945C1.55103 19.3437 1.64151 19.6871 1.81445 19.9905C1.98738 20.2939 2.23675 20.5467 2.53773 20.7238C2.83871 20.9009 3.18082 20.9962 3.53 21H20.47C20.8192 20.9962 21.1613 20.9009 21.4623 20.7238C21.7633 20.5467 22.0126 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3547 18.3024 22.18 18L13.71 3.86C13.5322 3.56611 13.2807 3.32312 12.9812 3.15447C12.6817 2.98581 12.3438 2.89725 12 2.89725C11.6562 2.89725 11.3183 2.98581 11.0188 3.15447C10.7193 3.32312 10.4678 3.56611 10.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Urgentes
+                    <span class="filtro-count" id="countUrgente">0</span>
+                </button>
+                <button class="filtro-btn" data-categoria="desviacion" onclick="filtrarNotificaciones('desviacion')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Desviaciones
+                    <span class="filtro-count" id="countDesviacion">0</span>
+                </button>
+                <button class="filtro-btn" data-categoria="novedad" onclick="filtrarNotificaciones('novedad')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Novedades
+                    <span class="filtro-count" id="countNovedad">0</span>
+                </button>
+                <button class="filtro-btn" data-categoria="informativa" onclick="filtrarNotificaciones('informativa')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 16V12M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Informativas
+                    <span class="filtro-count" id="countInformativa">0</span>
+                </button>
+            </div>
+
+            <!-- Contenedor de Notificaciones -->
+            <div class="notificaciones-container">
+                <!-- Sección: Alertas Urgentes -->
+                <div class="notificaciones-seccion" id="seccionUrgente">
+                    <div class="seccion-header">
+                        <div class="seccion-icon urgente">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10.29 3.86L1.82 18C1.64534 18.3024 1.55299 18.6453 1.55201 18.9945C1.55103 19.3437 1.64151 19.6871 1.81445 19.9905C1.98738 20.2939 2.23675 20.5467 2.53773 20.7238C2.83871 20.9009 3.18082 20.9962 3.53 21H20.47C20.8192 20.9962 21.1613 20.9009 21.4623 20.7238C21.7633 20.5467 22.0126 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3547 18.3024 22.18 18L13.71 3.86C13.5322 3.56611 13.2807 3.32312 12.9812 3.15447C12.6817 2.98581 12.3438 2.89725 12 2.89725C11.6562 2.89725 11.3183 2.98581 11.0188 3.15447C10.7193 3.32312 10.4678 3.56611 10.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
                         </div>
+                        <h2>Alertas Urgentes</h2>
+                        <span class="seccion-count" id="countSeccionUrgente">0</span>
                     </div>
-                    <div class="notificacion-footer">
-                        <span class="notificacion-tiempo">Hace 15 minutos</span>
+                    <div class="notificaciones-grid" id="gridUrgente">
+                        <!-- Se llenará dinámicamente -->
                     </div>
                 </div>
 
-                <div class="notificacion-card importante">
-                    <div class="notificacion-header">
-                        <span class="notificacion-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Sección: Desviaciones -->
+                <div class="notificaciones-seccion" id="seccionDesviacion">
+                    <div class="seccion-header">
+                        <div class="seccion-icon desviacion">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                        </span>
-                        <span class="notificacion-titulo">Consumo Superior al Planificado</span>
-                        <span class="notificacion-badge">Importante</span>
-                    </div>
-                    <div class="notificacion-body">
-                        <p>Se ha consumido <strong>15% más de Arroz</strong> de lo planificado. Consumo: <strong>520 kg</strong> vs Planificado: <strong>450 kg</strong></p>
-                        <div class="notificacion-acciones">
-                            <button class="btn-small" onclick="gestionarNotificacion('consumo-arroz')">Ver Detalle</button>
-                            <button class="btn-small btn-secondary" onclick="marcarLeida('notif-2')">Marcar Leída</button>
                         </div>
+                        <h2>Desviaciones de Planificación</h2>
+                        <span class="seccion-count" id="countSeccionDesviacion">0</span>
                     </div>
-                    <div class="notificacion-footer">
-                        <span class="notificacion-tiempo">Hace 2 horas</span>
+                    <div class="notificaciones-grid" id="gridDesviacion">
+                        <!-- Se llenará dinámicamente -->
                     </div>
                 </div>
 
-                <div class="notificacion-card informativa">
-                    <div class="notificacion-header">
-                        <span class="notificacion-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-                                <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <!-- Sección: Novedades -->
+                <div class="notificaciones-seccion" id="seccionNovedad">
+                    <div class="seccion-header">
+                        <div class="seccion-icon novedad">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                             </svg>
-                        </span>
-                        <span class="notificacion-titulo">Menú del Día Pendiente</span>
-                        <span class="notificacion-badge">Informativa</span>
-                    </div>
-                    <div class="notificacion-body">
-                        <p>El menú para <strong>mañana</strong> aún no ha sido planificado. Se recomienda completar la planificación antes de las 18:00</p>
-                        <div class="notificacion-acciones">
-                            <button class="btn-small" onclick="gestionarNotificacion('menu-pendiente')">Planificar Menú</button>
-                            <button class="btn-small btn-secondary" onclick="marcarLeida('notif-3')">Marcar Leída</button>
                         </div>
+                        <h2>Novedades</h2>
+                        <span class="seccion-count" id="countSeccionNovedad">0</span>
                     </div>
-                    <div class="notificacion-footer">
-                        <span class="notificacion-tiempo">Hace 4 horas</span>
+                    <div class="notificaciones-grid" id="gridNovedad">
+                        <!-- Se llenará dinámicamente -->
                     </div>
                 </div>
 
-                <div class="notificacion-card importante">
-                    <div class="notificacion-header">
-                        <span class="notificacion-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-                                <path d="M9 9H15M9 12H15M9 15H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <!-- Sección: Informativas -->
+                <div class="notificaciones-seccion" id="seccionInformativa">
+                    <div class="seccion-header">
+                        <div class="seccion-icon informativa">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 16V12M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                        </span>
-                        <span class="notificacion-titulo">Pedido de Compra Pendiente</span>
-                        <span class="notificacion-badge">Importante</span>
-                    </div>
-                    <div class="notificacion-body">
-                        <p>Hay <strong>3 pedidos de compra</strong> pendientes de aprobación. Total estimado: <strong>$12,450</strong></p>
-                        <div class="notificacion-acciones">
-                            <button class="btn-small" onclick="gestionarNotificacion('pedidos-pendientes')">Revisar Pedidos</button>
-                            <button class="btn-small btn-secondary" onclick="marcarLeida('notif-4')">Marcar Leída</button>
                         </div>
+                        <h2>Informativas</h2>
+                        <span class="seccion-count" id="countSeccionInformativa">0</span>
                     </div>
-                    <div class="notificacion-footer">
-                        <span class="notificacion-tiempo">Hace 6 horas</span>
-                    </div>
-                </div>
-
-                <div class="notificacion-card informativa">
-                    <div class="notificacion-header">
-                        <span class="notificacion-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="1"/>
-                            </svg>
-                        </span>
-                        <span class="notificacion-titulo">Nueva Encuesta de Satisfacción</span>
-                        <span class="notificacion-badge">Informativa</span>
-                    </div>
-                    <div class="notificacion-body">
-                        <p>Se han recibido <strong>12 nuevas respuestas</strong> a la encuesta de satisfacción. Calificación promedio: <strong>4.7/5</strong></p>
-                        <div class="notificacion-acciones">
-                            <button class="btn-small" onclick="gestionarNotificacion('encuestas-nuevas')">Ver Resultados</button>
-                            <button class="btn-small btn-secondary" onclick="marcarLeida('notif-5')">Marcar Leída</button>
-                        </div>
-                    </div>
-                    <div class="notificacion-footer">
-                        <span class="notificacion-tiempo">Hace 1 día</span>
+                    <div class="notificaciones-grid" id="gridInformativa">
+                        <!-- Se llenará dinámicamente -->
                     </div>
                 </div>
             </div>
