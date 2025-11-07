@@ -41,10 +41,12 @@ body.sidebar-open {
     right: 0;
     bottom: 0;
     overflow-y: auto;
+    overflow-x: hidden;
     transition: opacity 0.4s ease, transform 0.4s ease;
     opacity: 0;
     transform: translateY(20px);
     z-index: 1;
+    -webkit-overflow-scrolling: touch;
 }
 
 .screen.active {
@@ -562,6 +564,8 @@ body.sidebar-open {
     margin: 0 auto;
     width: 100%;
     box-sizing: border-box;
+    min-height: calc(100vh - 4rem);
+    overflow: visible;
 }
 
 .menu-header {
@@ -585,6 +589,9 @@ body.sidebar-open {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding-bottom: 2rem;
 }
 
 .menu-card {
@@ -595,6 +602,9 @@ body.sidebar-open {
     cursor: pointer;
     transition: all 0.3s;
     text-align: center;
+    min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .menu-card:hover {
@@ -624,6 +634,8 @@ body.sidebar-open {
     margin: 0 auto;
     width: 100%;
     box-sizing: border-box;
+    min-height: calc(100vh - 4rem);
+    overflow: visible;
 }
 
 .page-header {
@@ -2091,23 +2103,30 @@ body.sidebar-open {
 /* Cuando el sidebar está abierto, ajustar el contenido */
 body.sidebar-open .page-container {
     margin-left: 300px;
-    padding-left: calc(2rem + 10px); /* Ajuste para centrar mejor */
+    padding-left: 2rem;
+    padding-right: 2rem;
+    width: calc(100% - 300px);
+    max-width: calc(1400px - 300px);
 }
 
 body.sidebar-open .menu-container {
     margin-left: 300px;
-    padding-left: calc(2rem + 10px); /* Ajuste para centrar mejor */
+    padding-left: 2rem;
+    padding-right: 2rem;
+    width: calc(100% - 300px);
+    max-width: calc(1400px - 300px);
 }
 
-body.sidebar-open .screen.active:not(#portada):not(#login) {
+body.sidebar-open .screen.active:not(#portada) {
     margin-left: 300px;
+    width: calc(100% - 300px);
 }
 
-/* Asegurar que el contenido esté centrado */
+/* Asegurar que el contenido esté centrado y visible */
 body.sidebar-open .page-container,
 body.sidebar-open .menu-container {
-    max-width: calc(1400px - 300px);
     margin-right: auto;
+    margin-left: 300px;
 }
 
 @media (max-width: 768px) {
