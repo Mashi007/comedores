@@ -17,11 +17,28 @@ function cambiarPantalla(ocultar, mostrar) {
     
     // Mostrar sidebar en pantallas del sistema
     const pantallasSistema = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'configuracion'];
+    const sidebar = document.getElementById('sidebar');
+    
     if (pantallasSistema.includes(mostrar)) {
-        document.getElementById('sidebar').style.display = 'flex';
+        sidebar.style.display = 'flex';
+        // Abrir sidebar automáticamente en móvil
+        if (window.innerWidth <= 768) {
+            sidebar.classList.add('open');
+            document.getElementById('sidebarOverlay').classList.add('active');
+        }
     } else {
-        document.getElementById('sidebar').style.display = 'none';
+        sidebar.style.display = 'none';
+        sidebar.classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('active');
     }
+    
+    // Actualizar item activo en sidebar
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.section === mostrar) {
+            item.classList.add('active');
+        }
+    });
     
     // Inicializar gráficos si es dashboard
     if (mostrar === 'dashboard') {

@@ -53,22 +53,72 @@
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <button class="close-sidebar" onclick="toggleSidebar()">×</button>
-            <h2>Menú</h2>
+            <div class="sidebar-logo">
+                <span class="logo-icon">🍽️</span>
+                <div class="logo-text">
+                    <span class="logo-title">Comedores</span>
+                    <span class="logo-subtitle">Industrial</span>
+                </div>
+            </div>
+            <button class="close-sidebar" onclick="toggleSidebar()" title="Cerrar menú">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
         </div>
         <nav class="sidebar-nav">
-            <a href="#" class="nav-item" onclick="navegar('menu'); return false;">🏠 Menú Principal</a>
-            <a href="#" class="nav-item" onclick="navegar('dashboard'); return false;">📊 Dashboard</a>
-            <a href="#" class="nav-item" onclick="navegar('compras'); return false;">🛒 Compras</a>
-            <a href="#" class="nav-item" onclick="navegar('inventario'); return false;">📦 Inventario</a>
-            <a href="#" class="nav-item" onclick="navegar('planificacion'); return false;">📅 Planificación</a>
-            <a href="#" class="nav-item" onclick="navegar('produccion'); return false;">👨‍🍳 Producción</a>
-            <a href="#" class="nav-item" onclick="navegar('servicio'); return false;">💬 Servicio al Cliente</a>
-            <a href="#" class="nav-item" onclick="navegar('notificaciones'); return false;">🔔 Notificaciones</a>
-            <a href="#" class="nav-item" onclick="navegar('configuracion'); return false;">⚙️ Configuración</a>
+            <a href="#" class="nav-item" onclick="navegar('menu'); return false;" data-section="menu">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Menú Principal</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('dashboard'); return false;" data-section="dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+                <span class="nav-badge">6</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('compras'); return false;" data-section="compras">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-text">Compras</span>
+                <span class="nav-new">Nuevo</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('inventario'); return false;" data-section="inventario">
+                <span class="nav-icon">📦</span>
+                <span class="nav-text">Inventario</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('planificacion'); return false;" data-section="planificacion">
+                <span class="nav-icon">📅</span>
+                <span class="nav-text">Planificación</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('produccion'); return false;" data-section="produccion">
+                <span class="nav-icon">👨‍🍳</span>
+                <span class="nav-text">Producción</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('servicio'); return false;" data-section="servicio">
+                <span class="nav-icon">💬</span>
+                <span class="nav-text">Servicio al Cliente</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('notificaciones'); return false;" data-section="notificaciones">
+                <span class="nav-icon">🔔</span>
+                <span class="nav-text">Notificaciones</span>
+                <span class="nav-badge">3</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('configuracion'); return false;" data-section="configuracion">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Configuración</span>
+            </a>
         </nav>
         <div class="sidebar-footer">
-            <button class="nav-item logout-btn" onclick="cerrarSesion(); return false;">Cerrar Sesión</button>
+            <div class="sidebar-user">
+                <div class="user-avatar">U</div>
+                <div class="user-info">
+                    <span class="user-name">Usuario Demo</span>
+                    <span class="user-role">Administrador</span>
+                </div>
+            </div>
+            <button class="nav-item logout-btn" onclick="cerrarSesion(); return false;">
+                <span class="nav-icon">🚪</span>
+                <span class="nav-text">Cerrar Sesión</span>
+            </button>
         </div>
     </div>
 
