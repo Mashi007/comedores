@@ -184,7 +184,7 @@ window.cambiarPantalla = function(ocultar, mostrar) {
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const pantallasConSidebar = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'configuracion'];
-        const pantallasPublicas = ['portada', 'login'];
+        const pantallasPublicas = ['portada'];
         
         // Ocultar sidebar completamente en pantallas públicas
         if (pantallasPublicas.includes(mostrar)) {
