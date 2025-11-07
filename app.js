@@ -1346,11 +1346,6 @@ function agregarProducto() {
     const productosList = document.getElementById('productosList');
     const nuevoProducto = document.createElement('div');
     nuevoProducto.className = 'producto-item';
-    
-    // Exponer agregarProducto después de su declaración
-    if (typeof window !== 'undefined' && !window.agregarProducto) {
-        window.agregarProducto = agregarProducto;
-    }
     nuevoProducto.innerHTML = `
         <input type="text" placeholder="Producto" required>
         <input type="number" placeholder="Cantidad" step="0.01" required>
