@@ -157,6 +157,7 @@ function inicializarGraficos() {
     crearGrafico4();
     crearGrafico5();
     crearGrafico6();
+    crearGrafico7();
 }
 
 function crearGrafico1() {
@@ -762,6 +763,127 @@ function crearGrafico6() {
                         font: {
                             size: 12
                         }
+                    }
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+}
+
+function crearGrafico7() {
+    const ctx = document.getElementById('chart7');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    const recetas = ['Arroz con Frijoles', 'Pollo a la Plancha', 'Carne Asada', 'Ensalada Mixta', 'Sopa de Verduras', 'Pasta al Pesto'];
+    const merma = [8.5, 12.3, 15.2, 5.8, 7.1, 9.4];
+    const planificado = [120, 95, 80, 60, 45, 55];
+    const porcentajes = merma.map((m, i) => ((m / planificado[i]) * 100).toFixed(1));
+    const eficiencia = merma.map((m, i) => ((1 - m / planificado[i]) * 100).toFixed(1));
+    
+    chartInstances.chart7 = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: recetas,
+            datasets: [{
+                label: 'Merma (kg)',
+                data: merma,
+                backgroundColor: function(context) {
+                    const index = context.dataIndex;
+                    const porcentaje = parseFloat(porcentajes[index]);
+                    if (porcentaje > 15) return '#ef4444';
+                    if (porcentaje > 10) return '#f59e0b';
+                    return '#10b981';
+                },
+                borderRadius: 8,
+                borderSkipped: false,
+                barThickness: 40
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    padding: 16,
+                    titleFont: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 14
+                    },
+                    borderWidth: 2,
+                    cornerRadius: 12,
+                    displayColors: false,
+                    callbacks: {
+                        title: function(context) {
+                            return recetas[context[0].dataIndex];
+                        },
+                        label: function(context) {
+                            const index = context.dataIndex;
+                            const porcentaje = porcentajes[index];
+                            const efic = eficiencia[index];
+                            const plan = planificado[index];
+                            const mer = merma[index];
+                            
+                            let estado = '';
+                            if (parseFloat(porcentaje) > 15) {
+                                estado = '🔴 Crítico';
+                            } else if (parseFloat(porcentaje) > 10) {
+                                estado = '🟡 Atención';
+                            } else {
+                                estado = '🟢 Óptimo';
+                            }
+                            
+                            return [
+                                `📊 Merma: ${mer} kg`,
+                                `📋 Planificado: ${plan} kg`,
+                                `📉 Porcentaje: ${porcentaje}%`,
+                                `✅ Eficiencia: ${efic}%`,
+                                `🎯 Estado: ${estado}`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        callback: function(value) {
+                            return value + ' kg';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        },
+                        maxRotation: 45,
+                        minRotation: 45
                     }
                 }
             },
