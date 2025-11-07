@@ -2,7 +2,7 @@
 const mockData = {
     usuario: {
         email: 'admin@comedor.com',
-        password: 'demo123',
+        password: 'demo-credential-2024',
         nombre: 'Administrador'
     },
     productos: [
