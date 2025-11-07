@@ -1748,6 +1748,336 @@ body.sidebar-open .page-container {
     transition: width 0.3s ease;
 }
 
+/* ============================================
+   MÓDULO DE INVENTARIO
+   ============================================ */
+
+/* KPIs de Inventario */
+.inventario-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.inventario-kpis .kpi-card {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.inventario-kpis .kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.inventario-kpis .kpi-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.inventario-minimo .kpi-icon {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.inventario-seguridad .kpi-icon {
+    background: rgba(249, 115, 22, 0.1);
+}
+
+.inventario-adecuado .kpi-icon {
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.inventario-sobrestock .kpi-icon {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* Gráficos de Inventario */
+.inventario-charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Tabla de Inventario */
+.inventario-table-container {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.table-header h2 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+}
+
+.table-filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.table-filters select,
+.table-filters input {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.table-filters input {
+    min-width: 200px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.inventario-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.inventario-table th {
+    background: var(--bg-color);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.inventario-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.inventario-table tbody tr:hover {
+    background: var(--bg-color);
+}
+
+/* Badges de Estado */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.estado-minimo {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.estado-seguridad {
+    background: rgba(249, 115, 22, 0.1);
+    color: #ea580c;
+}
+
+.estado-adecuado {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+}
+
+.estado-sobrestock {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+}
+
+/* Badges de Desempeño */
+.desempeno-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: help;
+}
+
+.desempeno-critico {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.desempeno-bajo {
+    background: rgba(249, 115, 22, 0.1);
+    color: #ea580c;
+}
+
+.desempeno-adecuado {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+}
+
+.desempeno-alto {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+}
+
+.desempeno-exceso {
+    background: rgba(139, 92, 246, 0.1);
+    color: #7c3aed;
+}
+
+/* Historial de Movimientos */
+.movimientos-container {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.movimientos-container h2 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.movimientos-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.movimientos-table th {
+    background: var(--bg-color);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.movimientos-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.movimientos-table tbody tr:hover {
+    background: var(--bg-color);
+}
+
+/* Modal de Inventario */
+.modal-inventario {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content-inventario {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+}
+
+.modal-content-inventario .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.modal-content-inventario label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.modal-content-inventario select,
+.modal-content-inventario input,
+.modal-content-inventario textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.modal-content-inventario textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-small:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .satisfaccion-kpis {
@@ -1764,5 +2094,43 @@ body.sidebar-open .page-container {
     
     .variables-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .inventario-kpis {
+        grid-template-columns: 1fr;
+    }
+    
+    .inventario-charts {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .table-filters {
+        width: 100%;
+    }
+    
+    .table-filters input {
+        min-width: 100%;
+    }
+    
+    .inventario-table,
+    .movimientos-table {
+        font-size: 0.8rem;
+    }
+    
+    .inventario-table th,
+    .inventario-table td,
+    .movimientos-table th,
+    .movimientos-table td {
+        padding: 0.5rem;
+    }
+    
+    .modal-content-inventario {
+        padding: 1.5rem;
+        max-height: 95vh;
     }
 }

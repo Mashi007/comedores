@@ -105,6 +105,13 @@ function cambiarPantalla(ocultar, mostrar) {
             }, 300);
         }
         
+        // Inicializar módulo de Inventario si es inventario
+        if (mostrar === 'inventario') {
+            setTimeout(() => {
+                inicializarModuloInventario();
+            }, 300);
+        }
+        
         console.log('✅ Cambio de pantalla completado');
     } catch (error) {
         console.error('❌ Error al cambiar pantalla:', error);
@@ -2689,3 +2696,610 @@ function crearEncuesta() {
 // Exponer funciones globalmente
 window.crearEncuesta = crearEncuesta;
 window.inicializarModuloSatisfaccion = inicializarModuloSatisfaccion;
+
+// ============================================
+// MÓDULO DE INVENTARIO COMPLETO
+// ============================================
+
+// Estructura de datos de inventario
+const inventarioData = {
+    productos: [],
+    movimientos: []
+};
+
+// Generar datos mock de inventario
+function generarDatosMockInventario() {
+    const productosBase = [
+        { nombre: 'Arroz', unidad: 'kg', minimo: 50, seguridad: 100, adecuado: 200 },
+        { nombre: 'Frijoles', unidad: 'kg', minimo: 30, seguridad: 60, adecuado: 120 },
+        { nombre: 'Pollo', unidad: 'kg', minimo: 80, seguridad: 150, adecuado: 300 },
+        { nombre: 'Carne Res', unidad: 'kg', minimo: 50, seguridad: 100, adecuado: 200 },
+        { nombre: 'Pescado', unidad: 'kg', minimo: 40, seguridad: 80, adecuado: 160 },
+        { nombre: 'Huevos', unidad: 'unidad', minimo: 200, seguridad: 400, adecuado: 800 },
+        { nombre: 'Leche', unidad: 'L', minimo: 60, seguridad: 120, adecuado: 240 },
+        { nombre: 'Queso', unidad: 'kg', minimo: 20, seguridad: 40, adecuado: 80 },
+        { nombre: 'Tomates', unidad: 'kg', minimo: 30, seguridad: 60, adecuado: 120 },
+        { nombre: 'Cebolla', unidad: 'kg', minimo: 25, seguridad: 50, adecuado: 100 },
+        { nombre: 'Papa', unidad: 'kg', minimo: 40, seguridad: 80, adecuado: 160 },
+        { nombre: 'Aceite', unidad: 'L', minimo: 40, seguridad: 80, adecuado: 160 },
+        { nombre: 'Sal', unidad: 'kg', minimo: 20, seguridad: 40, adecuado: 80 },
+        { nombre: 'Pasta', unidad: 'kg', minimo: 30, seguridad: 60, adecuado: 120 },
+        { nombre: 'Lechuga', unidad: 'kg', minimo: 15, seguridad: 30, adecuado: 60 }
+    ];
+
+    inventarioData.productos = productosBase.map((p, index) => {
+        // Generar saldo inicial aleatorio
+        const saldoInicial = Math.random() * (p.adecuado * 1.5) + (p.minimo * 0.5);
+        const ultimaCompra = new Date();
+        ultimaCompra.setDate(ultimaCompra.getDate() - Math.floor(Math.random() * 30));
+        
+        // Calcular ingresos y salidas basados en movimientos mock
+        const ingresos = Math.floor(saldoInicial * 0.8);
+        const salidas = Math.floor(saldoInicial * 0.5);
+        const stockActual = saldoInicial + ingresos - salidas;
+        
+        return {
+            id: index + 1,
+            nombre: p.nombre,
+            unidad: p.unidad,
+            saldoInicial: parseFloat(saldoInicial.toFixed(2)),
+            ultimaCompra: ultimaCompra,
+            ingresos: parseFloat(ingresos.toFixed(2)),
+            salidas: parseFloat(salidas.toFixed(2)),
+            stockActual: parseFloat(stockActual.toFixed(2)),
+            minimo: p.minimo,
+            seguridad: p.seguridad,
+            adecuado: p.adecuado,
+            estado: calcularEstadoInventario(stockActual, p.minimo, p.seguridad, p.adecuado),
+            desempeno: calcularDesempeno(p.nombre, stockActual, p.adecuado)
+        };
+    });
+
+    // Generar movimientos mock
+    const tiposMovimiento = ['entrada', 'salida'];
+    const solicitantes = ['Cocina', 'Producción', 'Almacén', 'Servicio'];
+    
+    for (let i = 0; i < 50; i++) {
+        const producto = inventarioData.productos[Math.floor(Math.random() * inventarioData.productos.length)];
+        const tipo = tiposMovimiento[Math.floor(Math.random() * tiposMovimiento.length)];
+        const cantidad = Math.random() * 50 + 10;
+        const fecha = new Date();
+        fecha.setDate(fecha.getDate() - Math.floor(Math.random() * 60));
+        
+        inventarioData.movimientos.push({
+            id: i + 1,
+            fecha: fecha,
+            producto: producto.nombre,
+            tipo: tipo,
+            cantidad: parseFloat(cantidad.toFixed(2)),
+            unidad: producto.unidad,
+            solicitante: tipo === 'salida' ? solicitantes[Math.floor(Math.random() * solicitantes.length)] : null,
+            saldoAnterior: producto.stockActual - (tipo === 'entrada' ? cantidad : -cantidad),
+            saldoFinal: producto.stockActual,
+            observaciones: tipo === 'entrada' ? 'Compra' : `Consumo para ${tipo === 'salida' ? solicitantes[Math.floor(Math.random() * solicitantes.length)] : ''}`
+        });
+    }
+    
+    // Ordenar movimientos por fecha (más recientes primero)
+    inventarioData.movimientos.sort((a, b) => b.fecha - a.fecha);
+}
+
+// Calcular estado del inventario
+function calcularEstadoInventario(stock, minimo, seguridad, adecuado) {
+    if (stock < minimo) {
+        return 'minimo';
+    } else if (stock < seguridad) {
+        return 'seguridad';
+    } else if (stock <= adecuado) {
+        return 'adecuado';
+    } else {
+        return 'sobrestock';
+    }
+}
+
+// Calcular desempeño basado en planificación
+function calcularDesempeno(nombreProducto, stockActual, stockAdecuado) {
+    // Simular análisis de consumo vs planificado
+    const ratio = (stockActual / stockAdecuado) * 100;
+    
+    if (ratio < 50) {
+        return { estado: 'crítico', porcentaje: ratio.toFixed(1), mensaje: 'Muy bajo vs planificado' };
+    } else if (ratio < 80) {
+        return { estado: 'bajo', porcentaje: ratio.toFixed(1), mensaje: 'Bajo vs planificado' };
+    } else if (ratio <= 120) {
+        return { estado: 'adecuado', porcentaje: ratio.toFixed(1), mensaje: 'Adecuado vs planificado' };
+    } else if (ratio <= 150) {
+        return { estado: 'alto', porcentaje: ratio.toFixed(1), mensaje: 'Alto vs planificado' };
+    } else {
+        return { estado: 'exceso', porcentaje: ratio.toFixed(1), mensaje: 'Exceso vs planificado' };
+    }
+}
+
+// Inicializar módulo de inventario
+function inicializarModuloInventario() {
+    console.log('📦 Inicializando módulo de inventario...');
+    
+    // Generar datos mock si no existen
+    if (inventarioData.productos.length === 0) {
+        generarDatosMockInventario();
+    }
+    
+    // Actualizar KPIs
+    actualizarKPIsInventario();
+    
+    // Cargar tabla de inventario
+    cargarTablaInventario();
+    
+    // Cargar historial de movimientos
+    cargarHistorialMovimientos();
+    
+    // Cargar productos en formulario
+    cargarProductosEnFormulario();
+    
+    // Crear gráficos
+    crearGraficosInventario();
+}
+
+// Actualizar KPIs de inventario
+function actualizarKPIsInventario() {
+    const estados = {
+        minimo: 0,
+        seguridad: 0,
+        adecuado: 0,
+        sobrestock: 0
+    };
+    
+    inventarioData.productos.forEach(p => {
+        estados[p.estado]++;
+    });
+    
+    document.getElementById('kpiMinimo').textContent = estados.minimo;
+    document.getElementById('kpiSeguridad').textContent = estados.seguridad;
+    document.getElementById('kpiAdecuado').textContent = estados.adecuado;
+    document.getElementById('kpiSobreStock').textContent = estados.sobrestock;
+}
+
+// Cargar tabla de inventario
+function cargarTablaInventario() {
+    const tbody = document.getElementById('tablaInventarioBody');
+    if (!tbody) return;
+    
+    const filtroEstado = document.getElementById('filtroEstadoInventario')?.value || '';
+    const busqueda = document.getElementById('buscarProducto')?.value.toLowerCase() || '';
+    
+    let productosFiltrados = inventarioData.productos;
+    
+    if (filtroEstado) {
+        productosFiltrados = productosFiltrados.filter(p => p.estado === filtroEstado);
+    }
+    
+    if (busqueda) {
+        productosFiltrados = productosFiltrados.filter(p => 
+            p.nombre.toLowerCase().includes(busqueda)
+        );
+    }
+    
+    tbody.innerHTML = productosFiltrados.map(p => {
+        const estadoClass = {
+            'minimo': 'estado-minimo',
+            'seguridad': 'estado-seguridad',
+            'adecuado': 'estado-adecuado',
+            'sobrestock': 'estado-sobrestock'
+        }[p.estado] || '';
+        
+        const estadoLabel = {
+            'minimo': '🔴 Bajo Mínimo',
+            'seguridad': '🟠 En Seguridad',
+            'adecuado': '🟢 Stock Adecuado',
+            'sobrestock': '🔵 Sobre Stock'
+        }[p.estado] || '';
+        
+        const desempenoClass = {
+            'crítico': 'desempeno-critico',
+            'bajo': 'desempeno-bajo',
+            'adecuado': 'desempeno-adecuado',
+            'alto': 'desempeno-alto',
+            'exceso': 'desempeno-exceso'
+        }[p.desempeno.estado] || '';
+        
+        return `
+            <tr>
+                <td><strong>${p.nombre}</strong></td>
+                <td>${p.saldoInicial.toFixed(2)} ${p.unidad}</td>
+                <td>${p.ultimaCompra.toLocaleDateString('es-ES')}</td>
+                <td>${p.ingresos.toFixed(2)} ${p.unidad}</td>
+                <td>${p.salidas.toFixed(2)} ${p.unidad}</td>
+                <td><strong>${p.stockActual.toFixed(2)} ${p.unidad}</strong></td>
+                <td>${p.minimo} ${p.unidad}</td>
+                <td>${p.seguridad} ${p.unidad}</td>
+                <td><span class="badge ${estadoClass}">${estadoLabel}</span></td>
+                <td>
+                    <span class="desempeno-badge ${desempenoClass}" title="${p.desempeno.mensaje}">
+                        ${p.desempeno.porcentaje}%
+                    </span>
+                </td>
+                <td>
+                    <button class="btn-small" onclick="mostrarFormularioInventario('${p.nombre}')">Editar</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Cargar historial de movimientos
+function cargarHistorialMovimientos() {
+    const tbody = document.getElementById('historialMovimientosBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = inventarioData.movimientos.slice(0, 30).map(m => {
+        const tipoIcon = m.tipo === 'entrada' ? '📥' : '📤';
+        const tipoLabel = m.tipo === 'entrada' ? 'Entrada' : 'Salida';
+        
+        return `
+            <tr>
+                <td>${m.fecha.toLocaleDateString('es-ES')}</td>
+                <td><strong>${m.producto}</strong></td>
+                <td>${tipoIcon} ${tipoLabel}</td>
+                <td>${m.cantidad.toFixed(2)} ${m.unidad}</td>
+                <td>${m.solicitante || '-'}</td>
+                <td>${m.saldoAnterior.toFixed(2)} ${m.unidad}</td>
+                <td><strong>${m.saldoFinal.toFixed(2)} ${m.unidad}</strong></td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Cargar productos en formulario
+function cargarProductosEnFormulario() {
+    const select = document.getElementById('productoMovimiento');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">Seleccione un producto...</option>' +
+        inventarioData.productos.map(p => 
+            `<option value="${p.nombre}">${p.nombre} (${p.unidad})</option>`
+        ).join('');
+}
+
+// Mostrar formulario de inventario
+function mostrarFormularioInventario(productoNombre = '') {
+    const modal = document.getElementById('formularioInventario');
+    if (!modal) return;
+    
+    // Establecer fecha actual
+    const fechaInput = document.getElementById('fechaMovimiento');
+    if (fechaInput) {
+        fechaInput.value = new Date().toISOString().split('T')[0];
+    }
+    
+    // Si se pasa un producto, seleccionarlo
+    if (productoNombre) {
+        const selectProducto = document.getElementById('productoMovimiento');
+        if (selectProducto) {
+            selectProducto.value = productoNombre;
+        }
+    }
+    
+    modal.style.display = 'flex';
+}
+
+// Cerrar formulario de inventario
+function cerrarFormularioInventario() {
+    const modal = document.getElementById('formularioInventario');
+    if (!modal) return;
+    
+    modal.style.display = 'none';
+    document.getElementById('movimientoForm')?.reset();
+    document.getElementById('grupoSolicitante').style.display = 'none';
+}
+
+// Toggle campo solicitante
+function toggleSolicitante() {
+    const tipo = document.getElementById('tipoMovimiento')?.value;
+    const grupo = document.getElementById('grupoSolicitante');
+    const input = document.getElementById('solicitanteMovimiento');
+    
+    if (tipo === 'salida') {
+        grupo.style.display = 'block';
+        if (input) input.required = true;
+    } else {
+        grupo.style.display = 'none';
+        if (input) {
+            input.required = false;
+            input.value = '';
+        }
+    }
+}
+
+// Procesar movimiento de inventario
+function procesarMovimientoInventario(event) {
+    event.preventDefault();
+    
+    const tipo = document.getElementById('tipoMovimiento').value;
+    const productoNombre = document.getElementById('productoMovimiento').value;
+    const cantidad = parseFloat(document.getElementById('cantidadMovimiento').value);
+    const unidad = document.getElementById('unidadMovimiento').value;
+    const fecha = new Date(document.getElementById('fechaMovimiento').value);
+    const solicitante = document.getElementById('solicitanteMovimiento').value;
+    const observaciones = document.getElementById('observacionesMovimiento').value;
+    
+    // Buscar producto
+    const producto = inventarioData.productos.find(p => p.nombre === productoNombre);
+    if (!producto) {
+        ToastNotification.show('Producto no encontrado', 'error', 2000);
+        return;
+    }
+    
+    // Validar unidad
+    if (producto.unidad !== unidad) {
+        ToastNotification.show(`La unidad debe ser ${producto.unidad}`, 'error', 2000);
+        return;
+    }
+    
+    // Validar solicitante para salidas
+    if (tipo === 'salida' && !solicitante) {
+        ToastNotification.show('Debe especificar quién solicita la salida', 'error', 2000);
+        return;
+    }
+    
+    // Calcular nuevos valores
+    const saldoAnterior = producto.stockActual;
+    let saldoFinal;
+    
+    if (tipo === 'entrada') {
+        saldoFinal = saldoAnterior + cantidad;
+        producto.ingresos += cantidad;
+        producto.ultimaCompra = fecha;
+    } else {
+        saldoFinal = saldoAnterior - cantidad;
+        if (saldoFinal < 0) {
+            ToastNotification.show('No hay suficiente stock disponible', 'error', 2000);
+            return;
+        }
+        producto.salidas += cantidad;
+    }
+    
+    producto.stockActual = parseFloat(saldoFinal.toFixed(2));
+    producto.estado = calcularEstadoInventario(
+        producto.stockActual,
+        producto.minimo,
+        producto.seguridad,
+        producto.adecuado
+    );
+    producto.desempeno = calcularDesempeno(
+        producto.nombre,
+        producto.stockActual,
+        producto.adecuado
+    );
+    
+    // Agregar movimiento
+    const nuevoMovimiento = {
+        id: inventarioData.movimientos.length + 1,
+        fecha: fecha,
+        producto: productoNombre,
+        tipo: tipo,
+        cantidad: cantidad,
+        unidad: unidad,
+        solicitante: tipo === 'salida' ? solicitante : null,
+        saldoAnterior: saldoAnterior,
+        saldoFinal: saldoFinal,
+        observaciones: observaciones || ''
+    };
+    
+    inventarioData.movimientos.unshift(nuevoMovimiento);
+    
+    // Ordenar movimientos por fecha
+    inventarioData.movimientos.sort((a, b) => b.fecha - a.fecha);
+    
+    // Actualizar UI
+    actualizarKPIsInventario();
+    cargarTablaInventario();
+    cargarHistorialMovimientos();
+    
+    // Cerrar formulario
+    cerrarFormularioInventario();
+    
+    ToastNotification.show(
+        `Movimiento registrado: ${tipo === 'entrada' ? 'Entrada' : 'Salida'} de ${cantidad} ${unidad} de ${productoNombre}`,
+        'success',
+        3000
+    );
+}
+
+// Filtrar inventario
+function filtrarInventario() {
+    cargarTablaInventario();
+}
+
+// Crear gráficos de inventario
+function crearGraficosInventario() {
+    crearGraficoInventarioEstados();
+    crearGraficoInventarioEvolucion();
+    crearGraficoDesempenoPlanificacion();
+}
+
+// Gráfico 1: Distribución por Estado
+function crearGraficoInventarioEstados() {
+    const ctx = document.getElementById('chartInventarioEstados');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chartInventarioEstados) {
+        chartInstances.chartInventarioEstados.destroy();
+    }
+    
+    const estados = {
+        minimo: inventarioData.productos.filter(p => p.estado === 'minimo').length,
+        seguridad: inventarioData.productos.filter(p => p.estado === 'seguridad').length,
+        adecuado: inventarioData.productos.filter(p => p.estado === 'adecuado').length,
+        sobrestock: inventarioData.productos.filter(p => p.estado === 'sobrestock').length
+    };
+    
+    chartInstances.chartInventarioEstados = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Bajo Mínimo', 'En Seguridad', 'Stock Adecuado', 'Sobre Stock'],
+            datasets: [{
+                data: [estados.minimo, estados.seguridad, estados.adecuado, estados.sobrestock],
+                backgroundColor: ['#ef4444', '#f97316', '#22c55e', '#3b82f6'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const total = inventarioData.productos.length;
+                            const porcentaje = ((context.parsed / total) * 100).toFixed(1);
+                            return `${context.label}: ${context.parsed} productos (${porcentaje}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico 2: Evolución de Inventario
+function crearGraficoInventarioEvolucion() {
+    const ctx = document.getElementById('chartInventarioEvolucion');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chartInventarioEvolucion) {
+        chartInstances.chartInventarioEvolucion.destroy();
+    }
+    
+    // Agrupar movimientos por fecha (últimos 30 días)
+    const ultimos30Dias = [];
+    const hoy = new Date();
+    for (let i = 29; i >= 0; i--) {
+        const fecha = new Date(hoy);
+        fecha.setDate(fecha.getDate() - i);
+        ultimos30Dias.push(fecha.toISOString().split('T')[0]);
+    }
+    
+    const ingresos = ultimos30Dias.map(fecha => {
+        return inventarioData.movimientos
+            .filter(m => m.tipo === 'entrada' && m.fecha.toISOString().split('T')[0] === fecha)
+            .reduce((sum, m) => sum + m.cantidad, 0);
+    });
+    
+    const salidas = ultimos30Dias.map(fecha => {
+        return inventarioData.movimientos
+            .filter(m => m.tipo === 'salida' && m.fecha.toISOString().split('T')[0] === fecha)
+            .reduce((sum, m) => sum + m.cantidad, 0);
+    });
+    
+    chartInstances.chartInventarioEvolucion = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ultimos30Dias.map(f => new Date(f).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })),
+            datasets: [{
+                label: 'Ingresos',
+                data: ingresos,
+                borderColor: '#22c55e',
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }, {
+                label: 'Salidas',
+                data: salidas,
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
+
+// Gráfico 3: Desempeño vs Planificación
+function crearGraficoDesempenoPlanificacion() {
+    const ctx = document.getElementById('chartDesempenoPlanificacion');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    if (chartInstances.chartDesempenoPlanificacion) {
+        chartInstances.chartDesempenoPlanificacion.destroy();
+    }
+    
+    // Top 10 productos con mayor diferencia vs planificado
+    const productosOrdenados = [...inventarioData.productos]
+        .sort((a, b) => Math.abs(100 - parseFloat(b.desempeno.porcentaje)) - Math.abs(100 - parseFloat(a.desempeno.porcentaje)))
+        .slice(0, 10);
+    
+    chartInstances.chartDesempenoPlanificacion = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: productosOrdenados.map(p => p.nombre),
+            datasets: [{
+                label: 'Desempeño vs Planificado (%)',
+                data: productosOrdenados.map(p => parseFloat(p.desempeno.porcentaje)),
+                backgroundColor: productosOrdenados.map(p => {
+                    const porcentaje = parseFloat(p.desempeno.porcentaje);
+                    if (porcentaje < 50) return '#ef4444';
+                    if (porcentaje < 80) return '#f97316';
+                    if (porcentaje <= 120) return '#22c55e';
+                    if (porcentaje <= 150) return '#3b82f6';
+                    return '#8b5cf6';
+                }),
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const producto = productosOrdenados[context.dataIndex];
+                            return `${context.parsed.x.toFixed(1)}% - ${producto.desempeno.mensaje}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: (value) => value + '%'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Exponer funciones globalmente
+if (typeof window !== 'undefined') {
+    window.mostrarFormularioInventario = mostrarFormularioInventario;
+    window.cerrarFormularioInventario = cerrarFormularioInventario;
+    window.toggleSolicitante = toggleSolicitante;
+    window.procesarMovimientoInventario = procesarMovimientoInventario;
+    window.filtrarInventario = filtrarInventario;
+    window.inicializarModuloInventario = inicializarModuloInventario;
+}

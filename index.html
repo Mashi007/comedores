@@ -402,13 +402,183 @@
         </div>
     </div>
 
+    <!-- Inventario -->
     <div id="inventario" class="screen">
         <div class="page-container">
             <div class="page-header">
                 <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-                <h1>Inventario</h1>
+                <h1>📦 Gestión de Inventario</h1>
+                <button class="btn-primary" onclick="mostrarFormularioInventario()">➕ Nuevo Movimiento</button>
             </div>
-            <p>Módulo de inventario</p>
+
+            <!-- KPIs de Estados de Inventario -->
+            <div class="inventario-kpis">
+                <div class="kpi-card inventario-minimo">
+                    <div class="kpi-icon">🔴</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiMinimo">0</h3>
+                        <p>Bajo Mínimo</p>
+                        <span class="kpi-trend negative">Crítico</span>
+                    </div>
+                </div>
+                <div class="kpi-card inventario-seguridad">
+                    <div class="kpi-icon">🟠</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiSeguridad">0</h3>
+                        <p>En Seguridad</p>
+                        <span class="kpi-trend neutral">Atención</span>
+                    </div>
+                </div>
+                <div class="kpi-card inventario-adecuado">
+                    <div class="kpi-icon">🟢</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiAdecuado">0</h3>
+                        <p>Stock Adecuado</p>
+                        <span class="kpi-trend positive">Óptimo</span>
+                    </div>
+                </div>
+                <div class="kpi-card inventario-sobrestock">
+                    <div class="kpi-icon">🔵</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiSobreStock">0</h3>
+                        <p>Sobre Stock</p>
+                        <span class="kpi-trend neutral">Exceso</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos de Inventario -->
+            <div class="inventario-charts">
+                <div class="chart-card">
+                    <h3>📊 Distribución por Estado</h3>
+                    <canvas id="chartInventarioEstados" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>📈 Evolución de Inventario</h3>
+                    <canvas id="chartInventarioEvolucion" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>🎯 Desempeño vs Planificación</h3>
+                    <canvas id="chartDesempenoPlanificacion" width="400" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Tabla de Inventario -->
+            <div class="inventario-table-container">
+                <div class="table-header">
+                    <h2>📋 Inventario de Productos</h2>
+                    <div class="table-filters">
+                        <select id="filtroEstadoInventario" onchange="filtrarInventario()">
+                            <option value="">Todos los estados</option>
+                            <option value="minimo">Bajo Mínimo</option>
+                            <option value="seguridad">En Seguridad</option>
+                            <option value="adecuado">Stock Adecuado</option>
+                            <option value="sobrestock">Sobre Stock</option>
+                        </select>
+                        <input type="text" id="buscarProducto" placeholder="🔍 Buscar producto..." onkeyup="filtrarInventario()">
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="inventario-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Saldo Inicial</th>
+                                <th>Última Compra</th>
+                                <th>Ingresos</th>
+                                <th>Salidas</th>
+                                <th>Stock Actual</th>
+                                <th>Mínimo</th>
+                                <th>Seguridad</th>
+                                <th>Estado</th>
+                                <th>Desempeño</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaInventarioBody">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Historial de Movimientos -->
+            <div class="movimientos-container">
+                <h2>📜 Historial de Movimientos</h2>
+                <div class="table-wrapper">
+                    <table class="movimientos-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Tipo</th>
+                                <th>Cantidad</th>
+                                <th>Quién Solicita</th>
+                                <th>Saldo Anterior</th>
+                                <th>Saldo Final</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historialMovimientosBody">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Movimiento de Inventario -->
+    <div id="formularioInventario" class="modal-inventario" style="display: none;">
+        <div class="modal-content-inventario">
+            <div class="modal-header">
+                <h2>➕ Nuevo Movimiento de Inventario</h2>
+                <button class="btn-close" onclick="cerrarFormularioInventario()">×</button>
+            </div>
+            <form id="movimientoForm" onsubmit="procesarMovimientoInventario(event)">
+                <div class="form-group">
+                    <label for="tipoMovimiento">Tipo de Movimiento *</label>
+                    <select id="tipoMovimiento" required onchange="toggleSolicitante()">
+                        <option value="">Seleccione...</option>
+                        <option value="entrada">📥 Entrada (Compra)</option>
+                        <option value="salida">📤 Salida (Consumo)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productoMovimiento">Producto *</label>
+                    <select id="productoMovimiento" required>
+                        <option value="">Seleccione un producto...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cantidadMovimiento">Cantidad *</label>
+                    <input type="number" id="cantidadMovimiento" step="0.01" min="0.01" required placeholder="Ej: 50.5">
+                </div>
+                <div class="form-group">
+                    <label for="unidadMovimiento">Unidad *</label>
+                    <select id="unidadMovimiento" required>
+                        <option value="kg">kg</option>
+                        <option value="g">g</option>
+                        <option value="L">L</option>
+                        <option value="unidad">unidad</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fechaMovimiento">Fecha *</label>
+                    <input type="date" id="fechaMovimiento" required>
+                </div>
+                <div class="form-group" id="grupoSolicitante" style="display: none;">
+                    <label for="solicitanteMovimiento">Quién Solicita *</label>
+                    <input type="text" id="solicitanteMovimiento" placeholder="Ej: Cocina, Producción, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="observacionesMovimiento">Observaciones</label>
+                    <textarea id="observacionesMovimiento" rows="3" placeholder="Notas adicionales..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="cerrarFormularioInventario()">Cancelar</button>
+                    <button type="submit" class="btn-primary">💾 Guardar Movimiento</button>
+                </div>
+            </form>
         </div>
     </div>
 
