@@ -1361,6 +1361,11 @@ function agregarProducto() {
     productosList.appendChild(nuevoProducto);
 }
 
+// Exponer agregarProducto después de su declaración
+if (typeof window !== 'undefined') {
+    window.agregarProducto = agregarProducto;
+}
+
 function guardarFactura(event) {
     event.preventDefault();
     
@@ -1416,6 +1421,11 @@ function guardarFactura(event) {
     // Actualizar KARDEX inmediatamente (ya es permanente)
     mostrarDashboardKardex();
     cargarListaCompras();
+}
+
+// Exponer guardarFactura después de su declaración
+if (typeof window !== 'undefined') {
+    window.guardarFactura = guardarFactura;
 }
 
 function actualizarKardex(producto, cantidadIngreso, fecha) {
