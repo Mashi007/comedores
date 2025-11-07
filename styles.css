@@ -35,13 +35,16 @@ body.sidebar-open {
     display: none;
     min-height: 100vh;
     transition: margin-left 0.3s ease;
+    position: relative;
+    width: 100%;
 }
 
 .screen.active {
     display: block;
 }
 
-body.sidebar-open .screen.active {
+/* Ajuste de margen solo para pantallas del sistema (no portada/login) */
+body.sidebar-open .screen.active:not(#portada):not(#login) {
     margin-left: 280px;
 }
 
@@ -49,6 +52,12 @@ body.sidebar-open .screen.active {
     body.sidebar-open .screen.active {
         margin-left: 0;
     }
+}
+
+/* Asegurar que portada y login nunca tengan margen del sidebar */
+#portada.active,
+#login.active {
+    margin-left: 0 !important;
 }
 
 /* Portada - Diseño Premium */

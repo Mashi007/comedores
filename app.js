@@ -159,14 +159,25 @@ window.cambiarPantalla = function(ocultar, mostrar) {
         
         // Mostrar/ocultar sidebar según la pantalla
         const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
         const pantallasConSidebar = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'configuracion'];
+        const pantallasPublicas = ['portada', 'login'];
         
-        if (pantallasConSidebar.includes(mostrar)) {
+        // Ocultar sidebar completamente en pantallas públicas
+        if (pantallasPublicas.includes(mostrar)) {
+            sidebar.style.display = 'none';
+            sidebar.classList.remove('open');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+            document.body.classList.remove('sidebar-open');
+        } else if (pantallasConSidebar.includes(mostrar)) {
+            // Mostrar sidebar solo en pantallas del sistema (después del login)
             sidebar.style.display = 'flex';
         } else {
+            // Por defecto, ocultar
             sidebar.style.display = 'none';
+            sidebar.classList.remove('open');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('active');
             document.body.classList.remove('sidebar-open');
-            document.getElementById('sidebarOverlay').classList.remove('active');
         }
         
         console.log('Pantalla cambiada de', ocultar, 'a', mostrar);
@@ -230,17 +241,27 @@ window.toggleSidebar = function() {
 };
 
 window.cerrarSesion = function() {
-    // Cerrar sidebar si está abierto
+    // Cerrar sidebar completamente
     const sidebar = document.getElementById('sidebar');
-    if (sidebar.classList.contains('open')) {
-        toggleSidebar();
-    }
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
     
-    cambiarPantalla('menu', 'portada');
+    if (sidebar) {
+        sidebar.classList.remove('open');
+        sidebar.style.display = 'none';
+    }
+    if (sidebarOverlay) {
+        sidebarOverlay.classList.remove('active');
+    }
+    document.body.classList.remove('sidebar-open');
+    
+    // Resetear formulario de login
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.reset();
     }
+    
+    // Volver a la portada
+    cambiarPantalla('menu', 'portada');
     
     ToastNotification.show('Sesión cerrada correctamente', 'info');
 };
