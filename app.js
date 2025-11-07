@@ -979,13 +979,14 @@ function crearGrafico8() {
         type: 'bubble',
         data: {
             datasets: productos.map((p) => {
+                // Usar reorden original para calcular cuadrante, pero normalizado para posición Y
                 const cuadrante = getCuadrante(p.stock, p.reorder);
                 return {
                     label: p.name,
                     data: [{
                         x: p.stock,
-                        y: p.reorder,
-                        r: Math.max(p.usage * 1.2, 15)
+                        y: p.reorderNormalizado, // Usar reorden normalizado para alinear en fila
+                        r: Math.max(p.usage * 1.5, 18) // Aumentar tamaño de burbujas
                     }],
                     backgroundColor: getColorByCuadrante(cuadrante, '80'),
                     borderColor: getColorByCuadrante(cuadrante, 'FF'),
