@@ -7125,12 +7125,12 @@ function generarDatosMockOrdenesCompra() {
     if (!comprasData.ordenesCompra) {
         comprasData.ordenesCompra = [];
     }
-    
+
     // Si ya hay órdenes, no generar más
     if (comprasData.ordenesCompra.length > 0) {
         return;
     }
-    
+
     const proveedores = ['Distribuidora Alimentos SA', 'Carnes Premium Ltda', 'Verduras Frescas SL', 'Granos y Cereales SA', 'Productos Lácteos del Sur'];
     const productosBase = [
         { nombre: 'Arroz Premium', unidad: 'kg', precioBase: 2.50 },
@@ -7144,31 +7144,33 @@ function generarDatosMockOrdenesCompra() {
         { nombre: 'Huevos', unidad: 'unidad', precioBase: 0.15 },
         { nombre: 'Leche Entera', unidad: 'L', precioBase: 1.20 }
     ];
+
+    // Generar 8 órdenes con diferentes estados
+    const estados = ['pendiente_verificacion', 'pendiente_verificacion', 'pendiente_verificacion', 'pendiente_verificacion', 'aprobada', 'aprobada', 'rechazada', 'rechazada'];
     
-    // Generar 5 órdenes de compra pendientes
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
         const proveedor = proveedores[Math.floor(Math.random() * proveedores.length)];
         const fechaFactura = new Date();
-        fechaFactura.setDate(fechaFactura.getDate() - Math.floor(Math.random() * 7)); // Últimos 7 días
-        
+        fechaFactura.setDate(fechaFactura.getDate() - Math.floor(Math.random() * 10)); // Últimos 10 días
+
         // Seleccionar 3-6 productos aleatorios
         const numProductos = Math.floor(Math.random() * 4) + 3;
         const productosSeleccionados = [];
         const productosUsados = new Set();
-        
+
         for (let j = 0; j < numProductos; j++) {
             let producto;
             do {
                 producto = productosBase[Math.floor(Math.random() * productosBase.length)];
             } while (productosUsados.has(producto.nombre));
-            
+
             productosUsados.add(producto.nombre);
-            
-            const cantidad = producto.unidad === 'unidad' 
-                ? Math.floor(Math.random() * 200) + 50 
+
+            const cantidad = producto.unidad === 'unidad'
+                ? Math.floor(Math.random() * 200) + 50
                 : Math.random() * 50 + 10;
             const precioUnit = producto.precioBase * (0.9 + Math.random() * 0.2); // Variación ±10%
-            
+
             productosSeleccionados.push({
                 producto: producto.nombre,
                 cantidad: parseFloat(cantidad.toFixed(2)),
@@ -7177,9 +7179,32 @@ function generarDatosMockOrdenesCompra() {
                 subtotal: parseFloat((cantidad * precioUnit).toFixed(2))
             });
         }
-        
+
         const total = productosSeleccionados.reduce((sum, p) => sum + p.subtotal, 0);
+        const estado = estados[i];
         
+        // Generar datos de verificación si está aprobada o rechazada
+        let verificacionCalidad = null;
+        if (estado === 'aprobada' || estado === 'rechazada') {
+            const fechaVerificacion = new Date(fechaFactura);
+            fechaVerificacion.setDate(fechaVerificacion.getDate() + 1);
+            
+            verificacionCalidad = {
+                fechaVerificacion: fechaVerificacion.toISOString(),
+                verificador: estado === 'aprobada' ? 'María González' : 'Carlos Rodríguez',
+                observaciones: estado === 'aprobada' 
+                    ? 'Productos recibidos en buen estado. Cumple con estándares de calidad.'
+                    : 'Productos con problemas de calidad. Se requiere devolución parcial.',
+                productosVerificados: productosSeleccionados.map(p => ({
+                    ...p,
+                    cantidadRecibida: estado === 'aprobada' ? p.cantidad : p.cantidad * 0.8,
+                    devolucion: estado === 'rechazada' ? p.cantidad * 0.2 : 0,
+                    motivoDevolucion: estado === 'rechazada' ? 'calidad' : '',
+                    estado: estado === 'aprobada' ? 'aprobado' : 'rechazado'
+                }))
+            };
+        }
+
         const ordenCompra = {
             id: Date.now() + i,
             numeroOrden: `OC-${String(Date.now() + i).slice(-6)}`,
@@ -7189,12 +7214,12 @@ function generarDatosMockOrdenesCompra() {
             productos: productosSeleccionados,
             total: parseFloat(total.toFixed(2)),
             fechaRegistro: new Date().toISOString(),
-            estado: 'pendiente_verificacion',
-            verificacionCalidad: null
+            estado: estado,
+            verificacionCalidad: verificacionCalidad
         };
-        
+
         comprasData.ordenesCompra.push(ordenCompra);
-        
+
         // También crear factura para compatibilidad
         const factura = {
             id: ordenCompra.id,
@@ -7206,16 +7231,16 @@ function generarDatosMockOrdenesCompra() {
             fechaRegistro: ordenCompra.fechaRegistro,
             ordenCompra: ordenCompra.numeroOrden
         };
-        
+
         if (!comprasData.facturas) {
             comprasData.facturas = [];
         }
         comprasData.facturas.push(factura);
     }
-    
+
     // Guardar en memoria
     guardarComprasEnMemoria();
-    console.log(`📦 Generadas ${comprasData.ordenesCompra.length} órdenes de compra mock para Control de Calidad`);
+    console.log(`📦 Generadas ${comprasData.ordenesCompra.length} órdenes de compra mock para Control de Calidad (con diferentes estados)`);
 }
 
 // Inicializar módulo de calidad
@@ -7236,33 +7261,71 @@ function inicializarModuloCalidad() {
 
 // Cargar órdenes pendientes de verificación
 function cargarOrdenesPendientes() {
-    const container = document.getElementById('ordenesCalidadList');
+    const container = document.getElementById('ordenesCalidadGrid');
     if (!container) return;
     
-    // Obtener órdenes pendientes
-    const ordenesPendientes = (comprasData.ordenesCompra || []).filter(oc => 
-        oc.estado === 'pendiente_verificacion'
-    );
+    // Obtener filtro actual
+    const filtro = document.getElementById('filtroEstadoCalidad')?.value || 'todas';
     
-    if (ordenesPendientes.length === 0) {
+    let ordenesFiltradas = (comprasData.ordenesCompra || []);
+    
+    // Aplicar filtro
+    if (filtro === 'pendiente') {
+        ordenesFiltradas = ordenesFiltradas.filter(oc => oc.estado === 'pendiente_verificacion');
+    } else if (filtro === 'aprobada') {
+        ordenesFiltradas = ordenesFiltradas.filter(oc => oc.estado === 'aprobada');
+    } else if (filtro === 'rechazada') {
+        ordenesFiltradas = ordenesFiltradas.filter(oc => oc.estado === 'rechazada');
+    }
+    
+    // Ordenar por fecha (más recientes primero)
+    ordenesFiltradas.sort((a, b) => new Date(b.fechaFactura) - new Date(a.fechaFactura));
+    
+    if (ordenesFiltradas.length === 0) {
         container.innerHTML = `
             <div class="orden-vacia">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.3; margin-bottom: 1rem;">
                     <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <p>No hay órdenes pendientes de verificación</p>
+                <p>No hay órdenes ${filtro === 'todas' ? '' : filtro === 'pendiente' ? 'pendientes' : filtro === 'aprobada' ? 'aprobadas' : 'rechazadas'} de verificación</p>
             </div>
         `;
         return;
     }
     
-    container.innerHTML = ordenesPendientes.map(orden => {
+    container.innerHTML = ordenesFiltradas.map(orden => {
         const fecha = new Date(orden.fechaFactura);
         const fechaFormateada = fecha.toLocaleDateString('es-ES', { 
             day: '2-digit', 
             month: '2-digit', 
             year: 'numeric' 
         });
+        
+        // Determinar estado y badge
+        let estadoTexto = 'Pendiente';
+        let estadoClase = 'pendiente';
+        let botonTexto = 'Verificar Calidad';
+        let botonIcono = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>`;
+        
+        if (orden.estado === 'aprobada') {
+            estadoTexto = 'Aprobada';
+            estadoClase = 'aprobada';
+            botonTexto = 'Ver Detalle';
+            botonIcono = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                        </svg>`;
+        } else if (orden.estado === 'rechazada') {
+            estadoTexto = 'Rechazada';
+            estadoClase = 'rechazada';
+            botonTexto = 'Ver Detalle';
+            botonIcono = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                        </svg>`;
+        }
         
         return `
             <div class="orden-calidad-card" onclick="abrirVerificacionCalidad('${orden.id}')">
@@ -7271,7 +7334,7 @@ function cargarOrdenesPendientes() {
                         <h3>${orden.numeroOrden}</h3>
                         <p class="orden-proveedor">${orden.proveedor}</p>
                     </div>
-                    <span class="badge-estado pendiente">Pendiente</span>
+                    <span class="badge-estado ${estadoClase}">${estadoTexto}</span>
                 </div>
                 <div class="orden-calidad-body">
                     <div class="orden-detail">
@@ -7290,13 +7353,17 @@ function cargarOrdenesPendientes() {
                         <span class="detail-label">Total:</span>
                         <span class="detail-value destacado">$${orden.total.toLocaleString('es-ES', {minimumFractionDigits: 2})}</span>
                     </div>
+                    ${orden.verificacionCalidad ? `
+                    <div class="orden-detail">
+                        <span class="detail-label">Verificador:</span>
+                        <span class="detail-value">${orden.verificacionCalidad.verificador}</span>
+                    </div>
+                    ` : ''}
                 </div>
                 <div class="orden-calidad-footer">
                     <button class="btn-verificar" onclick="event.stopPropagation(); abrirVerificacionCalidad('${orden.id}')">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        Verificar Calidad
+                        ${botonIcono}
+                        ${botonTexto}
                     </button>
                 </div>
             </div>
@@ -7395,10 +7462,21 @@ function abrirVerificacionCalidad(ordenId) {
                     </select>
                 </td>
                 <td>
+                    <select class="estado-producto-select" 
+                            data-index="${index}"
+                            onchange="actualizarTotalesCalidad()"
+                            style="min-width: 120px;">
+                        <option value="pendiente" selected>Pendiente</option>
+                        <option value="aprobado">Aprobado</option>
+                        <option value="rechazado">Rechazado</option>
+                    </select>
+                </td>
+                <td>
                     <textarea class="observaciones-calidad-input" 
                               data-index="${index}"
                               rows="2" 
                               placeholder="Observaciones de calidad..."
+                              style="min-width: 200px;"
                               onchange="actualizarTotalesCalidad()"></textarea>
                 </td>
             </tr>
@@ -7728,27 +7806,7 @@ function cargarHistorialCalidad() {
 
 // Filtrar órdenes de calidad
 function filtrarOrdenesCalidad() {
-    const filtro = document.getElementById('filtroEstadoCalidad')?.value;
-    const ordenes = (comprasData.ordenesCompra || []);
-    
-    let ordenesFiltradas = ordenes;
-    if (filtro) {
-        if (filtro === 'pendiente') {
-            ordenesFiltradas = ordenes.filter(oc => oc.estado === 'pendiente_verificacion');
-        } else if (filtro === 'aprobada') {
-            ordenesFiltradas = ordenes.filter(oc => oc.estado === 'aprobada');
-        } else if (filtro === 'rechazada') {
-            ordenesFiltradas = ordenes.filter(oc => oc.estado === 'rechazada');
-        }
-    }
-    
-    // Actualizar lista
-    const container = document.getElementById('ordenesCalidadList');
-    if (container) {
-        if (filtro === 'pendiente' || !filtro) {
-            cargarOrdenesPendientes();
-        }
-    }
+    cargarOrdenesPendientes();
 }
 
 // Ver detalle de verificación
