@@ -219,7 +219,14 @@ function inicializarGraficos() {
     });
     chartInstances = {};
     
-    // Crear gráficos
+    // Actualizar KPIs
+    actualizarKPIsDashboard();
+    
+    // Crear gráficos principales
+    crearGraficoTendenciaPrincipal();
+    crearGraficoEficienciaModulos();
+    
+    // Crear gráficos secundarios
     crearGrafico1();
     crearGrafico2();
     crearGrafico3();
@@ -229,6 +236,48 @@ function inicializarGraficos() {
     crearGrafico7();
     crearGrafico8();
     crearGrafico9();
+    
+    // Crear gráficos innovadores
+    crearGraficoHeatmap();
+    crearGraficoDesviaciones();
+    crearGraficoROI();
+}
+
+// Actualizar KPIs del Dashboard
+function actualizarKPIsDashboard() {
+    // Calcular eficiencia general (promedio de eficiencias)
+    const eficienciaGeneral = 87.5; // Mock - calcular desde datos reales
+    document.getElementById('kpiEficienciaGeneral').textContent = eficienciaGeneral.toFixed(1) + '%';
+    
+    // Calcular producción total
+    const produccionTotal = 2450; // Mock - calcular desde produccionData
+    document.getElementById('kpiProduccionTotal').textContent = produccionTotal.toLocaleString('es-ES');
+    
+    // Calcular costo promedio por charola
+    const costoPromedio = 12.50; // Mock - calcular desde costosData
+    document.getElementById('kpiCostoPromedio').textContent = '$' + costoPromedio.toFixed(2);
+    
+    // Calcular satisfacción promedio
+    const satisfaccionPromedio = 4.3; // Mock - calcular desde satisfaccionData
+    document.getElementById('kpiSatisfaccionPromedio').textContent = satisfaccionPromedio.toFixed(1);
+}
+
+// Función para actualizar dashboard con filtros
+function actualizarDashboard() {
+    const periodo = document.getElementById('filtroPeriodoDashboard')?.value || 30;
+    inicializarGraficos();
+}
+
+// Función para exportar dashboard
+function exportarDashboard() {
+    ToastNotification.show('Exportando dashboard...', 'info', 2000);
+    // Implementar exportación a PDF/Excel
+}
+
+// Función para cambiar vista de gráfico
+function toggleChartView(chartId) {
+    ToastNotification.show('Cambiando vista del gráfico...', 'info', 1500);
+    // Implementar cambio de tipo de gráfico
 }
 
 function crearGrafico1() {

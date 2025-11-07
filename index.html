@@ -306,44 +306,200 @@
     <div id="dashboard" class="screen">
         <div class="page-container">
             <div class="page-header">
-                <h1>Dashboard</h1>
+                <div class="header-left">
+                    <h1>Dashboard Gerencial</h1>
+                    <p class="header-subtitle">Vista ejecutiva de métricas y tendencias</p>
+                </div>
+                <div class="header-actions-dashboard">
+                    <select id="filtroPeriodoDashboard" onchange="actualizarDashboard()" class="dashboard-filter">
+                        <option value="7">Últimos 7 días</option>
+                        <option value="15">Últimos 15 días</option>
+                        <option value="30" selected>Últimos 30 días</option>
+                        <option value="90">Últimos 90 días</option>
+                    </select>
+                    <button class="btn-primary" onclick="exportarDashboard()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M17 8L12 3M12 3L7 8M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Exportar
+                    </button>
+                </div>
             </div>
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <h3>Consumo de Inventario</h3>
+
+            <!-- KPIs Gerenciales -->
+            <div class="dashboard-kpis-exec">
+                <div class="kpi-exec-card primary">
+                    <div class="kpi-exec-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-exec-content">
+                        <h3 id="kpiEficienciaGeneral">0%</h3>
+                        <p>Eficiencia General</p>
+                        <div class="kpi-exec-trend">
+                            <span class="trend-icon">↑</span>
+                            <span class="trend-value">+5.2%</span>
+                            <span class="trend-label">vs mes anterior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="kpi-exec-card success">
+                    <div class="kpi-exec-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-exec-content">
+                        <h3 id="kpiProduccionTotal">0</h3>
+                        <p>Producción Total (Charolas)</p>
+                        <div class="kpi-exec-trend">
+                            <span class="trend-icon">↑</span>
+                            <span class="trend-value">+12%</span>
+                            <span class="trend-label">vs mes anterior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="kpi-exec-card warning">
+                    <div class="kpi-exec-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-exec-content">
+                        <h3 id="kpiCostoPromedio">$0.00</h3>
+                        <p>Costo Promedio por Charola</p>
+                        <div class="kpi-exec-trend">
+                            <span class="trend-icon">↓</span>
+                            <span class="trend-value">-3.1%</span>
+                            <span class="trend-label">vs mes anterior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="kpi-exec-card info">
+                    <div class="kpi-exec-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-exec-content">
+                        <h3 id="kpiSatisfaccionPromedio">0.0</h3>
+                        <p>Satisfacción Promedio</p>
+                        <div class="kpi-exec-trend">
+                            <span class="trend-icon">↑</span>
+                            <span class="trend-value">+0.3</span>
+                            <span class="trend-label">vs mes anterior</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos Principales -->
+            <div class="dashboard-main-charts">
+                <div class="chart-card-exec large">
+                    <div class="chart-header-exec">
+                        <h3>Tendencia de Producción y Costos</h3>
+                        <div class="chart-legend-exec">
+                            <span class="legend-item"><span class="legend-color" style="background: #3b82f6;"></span> Producción</span>
+                            <span class="legend-item"><span class="legend-color" style="background: #10b981;"></span> Costos</span>
+                        </div>
+                    </div>
+                    <canvas id="chartTendenciaPrincipal" width="400" height="300"></canvas>
+                </div>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Eficiencia por Módulo</h3>
+                    </div>
+                    <canvas id="chartEficienciaModulos" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Grid de Gráficos Secundarios -->
+            <div class="charts-grid-exec">
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Consumo de Inventario</h3>
+                        <button class="chart-action-btn" onclick="toggleChartView('chart1')" title="Cambiar vista">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
                     <canvas id="chart1" width="400" height="250"></canvas>
                 </div>
-                <div class="chart-card">
-                    <h3>Distribución de Compras</h3>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Distribución de Compras</h3>
+                    </div>
                     <canvas id="chart2" width="400" height="250"></canvas>
                 </div>
-                <div class="chart-card">
-                    <h3>Producción Diaria</h3>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Producción Diaria</h3>
+                    </div>
                     <canvas id="chart3" width="400" height="250"></canvas>
                 </div>
-                <div class="chart-card">
-                    <h3>Top Productos</h3>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Top Productos</h3>
+                    </div>
                     <canvas id="chart4" width="400" height="250"></canvas>
                 </div>
-                <div class="chart-card">
-                    <h3>Satisfacción</h3>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Satisfacción del Cliente</h3>
+                    </div>
                     <canvas id="chart5" width="400" height="250"></canvas>
                 </div>
-                <div class="chart-card">
-                    <h3>Merma vs Planificado</h3>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Merma vs Planificado</h3>
+                    </div>
                     <canvas id="chart6" width="400" height="250"></canvas>
                 </div>
-                <div class="chart-card">
-                    <h3>Merma por Receta</h3>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Merma por Receta</h3>
+                    </div>
                     <canvas id="chart7" width="400" height="250"></canvas>
                 </div>
-                <div class="chart-card">
-                    <h3>Inventario por Producto (Burbujas)</h3>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Inventario por Producto</h3>
+                    </div>
                     <canvas id="chart8" width="400" height="250"></canvas>
                 </div>
-                <div class="chart-card">
-                    <h3>Costos Variables por Tipo de Comida</h3>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Costos por Tipo de Comida</h3>
+                    </div>
                     <canvas id="chart9" width="400" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Nuevos Gráficos Innovadores -->
+            <div class="dashboard-innovative-charts">
+                <div class="chart-card-exec large">
+                    <div class="chart-header-exec">
+                        <h3>Heatmap de Actividad Semanal</h3>
+                        <p class="chart-subtitle">Intensidad de producción por día y comida</p>
+                    </div>
+                    <canvas id="chartHeatmap" width="400" height="300"></canvas>
+                </div>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Análisis de Desviaciones</h3>
+                    </div>
+                    <canvas id="chartDesviaciones" width="400" height="300"></canvas>
+                </div>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>ROI por Categoría</h3>
+                    </div>
+                    <canvas id="chartROI" width="400" height="300"></canvas>
                 </div>
             </div>
         </div>
