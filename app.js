@@ -31,11 +31,54 @@ const mockData = {
         { id: 11, fecha: '2024-01-25', proveedor: 'Proveedor B', factura: 'FAC-011', productos: 'Carne de Res, Pollo', monto: 5800, estado: 'Procesada' },
         { id: 12, fecha: '2024-01-26', proveedor: 'Proveedor A', factura: 'FAC-012', productos: 'Verduras varias', monto: 2200, estado: 'Procesada' }
     ],
-    movimientosInventario: [],
-    menus: [],
-    produccion: [],
-    encuestas: [],
-    notificaciones: []
+    movimientosInventario: [
+        { id: 1, fecha: '2024-01-20', producto: 'Arroz', tipo: 'entrada', cantidad: 50, observaciones: 'Compra proveedor A' },
+        { id: 2, fecha: '2024-01-21', producto: 'Frijoles', tipo: 'salida', cantidad: 15, observaciones: 'Uso en producción' },
+        { id: 3, fecha: '2024-01-22', producto: 'Papa', tipo: 'entrada', cantidad: 100, observaciones: 'Compra proveedor B' }
+    ],
+    menus: [
+        {
+            id: 1,
+            fecha: '2024-01-25',
+            recetas: [
+                {
+                    nombre: 'Arroz con Frijoles',
+                    materiales: [
+                        { producto: 'Arroz', cantidad: 20 },
+                        { producto: 'Frijoles', cantidad: 15 }
+                    ]
+                },
+                {
+                    nombre: 'Carne Asada',
+                    materiales: [
+                        { producto: 'Carne de Res', cantidad: 30 }
+                    ]
+                }
+            ],
+            fechaCreacion: '2024-01-24T10:00:00Z'
+        }
+    ],
+    produccion: [
+        { id: 1, fecha: '2024-01-25', menuId: 1, receta: 'Arroz con Frijoles', cantidad: 150, charolas: 8, merma: 2.5, observaciones: 'Producción normal', estado: 'Reportado' },
+        { id: 2, fecha: '2024-01-25', menuId: 1, receta: 'Carne Asada', cantidad: 120, charolas: 6, merma: 1.8, observaciones: 'Buena calidad', estado: 'Reportado' }
+    ],
+    encuestas: [
+        {
+            id: 1,
+            titulo: 'Satisfacción del Menú de Hoy',
+            preguntas: ['¿Cómo calificaría la calidad de la comida?', '¿El servicio fue rápido?', '¿Recomendaría nuestro comedor?'],
+            fechaCreacion: '2024-01-25T08:00:00Z',
+            url: 'https://encuesta.com/123456'
+        }
+    ],
+    notificaciones: [],
+    configuracion: {
+        stockMinimoGlobal: 50,
+        porcionesCharola: 20,
+        horarioServicio: '12:00',
+        whatsappAPI: '+52 123 456 7890',
+        ocrService: 'google'
+    }
 };
 
 // Navegación - Disponible inmediatamente (scope global)
@@ -238,6 +281,13 @@ window.navegar = function(destino) {
         cargarEncuestas();
     } else if (destino === 'notificaciones') {
         cargarNotificaciones();
+    } else if (destino === 'configuracion') {
+        cargarConfiguracion();
+    }
+    
+    // Cargar productos en selects cuando sea necesario
+    if (destino === 'inventario' || destino === 'planificacion') {
+        setTimeout(() => cargarProductosEnSelects(), 100);
     }
 };
 
@@ -939,7 +989,20 @@ function crearGrafico6() {
 }
 
 // Compras
-function simularOCRWhatsApp() {
+window.simularOCRWhatsApp = function() {
+    const proveedores = ['Proveedor A', 'Proveedor B', 'Proveedor C', 'Proveedor Nuevo'];
+    const productosEjemplo = [
+        { nombre: 'Arroz', cantidad: 50 },
+        { nombre: 'Frijoles', cantidad: 30 },
+        { nombre: 'Papa', cantidad: 40 },
+        { nombre: 'Carne de Res', cantidad: 25 }
+    ];
+    
+    const proveedorAleatorio = proveedores[Math.floor(Math.random() * proveedores.length)];
+    const productosAleatorios = productosEjemplo.sort(() => 0.5 - Math.random()).slice(0, 2);
+    const monto = Math.floor(Math.random() * 5000) + 2000;
+    const numFactura = 'FAC-NEW-' + String(mockData.compras.length + 1).padStart(3, '0');
+    
     const modal = document.createElement('div');
     modal.className = 'whatsapp-modal';
     modal.innerHTML = `
@@ -948,33 +1011,34 @@ function simularOCRWhatsApp() {
             <h3>Simulación de Ingreso por WhatsApp</h3>
             <p>Se ha recibido una factura por WhatsApp y procesado con OCR</p>
             <div style="margin: 1.5rem 0; padding: 1rem; background: #f0f0f0; border-radius: 0.5rem; text-align: left;">
-                <p><strong>Proveedor:</strong> Proveedor Nuevo</p>
-                <p><strong>Factura:</strong> FAC-NEW-001</p>
-                <p><strong>Productos detectados:</strong> Arroz 50kg, Frijoles 30kg</p>
-                <p><strong>Monto:</strong> $3,200</p>
+                <p><strong>Proveedor:</strong> ${proveedorAleatorio}</p>
+                <p><strong>Factura:</strong> ${numFactura}</p>
+                <p><strong>Productos detectados:</strong> ${productosAleatorios.map(p => `${p.nombre} ${p.cantidad}kg`).join(', ')}</p>
+                <p><strong>Monto:</strong> $${monto.toLocaleString()}</p>
             </div>
-            <button class="btn-primary" onclick="procesarFacturaOCR(this)">Procesar Factura</button>
+            <button class="btn-primary" onclick="procesarFacturaOCR(this, '${proveedorAleatorio}', '${numFactura}', ${monto}, '${productosAleatorios.map(p => `${p.nombre} ${p.cantidad}kg`).join(', ')}')">Procesar Factura</button>
             <button class="btn-secondary" onclick="this.closest('.whatsapp-modal').remove()" style="margin-top: 0.5rem;">Cerrar</button>
         </div>
     `;
     document.body.appendChild(modal);
-}
+    ToastNotification.show('Factura recibida por WhatsApp, procesando con OCR...', 'info');
+};
 
-function procesarFacturaOCR(btn) {
+window.procesarFacturaOCR = function(btn, proveedor, factura, monto, productos) {
     const nuevaCompra = {
         id: mockData.compras.length + 1,
         fecha: new Date().toISOString().split('T')[0],
-        proveedor: 'Proveedor Nuevo',
-        factura: 'FAC-NEW-001',
-        productos: 'Arroz, Frijoles',
-        monto: 3200,
+        proveedor: proveedor,
+        factura: factura,
+        productos: productos,
+        monto: monto,
         estado: 'Procesada'
     };
     mockData.compras.unshift(nuevaCompra);
     cargarCompras();
     btn.closest('.whatsapp-modal').remove();
-    alert('Factura procesada exitosamente');
-}
+    ToastNotification.show(`Factura ${factura} procesada exitosamente`, 'success');
+};
 
 function cargarCompras() {
     const tbody = document.getElementById('tablaCompras');
@@ -1064,9 +1128,11 @@ function cargarProductosEnSelects() {
     });
 }
 
-function mostrarFormularioInventario() {
+window.mostrarFormularioInventario = function() {
     document.getElementById('formularioInventario').style.display = 'block';
-}
+    // Asegurar que el select tenga datos
+    setTimeout(() => cargarProductosEnSelects(), 100);
+};
 
 function ocultarFormularioInventario() {
     document.getElementById('formularioInventario').style.display = 'none';
@@ -1158,17 +1224,19 @@ function cargarInventario() {
 }
 
 // Planificación de Menús
-function nuevoMenu() {
+window.nuevoMenu = function() {
     const fecha = document.getElementById('fechaMenu').value;
     if (!fecha) {
-        alert('Seleccione una fecha');
+        ToastNotification.show('Seleccione una fecha para el menú', 'warning');
         return;
     }
     document.getElementById('fechaMenuForm').value = fecha;
     document.getElementById('formularioMenu').style.display = 'block';
-}
+    // Asegurar que los selects tengan datos
+    setTimeout(() => cargarProductosEnSelects(), 100);
+};
 
-function agregarReceta() {
+window.agregarReceta = function() {
     const container = document.getElementById('recetasContainer');
     const numRecetas = container.children.length + 1;
     const nuevaReceta = document.createElement('div');
@@ -1192,9 +1260,10 @@ function agregarReceta() {
     `;
     container.appendChild(nuevaReceta);
     cargarProductosEnSelects();
-}
+    ToastNotification.show(`Receta ${numRecetas} agregada`, 'info');
+};
 
-function agregarMaterial(btn) {
+window.agregarMaterial = function(btn) {
     const materialesReceta = btn.closest('.materiales-receta');
     const nuevoMaterial = document.createElement('div');
     nuevoMaterial.className = 'material-item';
@@ -1207,7 +1276,7 @@ function agregarMaterial(btn) {
     `;
     materialesReceta.appendChild(nuevoMaterial);
     cargarProductosEnSelects();
-}
+};
 
 window.guardarMenu = function(event) {
     event.preventDefault();
@@ -1268,9 +1337,10 @@ window.guardarMenu = function(event) {
     return false;
 };
 
-function cancelarMenu() {
+window.cancelarMenu = function() {
     document.getElementById('formularioMenu').style.display = 'none';
-    document.getElementById('formularioMenu').querySelector('form').reset();
+    const form = document.getElementById('formularioMenu').querySelector('form');
+    if (form) form.reset();
     document.getElementById('recetasContainer').innerHTML = `
         <div class="receta-item">
             <h4>Receta 1</h4>
@@ -1291,7 +1361,7 @@ function cancelarMenu() {
         </div>
     `;
     cargarProductosEnSelects();
-}
+};
 
 function cargarMenus() {
     const container = document.getElementById('menusList');
@@ -1317,6 +1387,58 @@ function cargarMenus() {
             </div>
         </div>
     `).join('');
+}
+
+window.guardarConfiguracion = function(event) {
+    event.preventDefault();
+    const form = event.target;
+    const button = form.querySelector('button[type="submit"]');
+    
+    const config = {
+        stockMinimoGlobal: parseInt(document.getElementById('stockMinimoGlobal').value),
+        porcionesCharola: parseInt(document.getElementById('porcionesCharola').value),
+        horarioServicio: document.getElementById('horarioServicio').value,
+        whatsappAPI: document.getElementById('whatsappAPI').value,
+        ocrService: document.getElementById('ocrService').value
+    };
+    
+    LoadingState.setLoading(button, 'Guardando...');
+    
+    setTimeout(() => {
+        mockData.configuracion = config;
+        LoadingState.removeLoading(button);
+        ToastNotification.show('Configuración guardada exitosamente', 'success');
+    }, 600);
+    
+    return false;
+};
+
+window.resetearConfiguracion = function() {
+    if (confirm('¿Desea restaurar los valores por defecto?')) {
+        document.getElementById('stockMinimoGlobal').value = 50;
+        document.getElementById('porcionesCharola').value = 20;
+        document.getElementById('horarioServicio').value = '12:00';
+        document.getElementById('whatsappAPI').value = '+52 123 456 7890';
+        document.getElementById('ocrService').value = 'google';
+        ToastNotification.show('Valores restaurados', 'info');
+    }
+};
+
+function cargarConfiguracion() {
+    const config = mockData.configuracion;
+    if (!config) return;
+    
+    const stockMinimo = document.getElementById('stockMinimoGlobal');
+    const porciones = document.getElementById('porcionesCharola');
+    const horario = document.getElementById('horarioServicio');
+    const whatsapp = document.getElementById('whatsappAPI');
+    const ocr = document.getElementById('ocrService');
+    
+    if (stockMinimo) stockMinimo.value = config.stockMinimoGlobal || 50;
+    if (porciones) porciones.value = config.porcionesCharola || 20;
+    if (horario) horario.value = config.horarioServicio || '12:00';
+    if (whatsapp) whatsapp.value = config.whatsappAPI || '+52 123 456 7890';
+    if (ocr) ocr.value = config.ocrService || 'google';
 }
 
 window.generarCompras = function() {
@@ -1383,27 +1505,35 @@ function cargarMenusEnProduccion() {
     
     select.innerHTML = '<option value="">Seleccionar menú del día...</option>' +
         mockData.menus.map(menu => 
-            `<option value="${menu.id}">${new Date(menu.fecha).toLocaleDateString()}</option>`
+            `<option value="${menu.id}">${new Date(menu.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</option>`
         ).join('');
+    
+    // Si hay menús, seleccionar el primero por defecto
+    if (mockData.menus.length > 0 && !select.value) {
+        select.value = mockData.menus[0].id;
+    }
 }
 
 // Producción
-function mostrarFormularioProduccion() {
+window.mostrarFormularioProduccion = function() {
     const menuId = document.getElementById('menuProduccion').value;
     if (!menuId) {
-        alert('Seleccione un menú primero');
+        ToastNotification.show('Seleccione un menú primero', 'warning');
         return;
     }
     
     const menu = mockData.menus.find(m => m.id === parseInt(menuId));
-    if (!menu) return;
+    if (!menu) {
+        ToastNotification.show('Menú no encontrado', 'error');
+        return;
+    }
     
     const selectReceta = document.getElementById('recetaProduccion');
     selectReceta.innerHTML = '<option value="">Seleccionar receta...</option>' +
         menu.recetas.map((r, i) => `<option value="${i}">${r.nombre}</option>`).join('');
     
     document.getElementById('formularioProduccion').style.display = 'block';
-}
+};
 
 function ocultarFormularioProduccion() {
     document.getElementById('formularioProduccion').style.display = 'none';
@@ -1495,36 +1625,58 @@ function cargarProduccion() {
 }
 
 // Servicio al Cliente
-function crearEncuesta() {
+window.crearEncuesta = function() {
     document.getElementById('formularioEncuesta').style.display = 'block';
-}
+};
 
-function cancelarEncuesta() {
+window.cancelarEncuesta = function() {
     document.getElementById('formularioEncuesta').style.display = 'none';
-    document.getElementById('formularioEncuesta').querySelector('form').reset();
-}
+    const form = document.getElementById('formularioEncuesta').querySelector('form');
+    if (form) form.reset();
+};
 
-function guardarEncuesta(event) {
+window.guardarEncuesta = function(event) {
     event.preventDefault();
+    const form = event.target;
+    const button = form.querySelector('button[type="submit"]');
+    
+    if (!FormValidator.validateForm(form)) {
+        ToastNotification.show('Por favor, completa todos los campos requeridos', 'error');
+        return false;
+    }
+    
     const titulo = document.getElementById('tituloEncuesta').value;
     const preguntasTexto = document.getElementById('preguntasEncuesta').value;
     const preguntas = preguntasTexto.split('\n').filter(p => p.trim());
     
-    const encuesta = {
-        id: mockData.encuestas.length + 1,
-        titulo,
-        preguntas,
-        fechaCreacion: new Date().toISOString(),
-        url: `https://encuesta.com/${Date.now()}`
-    };
+    if (preguntas.length === 0) {
+        ToastNotification.show('Agrega al menos una pregunta', 'error');
+        return false;
+    }
     
-    mockData.encuestas.push(encuesta);
-    cargarEncuestas();
-    cancelarEncuesta();
+    LoadingState.setLoading(button, 'Generando...');
     
-    // Generar QR
-    generarQR(encuesta);
-}
+    setTimeout(() => {
+        const encuesta = {
+            id: mockData.encuestas.length + 1,
+            titulo,
+            preguntas,
+            fechaCreacion: new Date().toISOString(),
+            url: `https://encuesta.com/${Date.now()}`
+        };
+        
+        mockData.encuestas.push(encuesta);
+        cargarEncuestas();
+        cancelarEncuesta();
+        LoadingState.removeLoading(button);
+        ToastNotification.show(`Encuesta "${titulo}" creada exitosamente`, 'success');
+        
+        // Generar QR
+        setTimeout(() => generarQR(encuesta), 200);
+    }, 600);
+    
+    return false;
+};
 
 function generarQR(encuesta) {
     const qrContainer = document.createElement('div');
