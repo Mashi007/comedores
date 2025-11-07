@@ -1016,7 +1016,8 @@ function crearGrafico8() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
+            aspectRatio: 3, // Gráfico más ancho para una sola fila (3:1)
             interaction: {
                 intersect: false,
                 mode: 'point'
