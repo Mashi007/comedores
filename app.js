@@ -205,22 +205,34 @@ let chartInstances = {};
 
 function inicializarGraficos() {
     if (typeof Chart === 'undefined') {
+        console.log('⏳ Esperando Chart.js...');
         setTimeout(inicializarGraficos, 100);
         return;
     }
     
     const dashboard = document.getElementById('dashboard');
-    if (!dashboard || !dashboard.classList.contains('active')) {
+    if (!dashboard) {
+        console.log('⏳ Esperando elemento dashboard...');
         setTimeout(inicializarGraficos, 100);
         return;
     }
+    
+    if (!dashboard.classList.contains('active')) {
+        console.log('⏳ Dashboard no está activo, esperando...');
+        setTimeout(inicializarGraficos, 100);
+        return;
+    }
+    
+    console.log('📊 Inicializando gráficos del dashboard...');
     
     // Destruir gráficos existentes
     Object.keys(chartInstances).forEach(key => {
         if (chartInstances[key]) {
             try {
                 chartInstances[key].destroy();
-            } catch (e) {}
+            } catch (e) {
+                console.warn(`Error al destruir gráfico ${key}:`, e);
+            }
         }
     });
     chartInstances = {};
@@ -228,44 +240,114 @@ function inicializarGraficos() {
     // Actualizar KPIs
     actualizarKPIsDashboard();
     
-    // Crear gráficos principales
-    crearGraficoTendenciaPrincipal();
-    crearGraficoEficienciaModulos();
+    // Crear gráficos principales con delay para asegurar que el DOM esté listo
+    setTimeout(() => {
+        try {
+            crearGraficoTendenciaPrincipal();
+            console.log('✅ Gráfico Tendencia Principal creado');
+        } catch (e) {
+            console.error('❌ Error creando gráfico Tendencia Principal:', e);
+        }
+    }, 100);
+    
+    setTimeout(() => {
+        try {
+            crearGraficoEficienciaModulos();
+            console.log('✅ Gráfico Eficiencia Módulos creado');
+        } catch (e) {
+            console.error('❌ Error creando gráfico Eficiencia Módulos:', e);
+        }
+    }, 150);
     
     // Crear gráficos secundarios
-    crearGrafico1();
-    crearGrafico2();
-    crearGrafico3();
-    crearGrafico4();
-    crearGrafico5();
-    crearGrafico6();
-    crearGrafico7();
-    crearGrafico8();
-    crearGrafico9();
+    setTimeout(() => {
+        try {
+            crearGrafico1();
+            crearGrafico2();
+            crearGrafico3();
+            crearGrafico4();
+            crearGrafico5();
+            crearGrafico6();
+            crearGrafico7();
+            crearGrafico8();
+            crearGrafico9();
+            console.log('✅ Gráficos secundarios creados');
+        } catch (e) {
+            console.error('❌ Error creando gráficos secundarios:', e);
+        }
+    }, 200);
     
     // Crear gráficos innovadores
-    crearGraficoHeatmap();
-    crearGraficoDesviaciones();
-    crearGraficoROI();
+    setTimeout(() => {
+        try {
+            crearGraficoHeatmap();
+            crearGraficoDesviaciones();
+            crearGraficoROI();
+            console.log('✅ Gráficos innovadores creados');
+        } catch (e) {
+            console.error('❌ Error creando gráficos innovadores:', e);
+        }
+    }, 250);
+    
+    console.log('✅ Inicialización de gráficos completada');
 }
 
 // Actualizar KPIs del Dashboard
 function actualizarKPIsDashboard() {
-    // Calcular eficiencia general (promedio de eficiencias)
-    const eficienciaGeneral = 87.5; // Mock - calcular desde datos reales
-    document.getElementById('kpiEficienciaGeneral').textContent = eficienciaGeneral.toFixed(1) + '%';
+    // Calcular eficiencia general (promedio de eficiencias de módulos)
+    let eficienciaGeneral = 87.5; // Valor por defecto
+    if (typeof produccionData !== 'undefined' && produccionData.registros && produccionData.registros.length > 0) {
+        const hoy = new Date().toISOString().split('T')[0];
+        const registrosHoy = produccionData.registros.filter(r => r.fecha === hoy);
+        if (registrosHoy.length > 0) {
+            const mermaPromedio = registrosHoy.reduce((sum, r) => sum + r.merma, 0) / registrosHoy.length;
+            eficienciaGeneral = Math.max(0, 100 - mermaPromedio);
+        }
+    }
+    const kpiEficiencia = document.getElementById('kpiEficienciaGeneral');
+    if (kpiEficiencia) {
+        kpiEficiencia.textContent = eficienciaGeneral.toFixed(1) + '%';
+    }
     
-    // Calcular producción total
-    const produccionTotal = 2450; // Mock - calcular desde produccionData
-    document.getElementById('kpiProduccionTotal').textContent = produccionTotal.toLocaleString('es-ES');
+    // Calcular producción total (charolas del mes)
+    let produccionTotal = 2450; // Valor por defecto
+    if (typeof produccionData !== 'undefined' && produccionData.registros && produccionData.registros.length > 0) {
+        const hoy = new Date();
+        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        produccionTotal = produccionData.registros
+            .filter(r => new Date(r.fecha) >= inicioMes)
+            .reduce((sum, r) => sum + r.charolas, 0);
+    }
+    const kpiProduccion = document.getElementById('kpiProduccionTotal');
+    if (kpiProduccion) {
+        kpiProduccion.textContent = produccionTotal.toLocaleString('es-ES');
+    }
     
     // Calcular costo promedio por charola
-    const costoPromedio = 12.50; // Mock - calcular desde costosData
-    document.getElementById('kpiCostoPromedio').textContent = '$' + costoPromedio.toFixed(2);
+    let costoPromedio = 12.50; // Valor por defecto
+    if (typeof costosData !== 'undefined' && costosData.costosDiarios && costosData.costosDiarios.length > 0) {
+        const costosRecientes = costosData.costosDiarios.slice(-7); // Últimos 7 días
+        if (costosRecientes.length > 0) {
+            const costoTotal = costosRecientes.reduce((sum, c) => sum + c.costoTotal, 0);
+            const charolasTotal = produccionTotal > 0 ? produccionTotal : 2450;
+            costoPromedio = charolasTotal > 0 ? costoTotal / charolasTotal : 12.50;
+        }
+    }
+    const kpiCosto = document.getElementById('kpiCostoPromedio');
+    if (kpiCosto) {
+        kpiCosto.textContent = '$' + costoPromedio.toFixed(2);
+    }
     
     // Calcular satisfacción promedio
-    const satisfaccionPromedio = 4.3; // Mock - calcular desde satisfaccionData
-    document.getElementById('kpiSatisfaccionPromedio').textContent = satisfaccionPromedio.toFixed(1);
+    let satisfaccionPromedio = 4.3; // Valor por defecto
+    if (typeof satisfaccionData !== 'undefined' && satisfaccionData.respuestas && satisfaccionData.respuestas.length > 0) {
+        const promedio = satisfaccionData.respuestas.reduce((sum, r) => sum + r.calificacionGeneral, 0) / satisfaccionData.respuestas.length;
+        satisfaccionPromedio = promedio;
+    }
+    const kpiSatisfaccion = document.getElementById('kpiSatisfaccionPromedio');
+    if (kpiSatisfaccion) {
+        kpiSatisfaccion.textContent = satisfaccionPromedio.toFixed(1);
+    }
 }
 
 // Función para actualizar dashboard con filtros
