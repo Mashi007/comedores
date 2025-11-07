@@ -38,6 +38,7 @@ function cambiarPantalla(ocultar, mostrar) {
             // En desktop, abrir sidebar automáticamente
             if (window.innerWidth > 768) {
                 sidebar.classList.add('open');
+                console.log('📋 Sidebar abierto en desktop');
             }
         }
     } else {
@@ -56,6 +57,20 @@ function cambiarPantalla(ocultar, mostrar) {
             item.classList.add('active');
         }
     });
+    
+    // Verificar que la pantalla se muestre
+    setTimeout(() => {
+        const pantallaActiva = document.querySelector('.screen.active');
+        console.log('🔍 Pantalla activa después del cambio:', pantallaActiva?.id);
+        if (pantallaActiva) {
+            const display = window.getComputedStyle(pantallaActiva).display;
+            console.log('🔍 Display de pantalla activa:', display);
+            if (display === 'none') {
+                console.error('❌ La pantalla activa tiene display: none, forzando display: block');
+                pantallaActiva.style.display = 'block';
+            }
+        }
+    }, 100);
     
     // Inicializar gráficos si es dashboard
     if (mostrar === 'dashboard') {
