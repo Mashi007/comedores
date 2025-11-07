@@ -561,7 +561,8 @@ body.sidebar-open {
 .menu-container {
     padding: 2rem;
     max-width: 1400px;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
     width: 100%;
     box-sizing: border-box;
     min-height: calc(100vh - 4rem);
@@ -631,7 +632,8 @@ body.sidebar-open {
 .page-container {
     padding: 2rem;
     max-width: 1400px;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
     width: 100%;
     box-sizing: border-box;
     min-height: calc(100vh - 4rem);
@@ -2103,30 +2105,29 @@ body.sidebar-open {
 /* Cuando el sidebar está abierto, ajustar el contenido */
 body.sidebar-open .page-container {
     margin-left: 300px;
+    margin-right: auto;
     padding-left: 2rem;
     padding-right: 2rem;
     width: calc(100% - 300px);
     max-width: calc(1400px - 300px);
+    box-sizing: border-box;
 }
 
 body.sidebar-open .menu-container {
     margin-left: 300px;
+    margin-right: auto;
     padding-left: 2rem;
     padding-right: 2rem;
     width: calc(100% - 300px);
     max-width: calc(1400px - 300px);
+    box-sizing: border-box;
 }
 
 body.sidebar-open .screen.active:not(#portada) {
     margin-left: 300px;
+    margin-right: 0;
     width: calc(100% - 300px);
-}
-
-/* Asegurar que el contenido esté centrado y visible */
-body.sidebar-open .page-container,
-body.sidebar-open .menu-container {
-    margin-right: auto;
-    margin-left: 300px;
+    box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
