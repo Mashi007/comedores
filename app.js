@@ -947,15 +947,9 @@ function crearGrafico8() {
         { name: 'Conservas', stock: 300, reorder: 80, usage: 25, category: 'Enlatados', cuadrante: 4 }
     ];
     
-    // Normalizar reorden para mostrar productos en una fila (mismo nivel de reorden)
-    const reordenBase = 70; // Valor base para alinear horizontalmente
-    productos.forEach(p => {
-        p.reorderNormalizado = reordenBase; // Todos con el mismo reorden para fila horizontal
-    });
-    
-    // Calcular valores máximos para los ejes
-    const maxStock = Math.max(...productos.map(p => p.stock)) * 1.3;
-    const maxReorder = reordenBase * 2; // Rango fijo para mantener fila horizontal
+    // Calcular valores máximos para los ejes basados en datos reales
+    const maxStock = Math.max(...productos.map(p => p.stock)) * 1.2;
+    const maxReorder = Math.max(...productos.map(p => p.reorder)) * 1.5;
     
     // Función para determinar el cuadrante
     function getCuadrante(stock, reorder) {
@@ -980,14 +974,18 @@ function crearGrafico8() {
         type: 'bubble',
         data: {
             datasets: productos.map((p) => {
-                // Usar reorden original para calcular cuadrante, pero normalizado para posición Y
+                // Calcular cuadrante basado en relación stock/reorden
                 const cuadrante = getCuadrante(p.stock, p.reorder);
+                // El tamaño de la burbuja representa el uso semanal (normalizado)
+                const maxUsage = Math.max(...productos.map(pr => pr.usage));
+                const radioBurbuja = Math.max((p.usage / maxUsage) * 40, 15); // Radio entre 15 y 40
+                
                 return {
                     label: p.name,
                     data: [{
-                        x: p.stock,
-                        y: p.reorderNormalizado, // Usar reorden normalizado para alinear en fila
-                        r: Math.max(p.usage * 1.5, 18) // Aumentar tamaño de burbujas
+                        x: p.stock,           // Eje X: Stock Actual
+                        y: p.reorder,         // Eje Y: Punto de Reorden (valor real)
+                        r: radioBurbuja       // Radio: Uso semanal (proporcional)
                     }],
                     backgroundColor: getColorByCuadrante(cuadrante, '80'),
                     borderColor: getColorByCuadrante(cuadrante, 'FF'),
