@@ -1127,12 +1127,6 @@ function crearGrafico8() {
                 setTimeout(() => {
                     agregarEtiquetasCuadrantes(chart, maxStock, maxReorder);
                 }, 100);
-            },
-            plugins: {
-                ...chartInstances.chart8?.options?.plugins,
-                tooltip: {
-                    ...chartInstances.chart8?.options?.plugins?.tooltip
-                }
             }
         }
     });
