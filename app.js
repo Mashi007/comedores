@@ -9,33 +9,42 @@ function getPantallaActual() {
 }
 
 function cambiarPantalla(ocultar, mostrar) {
-    console.log('Cambiando pantalla de', ocultar, 'a', mostrar);
-    const ocultarEl = document.getElementById(ocultar);
-    const mostrarEl = document.getElementById(mostrar);
+    console.log('🔄 Cambiando pantalla de', ocultar, 'a', mostrar);
     
-    if (!ocultarEl || !mostrarEl) {
-        console.error('Pantalla no encontrada:', ocultar, mostrar);
+    // Ocultar todas las pantallas primero
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+    
+    // Mostrar la pantalla deseada
+    const mostrarEl = document.getElementById(mostrar);
+    if (!mostrarEl) {
+        console.error('❌ Pantalla no encontrada:', mostrar);
         return;
     }
     
-    ocultarEl.classList.remove('active');
+    console.log('✅ Pantalla encontrada:', mostrar);
     mostrarEl.classList.add('active');
+    console.log('✅ Clase active agregada');
     
     // Mostrar sidebar en pantallas del sistema
     const pantallasSistema = ['menu', 'dashboard', 'compras', 'inventario', 'planificacion', 'produccion', 'servicio', 'notificaciones', 'configuracion'];
     const sidebar = document.getElementById('sidebar');
     
     if (pantallasSistema.includes(mostrar)) {
-        sidebar.style.display = 'flex';
-        // Abrir sidebar automáticamente en móvil
-        if (window.innerWidth <= 768) {
-            sidebar.classList.add('open');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (overlay) overlay.classList.add('active');
+        console.log('📋 Mostrando sidebar para:', mostrar);
+        if (sidebar) {
+            sidebar.style.display = 'flex';
+            // En desktop, abrir sidebar automáticamente
+            if (window.innerWidth > 768) {
+                sidebar.classList.add('open');
+            }
         }
     } else {
-        sidebar.style.display = 'none';
-        sidebar.classList.remove('open');
+        if (sidebar) {
+            sidebar.style.display = 'none';
+            sidebar.classList.remove('open');
+        }
         const overlay = document.getElementById('sidebarOverlay');
         if (overlay) overlay.classList.remove('active');
     }
@@ -52,6 +61,8 @@ function cambiarPantalla(ocultar, mostrar) {
     if (mostrar === 'dashboard') {
         setTimeout(inicializarGraficos, 300);
     }
+    
+    console.log('✅ Cambio de pantalla completado');
 }
 
 // Hacer función global
@@ -249,21 +260,37 @@ function crearGrafico6() {
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM cargado, inicializando...');
+    
     const btnIniciar = document.getElementById('btnIniciar');
+    console.log('🔘 Botón encontrado:', !!btnIniciar);
+    
     if (btnIniciar) {
-        btnIniciar.addEventListener('click', function(e) {
+        // Remover cualquier listener anterior
+        const nuevoBtn = btnIniciar.cloneNode(true);
+        btnIniciar.parentNode.replaceChild(nuevoBtn, btnIniciar);
+        
+        nuevoBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Botón iniciar clickeado');
+            e.stopImmediatePropagation();
+            console.log('🖱️ Botón iniciar clickeado (listener)');
             cambiarPantalla('portada', 'menu');
-        });
+            return false;
+        }, true);
         
         // También agregar onclick directo como respaldo
-        btnIniciar.onclick = function(e) {
+        nuevoBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
+            console.log('🖱️ Botón iniciar clickeado (onclick)');
             cambiarPantalla('portada', 'menu');
             return false;
         };
+        
+        console.log('✅ Listeners agregados al botón');
+    } else {
+        console.error('❌ Botón btnIniciar no encontrado');
     }
 });
