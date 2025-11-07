@@ -141,6 +141,13 @@ function cambiarPantalla(ocultar, mostrar) {
             }, 300);
         }
         
+        // Inicializar módulo de Calidad si es calidad
+        if (mostrar === 'calidad') {
+            setTimeout(() => {
+                inicializarModuloCalidad();
+            }, 300);
+        }
+        
         console.log('✅ Cambio de pantalla completado');
     } catch (error) {
         console.error('❌ Error al cambiar pantalla:', error);
@@ -1483,6 +1490,7 @@ function crearGrafico9() {
 // Compras - OCR y KARDEX
 const comprasData = {
     facturas: [],
+    ordenesCompra: [], // Órdenes de compra con estado de verificación
     kardex: []
 };
 
@@ -1601,17 +1609,39 @@ function guardarFactura(event) {
         });
     });
     
-    const factura = {
+    // Crear orden de compra
+    const ordenCompra = {
         id: Date.now(),
+        numeroOrden: 'OC-' + Date.now(),
         proveedor,
         fechaFactura,
         numeroFactura,
         productos,
         total,
-        fechaRegistro: new Date().toISOString()
+        fechaRegistro: new Date().toISOString(),
+        estado: 'pendiente_verificacion', // pendiente_verificacion, aprobada, rechazada
+        verificacionCalidad: null
+    };
+    
+    // Guardar factura (compatibilidad)
+    const factura = {
+        id: ordenCompra.id,
+        proveedor,
+        fechaFactura,
+        numeroFactura,
+        productos,
+        total,
+        fechaRegistro: new Date().toISOString(),
+        ordenCompra: ordenCompra.numeroOrden
     };
     
     comprasData.facturas.push(factura);
+    
+    // Guardar orden de compra
+    if (!comprasData.ordenesCompra) {
+        comprasData.ordenesCompra = [];
+    }
+    comprasData.ordenesCompra.push(ordenCompra);
     
     // Actualizar KARDEX
     productos.forEach(prod => {

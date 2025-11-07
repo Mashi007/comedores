@@ -1938,6 +1938,195 @@
         </div>
     </div>
 
+    <!-- Control de Calidad -->
+    <div id="calidad" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <h1>Control de Calidad</h1>
+                <div class="header-actions">
+                    <select id="filtroEstadoCalidad" onchange="filtrarOrdenesCalidad()" style="padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 0.5rem; background: var(--bg-color);">
+                        <option value="">Todas las órdenes</option>
+                        <option value="pendiente">Pendientes</option>
+                        <option value="aprobada">Aprobadas</option>
+                        <option value="rechazada">Rechazadas</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- KPIs de Calidad -->
+            <div class="calidad-kpis">
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiOrdenesPendientes">0</h3>
+                        <p>Órdenes Pendientes</p>
+                        <span class="kpi-trend neutral">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
+                            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
+                            <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiDevoluciones">0</h3>
+                        <p>Devoluciones Totales</p>
+                        <span class="kpi-trend neutral">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiAjustes">0</h3>
+                        <p>Ajustes Realizados</p>
+                        <span class="kpi-trend neutral">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiTasaAprobacion">0%</h3>
+                        <p>Tasa de Aprobación</p>
+                        <span class="kpi-trend neutral">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Órdenes de Compra -->
+            <div class="calidad-ordenes-container">
+                <h2>Órdenes de Compra Pendientes de Verificación</h2>
+                <div id="ordenesCalidadList" class="ordenes-calidad-grid">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Historial de Verificaciones -->
+            <div class="calidad-historial-container">
+                <h2>Historial de Verificaciones</h2>
+                <div class="table-wrapper">
+                    <table class="calidad-historial-table">
+                        <thead>
+                            <tr>
+                                <th>Orden</th>
+                                <th>Proveedor</th>
+                                <th>Fecha Recepción</th>
+                                <th>Estado</th>
+                                <th>Productos</th>
+                                <th>Devoluciones</th>
+                                <th>Ajustes</th>
+                                <th>Verificador</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historialCalidadBody">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Verificación de Calidad -->
+    <div id="modalVerificacionCalidad" class="modal-exec" style="display: none;">
+        <div class="modal-exec-content" style="max-width: 1000px;">
+            <div class="modal-exec-header">
+                <h2 id="modalCalidadTitulo">Verificación de Calidad</h2>
+                <button class="btn-close-exec" onclick="cerrarModalCalidad()">×</button>
+            </div>
+            <div class="calidad-orden-info" id="calidadOrdenInfo">
+                <!-- Se llenará dinámicamente -->
+            </div>
+            <form id="formVerificacionCalidad" onsubmit="aprobarVerificacionCalidad(event)">
+                <div class="calidad-productos-container">
+                    <h3>Verificación de Productos</h3>
+                    <div class="table-wrapper">
+                        <table class="calidad-productos-table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad Facturada</th>
+                                    <th>Unidad</th>
+                                    <th>Precio Unit.</th>
+                                    <th>Cantidad Recibida</th>
+                                    <th>Ajuste</th>
+                                    <th>Devolución</th>
+                                    <th>Motivo Devolución</th>
+                                    <th>Observaciones Calidad</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productosCalidadBody">
+                                <!-- Se llenará dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="calidad-resumen">
+                    <div class="resumen-item">
+                        <span class="resumen-label">Total Facturado:</span>
+                        <span class="resumen-value" id="totalFacturadoCalidad">$0.00</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">Total Recibido:</span>
+                        <span class="resumen-value" id="totalRecibidoCalidad">$0.00</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">Total Devoluciones:</span>
+                        <span class="resumen-value negativo" id="totalDevolucionesCalidad">$0.00</span>
+                    </div>
+                    <div class="resumen-item destacado">
+                        <span class="resumen-label">Total a Aprobar:</span>
+                        <span class="resumen-value" id="totalAprobarCalidad">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="form-exec-group">
+                    <label>Observaciones Generales</label>
+                    <textarea id="observacionesGeneralesCalidad" rows="3" placeholder="Observaciones adicionales sobre la verificación de calidad..."></textarea>
+                </div>
+
+                <div class="form-exec-group">
+                    <label>Verificador</label>
+                    <input type="text" id="verificadorCalidad" placeholder="Nombre del verificador" required>
+                </div>
+
+                <div class="form-exec-actions">
+                    <button type="button" class="btn-exec-secondary" onclick="cerrarModalCalidad()">Cancelar</button>
+                    <button type="button" class="btn-exec-warning" onclick="rechazarVerificacionCalidad()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Rechazar
+                    </button>
+                    <button type="submit" class="btn-exec-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Aprobar y Procesar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="configuracion" class="screen">
         <div class="page-container">
             <div class="page-header">

@@ -3085,6 +3085,420 @@ body.sidebar-open .page-container {
     }
 }
 
+/* ============================================
+   MÓDULO DE CONTROL DE CALIDAD
+   ============================================ */
+
+.calidad-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.calidad-ordenes-container {
+    margin-bottom: 2rem;
+}
+
+.calidad-ordenes-container h2 {
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.ordenes-calidad-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.orden-calidad-card {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--border-color);
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.orden-calidad-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: var(--primary-color);
+}
+
+.orden-calidad-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.orden-info h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.orden-proveedor {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.badge-estado {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-estado.pendiente {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border: 2px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-estado.aprobada {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border: 2px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-estado.rechazada {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 2px solid rgba(239, 68, 68, 0.3);
+}
+
+.orden-calidad-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.orden-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: var(--bg-color);
+    border-radius: 0.5rem;
+}
+
+.detail-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.detail-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.detail-value.destacado {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.orden-calidad-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 2px solid var(--border-color);
+}
+
+.btn-verificar {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.btn-verificar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.orden-vacia {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+}
+
+.calidad-historial-container {
+    margin-top: 2rem;
+}
+
+.calidad-historial-container h2 {
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.calidad-historial-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.calidad-historial-table thead {
+    background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+    color: white;
+}
+
+.calidad-historial-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calidad-historial-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.calidad-historial-table tbody tr:hover {
+    background: rgba(37, 99, 235, 0.05);
+}
+
+/* Modal de Verificación */
+.calidad-orden-info {
+    margin-bottom: 2rem;
+}
+
+.orden-info-card {
+    background: var(--bg-color);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    border: 2px solid var(--border-color);
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row.destacado {
+    background: rgba(37, 99, 235, 0.05);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
+    border: 2px solid var(--primary-color);
+}
+
+.info-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.info-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.calidad-productos-container {
+    margin: 2rem 0;
+}
+
+.calidad-productos-container h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.calidad-productos-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.calidad-productos-table thead {
+    background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+    color: white;
+}
+
+.calidad-productos-table th {
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calidad-productos-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.calidad-productos-table tbody tr:hover {
+    background: rgba(37, 99, 235, 0.05);
+}
+
+.cantidad-recibida-input,
+.ajuste-input,
+.devolucion-input {
+    width: 100px;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    background: white;
+    color: var(--text-primary);
+}
+
+.cantidad-recibida-input:focus,
+.ajuste-input:focus,
+.devolucion-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.motivo-devolucion-select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    background: white;
+    color: var(--text-primary);
+}
+
+.observaciones-calidad-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-family: inherit;
+    resize: vertical;
+    background: white;
+    color: var(--text-primary);
+}
+
+.calidad-resumen {
+    background: var(--bg-color);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    border: 2px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.resumen-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 0.5rem;
+}
+
+.resumen-item.destacado {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(59, 130, 246, 0.1));
+    border: 2px solid var(--primary-color);
+}
+
+.resumen-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.resumen-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.resumen-value.negativo {
+    color: #dc2626;
+}
+
+.btn-exec-warning {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.btn-exec-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ordenes-calidad-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .calidad-productos-table {
+        font-size: 0.8rem;
+    }
+    
+    .calidad-productos-table th,
+    .calidad-productos-table td {
+        padding: 0.5rem;
+    }
+    
+    .calidad-resumen {
+        flex-direction: column;
+    }
+}
+
 /* Chat AI */
 .chat-container {
     background: var(--card-bg);
