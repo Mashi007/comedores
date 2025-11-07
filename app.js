@@ -7227,9 +7227,17 @@ function generarDatosMockOrdenesCompra() {
         comprasData.ordenesCompra = [];
     }
 
-    // Si ya hay órdenes, no generar más
-    if (comprasData.ordenesCompra.length > 0) {
+    // Si ya hay órdenes (más de 4 para tener variedad), no generar más
+    // Pero si hay menos de 4, regenerar para asegurar datos suficientes
+    if (comprasData.ordenesCompra.length >= 4) {
+        console.log(`📦 Ya existen ${comprasData.ordenesCompra.length} órdenes de compra, no se generan más`);
         return;
+    }
+    
+    // Limpiar órdenes existentes si hay menos de 4
+    if (comprasData.ordenesCompra.length > 0 && comprasData.ordenesCompra.length < 4) {
+        console.log(`🔄 Regenerando órdenes de compra (solo había ${comprasData.ordenesCompra.length})`);
+        comprasData.ordenesCompra = [];
     }
 
     const proveedores = ['Distribuidora Alimentos SA', 'Carnes Premium Ltda', 'Verduras Frescas SL', 'Granos y Cereales SA', 'Productos Lácteos del Sur'];
@@ -7863,23 +7871,30 @@ function rechazarVerificacionCalidad() {
 
 // Actualizar KPIs de calidad
 function actualizarKPIsCalidad() {
-    const ordenesPendientes = (comprasData.ordenesCompra || []).filter(oc => 
+    // Asegurar que comprasData.ordenesCompra existe
+    if (!comprasData.ordenesCompra) {
+        comprasData.ordenesCompra = [];
+    }
+    
+    const ordenesPendientes = comprasData.ordenesCompra.filter(oc => 
         oc.estado === 'pendiente_verificacion'
     ).length;
     
+    // Calcular devoluciones y ajustes desde las verificaciones
+    // Las verificaciones tienen devoluciones y ajustes ya calculados
     const totalDevoluciones = calidadData.verificaciones.reduce((sum, v) => {
-        return sum + v.productos.reduce((s, p) => s + (p.devolucion * p.precioUnit), 0);
+        return sum + (v.devoluciones || 0);
     }, 0);
     
     const totalAjustes = calidadData.verificaciones.reduce((sum, v) => {
-        return sum + v.productos.reduce((s, p) => s + Math.abs(p.ajuste * p.precioUnit), 0);
+        return sum + (v.ajustes || 0);
     }, 0);
     
-    const totalOrdenes = (comprasData.ordenesCompra || []).length;
-    const ordenesAprobadas = (comprasData.ordenesCompra || []).filter(oc => 
+    const totalOrdenes = comprasData.ordenesCompra.length;
+    const ordenesAprobadas = comprasData.ordenesCompra.filter(oc => 
         oc.estado === 'aprobada'
     ).length;
-    const tasaAprobacion = totalOrdenes > 0 ? ((ordenesAprobadas / totalOrdenes) * 100).toFixed(1) : 0;
+    const tasaAprobacion = totalOrdenes > 0 ? ((ordenesAprobadas / totalOrdenes) * 100).toFixed(1) : '0.0';
     
     if (document.getElementById('kpiOrdenesPendientes')) {
         document.getElementById('kpiOrdenesPendientes').textContent = ordenesPendientes;
@@ -7888,7 +7903,7 @@ function actualizarKPIsCalidad() {
         document.getElementById('kpiDevoluciones').textContent = `$${totalDevoluciones.toLocaleString('es-ES', {minimumFractionDigits: 2})}`;
     }
     if (document.getElementById('kpiAjustes')) {
-        document.getElementById('kpiAjustes').textContent = totalAjustes > 0 ? `$${totalAjustes.toLocaleString('es-ES', {minimumFractionDigits: 2})}` : '0';
+        document.getElementById('kpiAjustes').textContent = totalAjustes > 0 ? totalAjustes.toLocaleString('es-ES', {minimumFractionDigits: 0}) : '0';
     }
     if (document.getElementById('kpiTasaAprobacion')) {
         document.getElementById('kpiTasaAprobacion').textContent = tasaAprobacion + '%';
@@ -7904,6 +7919,8 @@ function actualizarKPIsCalidad() {
             badge.style.display = 'none';
         }
     }
+    
+    console.log(`📊 KPIs Calidad actualizados: ${ordenesPendientes} pendientes, $${totalDevoluciones.toFixed(2)} devoluciones, ${tasaAprobacion}% aprobación`);
 }
 
 // Cargar historial de verificaciones
