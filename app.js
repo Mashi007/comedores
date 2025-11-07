@@ -903,13 +903,29 @@ function crearGrafico1(periodo = '7') {
 function crearGrafico2(categoria = 'all') {
     const ctx = document.getElementById('chart2');
     if (!ctx) return;
+    if (typeof Chart === 'undefined') return;
     
-    const data = dashboardData.comprasCategoria;
-    const labels = Object.keys(data);
-    const valores = Object.values(data).map(d => d.valor);
-    const montos = Object.values(data).map(d => d.monto);
-    const facturas = Object.values(data).map(d => d.facturas);
-    const colores = ['#ef4444', '#10b981', '#f59e0b', '#64748b'];
+    let labels, data, colors;
+    
+    if (categoria === 'all') {
+        // Mostrar todas las categorías (excepto 'all')
+        labels = ['Carnes', 'Verduras', 'Granos', 'Otros'];
+        data = [
+            dashboardData.comprasCategoria.carnes.valor,
+            dashboardData.comprasCategoria.verduras.valor,
+            dashboardData.comprasCategoria.granos.valor,
+            dashboardData.comprasCategoria.otros.valor
+        ];
+        colors = ['#ef4444', '#10b981', '#f59e0b', '#6366f1'];
+    } else {
+        // Mostrar solo la categoría seleccionada
+        const categoriaData = dashboardData.comprasCategoria[categoria];
+        labels = [categoria.charAt(0).toUpperCase() + categoria.slice(1)];
+        data = [categoriaData.valor];
+        colors = categoria === 'carnes' ? ['#ef4444'] : 
+                 categoria === 'verduras' ? ['#10b981'] : 
+                 categoria === 'granos' ? ['#f59e0b'] : ['#6366f1'];
+    }
     
     try {
         if (chartInstances.chart2) chartInstances.chart2.destroy();
@@ -917,10 +933,10 @@ function crearGrafico2(categoria = 'all') {
         chartInstances.chart2 = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: labels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
+                labels: labels,
                 datasets: [{
-                    data: valores,
-                    backgroundColor: colores,
+                    data: data,
+                    backgroundColor: colors,
                     borderWidth: 3,
                     borderColor: '#ffffff',
                     hoverOffset: 15
