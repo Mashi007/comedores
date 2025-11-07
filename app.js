@@ -912,31 +912,45 @@ function crearGrafico8() {
     const ctx = document.getElementById('chart8');
     if (!ctx || typeof Chart === 'undefined') return;
     
-    // Datos de productos distribuidos en los 4 cuadrantes
+    // Datos de productos distribuidos en los 4 cuadrantes - MOCK DATA EXTENDIDO
     const productos = [
         // Cuadrante 1: Stock menor al inventario de seguridad (Stock < Reorden)
         { name: 'Frijoles', stock: 35, reorder: 50, usage: 45, category: 'Granos', cuadrante: 1 },
         { name: 'Lechuga', stock: 20, reorder: 30, usage: 25, category: 'Vegetales', cuadrante: 1 },
         { name: 'Cebolla', stock: 40, reorder: 50, usage: 55, category: 'Vegetales', cuadrante: 1 },
+        { name: 'Zanahoria', stock: 25, reorder: 40, usage: 30, category: 'Vegetales', cuadrante: 1 },
+        { name: 'Papa', stock: 45, reorder: 60, usage: 50, category: 'Vegetales', cuadrante: 1 },
+        { name: 'Ajo', stock: 8, reorder: 15, usage: 5, category: 'Condimentos', cuadrante: 1 },
         
         // Cuadrante 2: Dentro de inventario de seguridad (Reorden <= Stock < Reorden*2)
         { name: 'Tomates', stock: 80, reorder: 60, usage: 35, category: 'Vegetales', cuadrante: 2 },
         { name: 'Aceite', stock: 120, reorder: 80, usage: 40, category: 'Condimentos', cuadrante: 2 },
         { name: 'Carne Res', stock: 140, reorder: 80, usage: 95, category: 'Carnes', cuadrante: 2 },
+        { name: 'Pescado', stock: 90, reorder: 70, usage: 60, category: 'Carnes', cuadrante: 2 },
+        { name: 'Queso', stock: 55, reorder: 40, usage: 25, category: 'Lácteos', cuadrante: 2 },
+        { name: 'Leche', stock: 100, reorder: 80, usage: 45, category: 'Lácteos', cuadrante: 2 },
+        { name: 'Huevos', stock: 180, reorder: 120, usage: 80, category: 'Proteínas', cuadrante: 2 },
         
         // Cuadrante 3: Inventario según menús planificados (Reorden*2 <= Stock < Reorden*3)
         { name: 'Pollo', stock: 250, reorder: 100, usage: 120, category: 'Carnes', cuadrante: 3 },
         { name: 'Pasta', stock: 220, reorder: 90, usage: 65, category: 'Granos', cuadrante: 3 },
         { name: 'Arroz', stock: 320, reorder: 150, usage: 85, category: 'Granos', cuadrante: 3 },
+        { name: 'Lentejas', stock: 180, reorder: 80, usage: 55, category: 'Granos', cuadrante: 3 },
+        { name: 'Harina', stock: 200, reorder: 100, usage: 50, category: 'Granos', cuadrante: 3 },
+        { name: 'Azúcar', stock: 240, reorder: 120, usage: 20, category: 'Condimentos', cuadrante: 3 },
         
         // Cuadrante 4: Sobre stock (Stock >= Reorden*3)
         { name: 'Sal', stock: 350, reorder: 100, usage: 15, category: 'Condimentos', cuadrante: 4 },
-        { name: 'Azúcar', stock: 400, reorder: 120, usage: 20, category: 'Condimentos', cuadrante: 4 }
+        { name: 'Vinagre', stock: 180, reorder: 50, usage: 10, category: 'Condimentos', cuadrante: 4 },
+        { name: 'Especias', stock: 120, reorder: 30, usage: 8, category: 'Condimentos', cuadrante: 4 },
+        { name: 'Conservas', stock: 300, reorder: 80, usage: 25, category: 'Enlatados', cuadrante: 4 }
     ];
     
-    // Calcular valores máximos para los ejes
-    const maxStock = Math.max(...productos.map(p => p.stock)) * 1.2;
-    const maxReorder = Math.max(...productos.map(p => p.reorder)) * 1.2;
+    // Calcular valores máximos para los ejes - Ajustar para mostrar en una fila
+    const maxStock = Math.max(...productos.map(p => p.stock)) * 1.3;
+    // Fijar reorden en un rango más estrecho para alinear productos horizontalmente
+    const reordenPromedio = productos.reduce((sum, p) => sum + p.reorder, 0) / productos.length;
+    const maxReorder = reordenPromedio * 1.5;
     
     // Función para determinar el cuadrante
     function getCuadrante(stock, reorder) {
@@ -1080,7 +1094,8 @@ function crearGrafico8() {
                     grid: {
                         color: 'rgba(0, 0, 0, 0.05)',
                         drawBorder: true,
-                        borderColor: '#e2e8f0'
+                        borderColor: '#e2e8f0',
+                        lineWidth: 1
                     },
                     ticks: {
                         font: {
@@ -1106,7 +1121,8 @@ function crearGrafico8() {
                     grid: {
                         color: 'rgba(0, 0, 0, 0.05)',
                         drawBorder: true,
-                        borderColor: '#e2e8f0'
+                        borderColor: '#e2e8f0',
+                        lineWidth: 1
                     },
                     ticks: {
                         font: {
