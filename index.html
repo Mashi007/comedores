@@ -436,9 +436,108 @@
         <div class="page-container">
             <div class="page-header">
                 <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-                <h1>Servicio al Cliente</h1>
+                <h1>⭐ Satisfacción al Cliente</h1>
+                <button class="btn-primary" onclick="crearEncuesta()">📝 Crear Nueva Encuesta</button>
             </div>
-            <p>Módulo de servicio al cliente</p>
+            
+            <!-- KPIs de Satisfacción -->
+            <div class="satisfaccion-kpis">
+                <div class="kpi-card">
+                    <div class="kpi-icon">⭐</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiPromedio">4.7</h3>
+                        <p>Calificación Promedio</p>
+                        <span class="kpi-trend positive">↑ +0.2</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">📊</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiRespuestas">127</h3>
+                        <p>Total Respuestas</p>
+                        <span class="kpi-trend positive">↑ +12</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">🎯</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiNPS">68%</h3>
+                        <p>NPS (Net Promoter Score)</p>
+                        <span class="kpi-trend positive">↑ +5%</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">🔄</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiRegreso">87%</h3>
+                        <p>Intención de Regreso</p>
+                        <span class="kpi-trend positive">↑ +3%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medidas de Tendencia Central -->
+            <div class="tendencia-central">
+                <h2>📊 Medidas de Tendencia Central</h2>
+                <div class="tendencia-grid">
+                    <div class="tendencia-card">
+                        <h3>Media Aritmética</h3>
+                        <p class="tendencia-valor" id="mediaAritmetica">4.68</p>
+                        <p class="tendencia-desc">Promedio de todas las calificaciones</p>
+                    </div>
+                    <div class="tendencia-card">
+                        <h3>Mediana</h3>
+                        <p class="tendencia-valor" id="mediana">4.7</p>
+                        <p class="tendencia-desc">Valor central de las calificaciones</p>
+                    </div>
+                    <div class="tendencia-card">
+                        <h3>Moda</h3>
+                        <p class="tendencia-valor" id="moda">4.8</p>
+                        <p class="tendencia-desc">Calificación más frecuente</p>
+                    </div>
+                    <div class="tendencia-card">
+                        <h3>Desviación Estándar</h3>
+                        <p class="tendencia-valor" id="desviacion">0.42</p>
+                        <p class="tendencia-desc">Variabilidad de las respuestas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos Estratégicos -->
+            <div class="satisfaccion-charts">
+                <div class="chart-card">
+                    <h3>📈 Evolución de Satisfacción</h3>
+                    <canvas id="chartSatisfaccionEvolucion" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>🎯 Satisfacción por Categoría</h3>
+                    <canvas id="chartSatisfaccionCategorias" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>🔄 Intención de Regreso (NPS)</h3>
+                    <canvas id="chartNPS" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>📊 Distribución de Calificaciones</h3>
+                    <canvas id="chartDistribucion" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>⭐ Comparativa de Variables</h3>
+                    <canvas id="chartComparativa" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>📅 Satisfacción por Día de la Semana</h3>
+                    <canvas id="chartDiaSemana" width="400" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Análisis Detallado -->
+            <div class="analisis-detallado">
+                <h2>🔍 Análisis Detallado por Variable</h2>
+                <div class="variables-grid" id="variablesGrid">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
         </div>
     </div>
 

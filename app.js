@@ -87,6 +87,20 @@ function cambiarPantalla(ocultar, mostrar) {
             setTimeout(inicializarGraficos, 300);
         }
         
+        // Inicializar módulo de Compras si es compras
+        if (mostrar === 'compras') {
+            setTimeout(() => {
+                inicializarModuloCompras();
+            }, 300);
+        }
+        
+        // Inicializar módulo de Satisfacción si es servicio
+        if (mostrar === 'servicio') {
+            setTimeout(() => {
+                inicializarModuloSatisfaccion();
+            }, 300);
+        }
+        
         console.log('✅ Cambio de pantalla completado');
     } catch (error) {
         console.error('❌ Error al cambiar pantalla:', error);
@@ -952,10 +966,13 @@ function crearGrafico8() {
         { name: 'Azúcar', stock: 240, reorder: 120, usage: 20, category: 'Condimentos', cuadrante: 3 },
         
         // Cuadrante 4: Sobre stock (Stock >= Reorden*3)
-        { name: 'Sal', stock: 350, reorder: 100, usage: 15, category: 'Condimentos', cuadrante: 4 },
-        { name: 'Vinagre', stock: 180, reorder: 50, usage: 10, category: 'Condimentos', cuadrante: 4 },
-        { name: 'Especias', stock: 120, reorder: 30, usage: 8, category: 'Condimentos', cuadrante: 4 },
-        { name: 'Conservas', stock: 300, reorder: 80, usage: 25, category: 'Enlatados', cuadrante: 4 }
+        { name: 'Sal', stock: 380, reorder: 100, usage: 15, category: 'Condimentos', cuadrante: 4 },
+        { name: 'Vinagre', stock: 200, reorder: 50, usage: 10, category: 'Condimentos', cuadrante: 4 },
+        { name: 'Especias', stock: 150, reorder: 30, usage: 8, category: 'Condimentos', cuadrante: 4 },
+        { name: 'Conservas', stock: 350, reorder: 80, usage: 25, category: 'Enlatados', cuadrante: 4 },
+        { name: 'Aceite', stock: 280, reorder: 70, usage: 30, category: 'Condimentos', cuadrante: 4 },
+        { name: 'Papas', stock: 420, reorder: 120, usage: 60, category: 'Vegetales', cuadrante: 4 },
+        { name: 'Cebollas', stock: 250, reorder: 60, usage: 40, category: 'Vegetales', cuadrante: 4 }
     ];
     
     // Normalizar para mostrar todos los productos en una sola fila horizontal
@@ -978,12 +995,13 @@ function crearGrafico8() {
     }
     
     // Función para obtener color según cuadrante
+    // Gama de colores: Rojo (crítico) -> Naranja -> Amarillo -> Verde -> Azul (sobre stock)
     function getColorByCuadrante(cuadrante, opacity = '80') {
         const colors = {
-            1: '#ef4444', // Rojo - Crítico
-            2: '#f59e0b', // Naranja - Atención
-            3: '#10b981', // Verde - Óptimo
-            4: '#3b82f6'  // Azul - Sobre stock
+            1: '#ef4444', // Rojo - Stock menor al inventario de seguridad (CRÍTICO)
+            2: '#f97316', // Naranja intenso - Dentro de inventario de seguridad (ATENCIÓN)
+            3: '#22c55e', // Verde - Inventario según menús planificados (ÓPTIMO)
+            4: '#3b82f6'  // Azul - Sobre stock (EXCELENTE)
         };
         return colors[cuadrante] + opacity;
     }
@@ -1179,35 +1197,42 @@ function agregarEtiquetasCuadrantes(chart, maxStock, maxReorder, reordenNormaliz
     }
     
     // Calcular posiciones de cuadrantes para una sola fila horizontal
-    // Los cuadrantes se dividen solo por el eje X (stock), ya que Y está normalizado
+    // Las etiquetas se posicionan dentro del área del gráfico, en la parte superior
+    const chartArea = chart.chartArea;
+    if (!chartArea) return;
+    
+    // Calcular posiciones basadas en el área real del gráfico
+    const chartWidth = chartArea.right - chartArea.left;
+    const chartHeight = chartArea.top; // Altura disponible arriba del gráfico
+    
     const labels = [
         {
             text: '1. Stock menor al inventario de seguridad',
-            x: maxStock * 0.15,
-            y: reordenNormalizado,
+            xPercent: 12.5, // 12.5% del ancho del gráfico
             color: '#ef4444',
-            bg: 'rgba(239, 68, 68, 0.2)'
+            bg: 'rgba(239, 68, 68, 0.15)',
+            border: 'rgba(239, 68, 68, 0.4)'
         },
         {
             text: '2. Dentro de inventario de seguridad',
-            x: maxStock * 0.4,
-            y: reordenNormalizado,
-            color: '#f59e0b',
-            bg: 'rgba(245, 158, 11, 0.2)'
+            xPercent: 37.5, // 37.5% del ancho del gráfico
+            color: '#f97316',
+            bg: 'rgba(249, 115, 22, 0.15)',
+            border: 'rgba(249, 115, 22, 0.4)'
         },
         {
             text: '3. Inventario según menús planificados',
-            x: maxStock * 0.65,
-            y: reordenNormalizado,
-            color: '#10b981',
-            bg: 'rgba(16, 185, 129, 0.2)'
+            xPercent: 62.5, // 62.5% del ancho del gráfico
+            color: '#22c55e',
+            bg: 'rgba(34, 197, 94, 0.15)',
+            border: 'rgba(34, 197, 94, 0.4)'
         },
         {
             text: '4. Sobre stock',
-            x: maxStock * 0.9,
-            y: reordenNormalizado,
+            xPercent: 87.5, // 87.5% del ancho del gráfico
             color: '#3b82f6',
-            bg: 'rgba(59, 130, 246, 0.2)'
+            bg: 'rgba(59, 130, 246, 0.15)',
+            border: 'rgba(59, 130, 246, 0.4)'
         }
     ];
     
@@ -1216,26 +1241,25 @@ function agregarEtiquetasCuadrantes(chart, maxStock, maxReorder, reordenNormaliz
         labelEl.className = 'cuadrante-label';
         labelEl.textContent = label.text;
         labelEl.style.position = 'absolute';
-        labelEl.style.padding = '0.5rem 1rem';
-        labelEl.style.borderRadius = '6px';
-        labelEl.style.fontSize = '0.85rem';
+        labelEl.style.padding = '0.4rem 0.8rem';
+        labelEl.style.borderRadius = '8px';
+        labelEl.style.fontSize = '0.75rem';
         labelEl.style.fontWeight = '600';
         labelEl.style.color = label.color;
         labelEl.style.background = label.bg;
-        labelEl.style.border = `2px solid ${label.color}40`;
+        labelEl.style.border = `2px solid ${label.border}`;
         labelEl.style.pointerEvents = 'none';
         labelEl.style.zIndex = '10';
+        labelEl.style.whiteSpace = 'nowrap';
+        labelEl.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
         
-        // Calcular posición basada en el área del gráfico
-        const chartArea = chart.chartArea;
-        if (!chartArea) return;
+        // Posicionar dentro del área del gráfico, en la parte superior
+        const leftPosition = chartArea.left + (chartWidth * label.xPercent / 100);
+        const topPosition = chartArea.top - 25; // 25px arriba del área del gráfico
         
-        const xPercent = ((label.x / maxStock) * 100);
-        const yPercent = ((label.y / maxReorder) * 100);
-        
-        labelEl.style.left = xPercent + '%';
-        labelEl.style.top = yPercent + '%';
-        labelEl.style.transform = 'translate(-50%, -50%)';
+        labelEl.style.left = leftPosition + 'px';
+        labelEl.style.top = topPosition + 'px';
+        labelEl.style.transform = 'translate(-50%, -100%)'; // Centrar horizontalmente, arriba del punto
         
         labelContainer.appendChild(labelEl);
     });
@@ -2068,3 +2092,534 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('❌ Botón btnIniciar no encontrado');
     }
 });
+
+// ============================================
+// MÓDULO DE SATISFACCIÓN AL CLIENTE
+// ============================================
+
+// Datos mock de satisfacción con múltiples variables
+const satisfaccionData = {
+    respuestas: [],
+    variables: [
+        { id: 'sabor', nombre: 'Sabor de la Comida', icon: '🍽️' },
+        { id: 'calidad', nombre: 'Calidad de Ingredientes', icon: '🥗' },
+        { id: 'presentacion', nombre: 'Presentación', icon: '🎨' },
+        { id: 'temperatura', nombre: 'Temperatura', icon: '🌡️' },
+        { id: 'variedad', nombre: 'Variedad de Menú', icon: '📋' },
+        { id: 'servicio', nombre: 'Atención al Cliente', icon: '👥' },
+        { id: 'limpieza', nombre: 'Limpieza del Área', icon: '🧹' },
+        { id: 'tiempo', nombre: 'Tiempo de Espera', icon: '⏱️' },
+        { id: 'precio', nombre: 'Relación Precio/Calidad', icon: '💰' }
+    ]
+};
+
+// Generar datos mock históricos
+function generarDatosMockSatisfaccion() {
+    const semanas = 4;
+    const respuestasPorSemana = [32, 35, 30, 30];
+    const fechaBase = new Date();
+    fechaBase.setDate(fechaBase.getDate() - (semanas * 7));
+    
+    satisfaccionData.respuestas = [];
+    
+    for (let semana = 0; semana < semanas; semana++) {
+        const fechaSemana = new Date(fechaBase);
+        fechaSemana.setDate(fechaSemana.getDate() + (semana * 7));
+        
+        for (let i = 0; i < respuestasPorSemana[semana]; i++) {
+            const respuesta = {
+                id: Date.now() + Math.random(),
+                fecha: new Date(fechaSemana.getTime() + (i * 24 * 60 * 60 * 1000)),
+                semana: semana + 1,
+                variables: {},
+                promedio: 0,
+                regresaria: Math.random() > 0.15, // 85% regresaría
+                nps: Math.floor(Math.random() * 11) // 0-10
+            };
+            
+            // Generar calificaciones para cada variable (1-5)
+            let suma = 0;
+            satisfaccionData.variables.forEach(variable => {
+                // Calificaciones con tendencia positiva
+                const base = 4.0 + (semana * 0.1); // Mejora con el tiempo
+                const variacion = (Math.random() - 0.5) * 0.8;
+                const calificacion = Math.max(1, Math.min(5, base + variacion));
+                respuesta.variables[variable.id] = parseFloat(calificacion.toFixed(1));
+                suma += calificacion;
+            });
+            
+            respuesta.promedio = parseFloat((suma / satisfaccionData.variables.length).toFixed(2));
+            satisfaccionData.respuestas.push(respuesta);
+        }
+    }
+}
+
+// Calcular medidas de tendencia central
+function calcularTendenciasCentrales() {
+    const todasCalificaciones = satisfaccionData.respuestas.map(r => r.promedio);
+    
+    // Media aritmética
+    const media = todasCalificaciones.reduce((a, b) => a + b, 0) / todasCalificaciones.length;
+    
+    // Mediana
+    const sorted = [...todasCalificaciones].sort((a, b) => a - b);
+    const mediana = sorted.length % 2 === 0
+        ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
+        : sorted[Math.floor(sorted.length / 2)];
+    
+    // Moda (calificación más frecuente)
+    const frecuencia = {};
+    todasCalificaciones.forEach(c => {
+        const redondeada = Math.round(c * 10) / 10;
+        frecuencia[redondeada] = (frecuencia[redondeada] || 0) + 1;
+    });
+    const moda = Object.keys(frecuencia).reduce((a, b) => frecuencia[a] > frecuencia[b] ? a : b);
+    
+    // Desviación estándar
+    const varianza = todasCalificaciones.reduce((sum, c) => sum + Math.pow(c - media, 2), 0) / todasCalificaciones.length;
+    const desviacion = Math.sqrt(varianza);
+    
+    return {
+        media: parseFloat(media.toFixed(2)),
+        mediana: parseFloat(mediana.toFixed(2)),
+        moda: parseFloat(moda),
+        desviacion: parseFloat(desviacion.toFixed(2))
+    };
+}
+
+// Calcular NPS (Net Promoter Score)
+function calcularNPS() {
+    const promotores = satisfaccionData.respuestas.filter(r => r.nps >= 9).length;
+    const detractores = satisfaccionData.respuestas.filter(r => r.nps <= 6).length;
+    const total = satisfaccionData.respuestas.length;
+    const nps = ((promotores - detractores) / total) * 100;
+    return Math.round(nps);
+}
+
+// Inicializar módulo de satisfacción
+function inicializarModuloSatisfaccion() {
+    // Generar datos mock si no existen
+    if (satisfaccionData.respuestas.length === 0) {
+        generarDatosMockSatisfaccion();
+    }
+    
+    // Actualizar KPIs
+    const tendencias = calcularTendenciasCentrales();
+    const nps = calcularNPS();
+    const intencionRegreso = Math.round((satisfaccionData.respuestas.filter(r => r.regresaria).length / satisfaccionData.respuestas.length) * 100);
+    
+    document.getElementById('kpiPromedio').textContent = tendencias.media;
+    document.getElementById('kpiRespuestas').textContent = satisfaccionData.respuestas.length;
+    document.getElementById('kpiNPS').textContent = nps + '%';
+    document.getElementById('kpiRegreso').textContent = intencionRegreso + '%';
+    
+    // Actualizar medidas de tendencia central
+    document.getElementById('mediaAritmetica').textContent = tendencias.media;
+    document.getElementById('mediana').textContent = tendencias.mediana;
+    document.getElementById('moda').textContent = tendencias.moda;
+    document.getElementById('desviacion').textContent = tendencias.desviacion;
+    
+    // Crear gráficos
+    crearGraficosSatisfaccion();
+    
+    // Cargar análisis detallado
+    cargarAnalisisDetallado();
+}
+
+// Crear todos los gráficos de satisfacción
+function crearGraficosSatisfaccion() {
+    crearGraficoSatisfaccionEvolucion();
+    crearGraficoSatisfaccionCategorias();
+    crearGraficoNPS();
+    crearGraficoDistribucion();
+    crearGraficoComparativa();
+    crearGraficoDiaSemana();
+}
+
+// Gráfico 1: Evolución de Satisfacción
+function crearGraficoSatisfaccionEvolucion() {
+    const ctx = document.getElementById('chartSatisfaccionEvolucion');
+    if (!ctx) return;
+    
+    // Destruir gráfico anterior si existe
+    if (chartInstances.chartSatisfaccionEvolucion) {
+        chartInstances.chartSatisfaccionEvolucion.destroy();
+    }
+    
+    // Agrupar por semana
+    const porSemana = {};
+    satisfaccionData.respuestas.forEach(r => {
+        if (!porSemana[r.semana]) {
+            porSemana[r.semana] = [];
+        }
+        porSemana[r.semana].push(r.promedio);
+    });
+    
+    const semanas = Object.keys(porSemana).sort((a, b) => a - b);
+    const promedios = semanas.map(s => {
+        const calificaciones = porSemana[s];
+        return calificaciones.reduce((a, b) => a + b, 0) / calificaciones.length;
+    });
+    
+    chartInstances.chartSatisfaccionEvolucion = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: semanas.map(s => `Semana ${s}`),
+            datasets: [{
+                label: 'Satisfacción Promedio',
+                data: promedios,
+                borderColor: '#8b5cf6',
+                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#8b5cf6',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: () => '',
+                        label: (context) => {
+                            const semana = context.label;
+                            const valor = context.parsed.y;
+                            const respuestas = porSemana[semana.replace('Semana ', '')].length;
+                            return `Calificación: ${valor.toFixed(2)}/5.0\nEncuestas: ${respuestas}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 3.5,
+                    max: 5.0,
+                    ticks: { stepSize: 0.1 }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico 2: Satisfacción por Categoría
+function crearGraficoSatisfaccionCategorias() {
+    const ctx = document.getElementById('chartSatisfaccionCategorias');
+    if (!ctx) return;
+    
+    if (chartInstances.chartSatisfaccionCategorias) {
+        chartInstances.chartSatisfaccionCategorias.destroy();
+    }
+    
+    const promedios = satisfaccionData.variables.map(v => {
+        const calificaciones = satisfaccionData.respuestas.map(r => r.variables[v.id]);
+        return calificaciones.reduce((a, b) => a + b, 0) / calificaciones.length;
+    });
+    
+    chartInstances.chartSatisfaccionCategorias = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: satisfaccionData.variables.map(v => v.nombre),
+            datasets: [{
+                label: 'Calificación Promedio',
+                data: promedios,
+                backgroundColor: promedios.map(p => {
+                    if (p >= 4.5) return '#22c55e';
+                    if (p >= 4.0) return '#eab308';
+                    if (p >= 3.5) return '#f97316';
+                    return '#ef4444';
+                }),
+                borderColor: promedios.map(p => {
+                    if (p >= 4.5) return '#16a34a';
+                    if (p >= 4.0) return '#ca8a04';
+                    if (p >= 3.5) return '#ea580c';
+                    return '#dc2626';
+                }),
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `Calificación: ${context.parsed.x.toFixed(2)}/5.0`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: false,
+                    min: 3.0,
+                    max: 5.0,
+                    ticks: { stepSize: 0.5 }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico 3: NPS (Net Promoter Score)
+function crearGraficoNPS() {
+    const ctx = document.getElementById('chartNPS');
+    if (!ctx) return;
+    
+    if (chartInstances.chartNPS) {
+        chartInstances.chartNPS.destroy();
+    }
+    
+    const promotores = satisfaccionData.respuestas.filter(r => r.nps >= 9).length;
+    const pasivos = satisfaccionData.respuestas.filter(r => r.nps >= 7 && r.nps <= 8).length;
+    const detractores = satisfaccionData.respuestas.filter(r => r.nps <= 6).length;
+    const total = satisfaccionData.respuestas.length;
+    
+    chartInstances.chartNPS = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Promotores (9-10)', 'Pasivos (7-8)', 'Detractores (0-6)'],
+            datasets: [{
+                data: [promotores, pasivos, detractores],
+                backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const porcentaje = ((context.parsed / total) * 100).toFixed(1);
+                            return `${context.label}: ${context.parsed} (${porcentaje}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico 4: Distribución de Calificaciones
+function crearGraficoDistribucion() {
+    const ctx = document.getElementById('chartDistribucion');
+    if (!ctx) return;
+    
+    if (chartInstances.chartDistribucion) {
+        chartInstances.chartDistribucion.destroy();
+    }
+    
+    const distribucion = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    satisfaccionData.respuestas.forEach(r => {
+        const redondeada = Math.round(r.promedio);
+        distribucion[redondeada]++;
+    });
+    
+    chartInstances.chartDistribucion = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['1', '2', '3', '4', '5'],
+            datasets: [{
+                label: 'Cantidad de Respuestas',
+                data: [distribucion[1], distribucion[2], distribucion[3], distribucion[4], distribucion[5]],
+                backgroundColor: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#16a34a'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const porcentaje = ((context.parsed.y / satisfaccionData.respuestas.length) * 100).toFixed(1);
+                            return `${context.parsed.y} respuestas (${porcentaje}%)`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
+
+// Gráfico 5: Comparativa de Variables
+function crearGraficoComparativa() {
+    const ctx = document.getElementById('chartComparativa');
+    if (!ctx) return;
+    
+    if (chartInstances.chartComparativa) {
+        chartInstances.chartComparativa.destroy();
+    }
+    
+    const semanas = [1, 2, 3, 4];
+    const datasets = satisfaccionData.variables.map((v, index) => {
+        const colores = ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#06b6d4', '#84cc16', '#f97316'];
+        const data = semanas.map(semana => {
+            const respuestasSemana = satisfaccionData.respuestas.filter(r => r.semana === semana);
+            const calificaciones = respuestasSemana.map(r => r.variables[v.id]);
+            return calificaciones.length > 0 
+                ? calificaciones.reduce((a, b) => a + b, 0) / calificaciones.length 
+                : 0;
+        });
+        
+        return {
+            label: v.nombre,
+            data: data,
+            borderColor: colores[index % colores.length],
+            backgroundColor: colores[index % colores.length] + '40',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 3,
+            pointHoverRadius: 6
+        };
+    });
+    
+    chartInstances.chartComparativa = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: semanas.map(s => `Semana ${s}`),
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    display: true,
+                    position: 'right',
+                    labels: { boxWidth: 12, font: { size: 10 } }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 3.0,
+                    max: 5.0,
+                    ticks: { stepSize: 0.5 }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico 6: Satisfacción por Día de la Semana
+function crearGraficoDiaSemana() {
+    const ctx = document.getElementById('chartDiaSemana');
+    if (!ctx) return;
+    
+    if (chartInstances.chartDiaSemana) {
+        chartInstances.chartDiaSemana.destroy();
+    }
+    
+    const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const promedios = dias.map((dia, index) => {
+        const respuestasDia = satisfaccionData.respuestas.filter(r => {
+            const diaRespuesta = r.fecha.getDay();
+            return diaRespuesta === (index === 0 ? 1 : index); // Ajustar índice
+        });
+        if (respuestasDia.length === 0) return 0;
+        return respuestasDia.reduce((sum, r) => sum + r.promedio, 0) / respuestasDia.length;
+    });
+    
+    chartInstances.chartDiaSemana = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dias,
+            datasets: [{
+                label: 'Satisfacción Promedio',
+                data: promedios,
+                backgroundColor: '#8b5cf6',
+                borderColor: '#7c3aed',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `Calificación: ${context.parsed.y.toFixed(2)}/5.0`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 3.5,
+                    max: 5.0,
+                    ticks: { stepSize: 0.2 }
+                }
+            }
+        }
+    });
+}
+
+// Cargar análisis detallado por variable
+function cargarAnalisisDetallado() {
+    const grid = document.getElementById('variablesGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = satisfaccionData.variables.map(v => {
+        const calificaciones = satisfaccionData.respuestas.map(r => r.variables[v.id]);
+        const promedio = calificaciones.reduce((a, b) => a + b, 0) / calificaciones.length;
+        const min = Math.min(...calificaciones);
+        const max = Math.max(...calificaciones);
+        const tendencia = promedio >= 4.5 ? 'positive' : promedio >= 4.0 ? 'neutral' : 'negative';
+        
+        return `
+            <div class="variable-card">
+                <div class="variable-header">
+                    <span class="variable-icon">${v.icon}</span>
+                    <h3>${v.nombre}</h3>
+                </div>
+                <div class="variable-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Promedio</span>
+                        <span class="stat-value ${tendencia}">${promedio.toFixed(2)}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Mínimo</span>
+                        <span class="stat-value">${min.toFixed(1)}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Máximo</span>
+                        <span class="stat-value">${max.toFixed(1)}</span>
+                    </div>
+                </div>
+                <div class="variable-bar">
+                    <div class="bar-fill" style="width: ${(promedio / 5) * 100}%; background: ${promedio >= 4.5 ? '#22c55e' : promedio >= 4.0 ? '#eab308' : '#ef4444'}"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Función para crear encuesta (placeholder)
+function crearEncuesta() {
+    ToastNotification.show('Funcionalidad de creación de encuestas próximamente', 'info', 3000);
+}
+
+// Exponer funciones globalmente
+window.crearEncuesta = crearEncuesta;
+window.inicializarModuloSatisfaccion = inicializarModuloSatisfaccion;
