@@ -255,50 +255,119 @@ function inicializarBotonInicio() {
     function manejarClick(e) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         console.log('=== BOTÓN CLICKEADO ===');
-        console.log('Event:', e);
-        console.log('mostrarLogin disponible:', typeof mostrarLogin);
-        console.log('cambiarPantalla disponible:', typeof cambiarPantalla);
+        console.log('Event type:', e.type);
+        console.log('Event target:', e.target);
+        console.log('mostrarLogin disponible:', typeof window.mostrarLogin);
+        console.log('cambiarPantalla disponible:', typeof window.cambiarPantalla);
         
-        if (typeof mostrarLogin === 'function') {
-            console.log('Llamando mostrarLogin()...');
-            mostrarLogin();
-        } else if (typeof cambiarPantalla === 'function') {
-            console.log('Llamando cambiarPantalla()...');
-            cambiarPantalla('portada', 'login');
-        } else {
-            console.error('Ni mostrarLogin ni cambiarPantalla están disponibles');
-            // Fallback directo
+        // Intentar múltiples métodos
+        let navegacionExitosa = false;
+        
+        // Método 1: usar mostrarLogin
+        if (typeof window.mostrarLogin === 'function') {
+            try {
+                console.log('Llamando mostrarLogin()...');
+                window.mostrarLogin();
+                navegacionExitosa = true;
+            } catch (err) {
+                console.error('Error al llamar mostrarLogin:', err);
+            }
+        }
+        
+        // Método 2: usar cambiarPantalla directamente
+        if (!navegacionExitosa && typeof window.cambiarPantalla === 'function') {
+            try {
+                console.log('Llamando cambiarPantalla()...');
+                window.cambiarPantalla('portada', 'login');
+                navegacionExitosa = true;
+            } catch (err) {
+                console.error('Error al llamar cambiarPantalla:', err);
+            }
+        }
+        
+        // Método 3: Fallback directo manipulando DOM
+        if (!navegacionExitosa) {
+            console.log('Usando fallback directo...');
             const portada = document.getElementById('portada');
             const login = document.getElementById('login');
             if (portada && login) {
                 portada.classList.remove('active');
                 login.classList.add('active');
-                console.log('Navegación directa ejecutada');
+                console.log('✅ Navegación directa ejecutada');
+            } else {
+                console.error('No se encontraron las pantallas portada o login');
             }
         }
+        
         return false;
     }
     
-    // Agregar múltiples event listeners
-    btnInicio.addEventListener('click', manejarClick, true); // Usar capture phase
-    btnInicio.addEventListener('mousedown', manejarClick, true);
+    // Agregar múltiples event listeners con diferentes estrategias
+    // 1. Click normal
+    btnInicio.addEventListener('click', manejarClick, false);
+    
+    // 2. Click en capture phase (se ejecuta primero)
+    btnInicio.addEventListener('click', manejarClick, true);
+    
+    // 3. Mousedown (se ejecuta antes que click)
+    btnInicio.addEventListener('mousedown', function(e) {
+        if (e.button === 0) { // Solo botón izquierdo
+            manejarClick(e);
+        }
+    }, true);
+    
+    // 4. Touchstart para móviles
     btnInicio.addEventListener('touchstart', function(e) {
         e.preventDefault();
         e.stopPropagation();
         console.log('=== BOTÓN TOCADO (TOUCH) ===');
         manejarClick(e);
         return false;
-    }, true);
+    }, { passive: false, capture: true });
     
-    // También agregar onclick como respaldo
-    btnInicio.onclick = manejarClick;
+    // 5. onclick como respaldo absoluto
+    btnInicio.onclick = function(e) {
+        console.log('onclick handler ejecutado');
+        return manejarClick(e);
+    };
+    
+    // 6. Agregar también al span dentro del botón por si acaso
+    const span = btnInicio.querySelector('span');
+    if (span) {
+        span.style.pointerEvents = 'none'; // El span no debe interceptar clicks
+    }
     
     console.log('✅ Botón de inicio inicializado correctamente con múltiples listeners');
 }
 
 function inicializarApp() {
     try {
+        // Asegurar que solo la portada esté activa al inicio
+        const todasLasPantallas = document.querySelectorAll('.screen');
+        todasLasPantallas.forEach(screen => {
+            screen.classList.remove('active');
+        });
+        
+        const portada = document.getElementById('portada');
+        if (portada) {
+            portada.classList.add('active');
+            console.log('Portada activada al inicio');
+        }
+        
+        // Asegurar que el sidebar esté oculto al inicio
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            sidebar.style.display = 'none';
+            sidebar.classList.remove('open');
+        }
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        if (sidebarOverlay) {
+            sidebarOverlay.classList.remove('active');
+        }
+        document.body.classList.remove('sidebar-open');
+        
         // Solo cargar funciones que no requieren estar en una pantalla específica
         // Los gráficos se cargarán cuando se navegue al dashboard
         console.log('Aplicación inicializada correctamente');
