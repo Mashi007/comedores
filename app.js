@@ -1360,10 +1360,8 @@ function guardarFactura(event) {
     ToastNotification.show('Factura guardada correctamente', 'success', 2000);
     cerrarFormularioDigitalizacion();
     
-    setTimeout(() => {
-        mostrarDashboardKardex();
-    }, 500);
-    
+    // Actualizar KARDEX inmediatamente (ya es permanente)
+    mostrarDashboardKardex();
     cargarListaCompras();
 }
 
@@ -1400,13 +1398,14 @@ function actualizarKardex(producto, cantidadIngreso, fecha) {
 }
 
 function mostrarDashboardKardex() {
-    document.getElementById('dashboardKardex').style.display = 'block';
+    // El KARDEX ahora es permanente, solo recargar datos
     cargarKardex();
     cargarProductosEnFiltro();
 }
 
 function cerrarDashboardKardex() {
-    document.getElementById('dashboardKardex').style.display = 'none';
+    // Función mantenida por compatibilidad, pero ya no cierra el KARDEX
+    // El KARDEX es permanente ahora
 }
 
 function cargarKardex() {
