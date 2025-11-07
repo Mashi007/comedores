@@ -7574,12 +7574,14 @@ function aprobarVerificacionCalidad(event) {
         const devolucionInput = document.querySelector(`.devolucion-input[data-index="${index}"]`);
         const motivoSelect = document.querySelector(`.motivo-devolucion-select[data-index="${index}"]`);
         const observacionesInput = document.querySelector(`.observaciones-calidad-input[data-index="${index}"]`);
+        const estadoSelect = document.querySelector(`.estado-producto-select[data-index="${index}"]`);
         
         const cantidadRecibida = parseFloat(recibidaInput?.value) || prod.cantidad;
         const ajuste = parseFloat(ajusteInput?.value) || 0;
         const devolucion = parseFloat(devolucionInput?.value) || 0;
         const motivoDevolucion = motivoSelect?.value || '';
         const observaciones = observacionesInput?.value || '';
+        const estado = estadoSelect?.value || 'pendiente';
         
         return {
             producto: prod.producto,
@@ -7589,6 +7591,7 @@ function aprobarVerificacionCalidad(event) {
             devolucion: devolucion,
             motivoDevolucion: motivoDevolucion,
             observaciones: observaciones,
+            estado: estado,
             unidad: prod.unidad,
             precioUnit: prod.precioUnit
         };
