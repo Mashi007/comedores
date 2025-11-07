@@ -156,21 +156,109 @@ function crearGrafico1() {
     const ctx = document.getElementById('chart1');
     if (!ctx || typeof Chart === 'undefined') return;
     
+    const data = [120, 135, 128, 142, 130, 125, 118];
+    const labels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    
     chartInstances.chart1 = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            labels: labels,
             datasets: [{
                 label: 'Consumo (kg)',
-                data: [120, 135, 128, 142, 130, 125, 118],
+                data: data,
                 borderColor: '#2563eb',
                 backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                tension: 0.4
+                borderWidth: 3,
+                pointRadius: 0,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#2563eb',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 3,
+                pointHoverBackgroundColor: '#1d4ed8',
+                pointHoverBorderColor: '#ffffff',
+                pointHoverBorderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                shadowOffsetX: 0,
+                shadowOffsetY: 4,
+                shadowBlur: 10,
+                shadowColor: 'rgba(37, 99, 235, 0.3)'
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    padding: 16,
+                    titleFont: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 14
+                    },
+                    borderColor: '#2563eb',
+                    borderWidth: 2,
+                    cornerRadius: 12,
+                    displayColors: false,
+                    callbacks: {
+                        title: function(context) {
+                            return labels[context[0].dataIndex];
+                        },
+                        label: function(context) {
+                            const value = context.parsed.y;
+                            const promedio = (data.reduce((a, b) => a + b, 0) / data.length).toFixed(1);
+                            const diferencia = (value - promedio).toFixed(1);
+                            const porcentaje = ((value / promedio - 1) * 100).toFixed(1);
+                            return [
+                                `Consumo: ${value} kg`,
+                                `Promedio semanal: ${promedio} kg`,
+                                diferencia >= 0 ? `↑ +${diferencia} kg (+${porcentaje}%)` : `↓ ${diferencia} kg (${porcentaje}%)`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        callback: function(value) {
+                            return value + ' kg';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
         }
     });
 }
@@ -179,18 +267,75 @@ function crearGrafico2() {
     const ctx = document.getElementById('chart2');
     if (!ctx || typeof Chart === 'undefined') return;
     
+    const data = [35, 25, 20, 20];
+    const labels = ['Carnes', 'Verduras', 'Granos', 'Otros'];
+    const colors = ['#ef4444', '#10b981', '#f59e0b', '#6366f1'];
+    const montos = [15230, 10850, 8650, 6920];
+    const total = data.reduce((a, b) => a + b, 0);
+    
     chartInstances.chart2 = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Carnes', 'Verduras', 'Granos', 'Otros'],
+            labels: labels,
             datasets: [{
-                data: [35, 25, 20, 20],
-                backgroundColor: ['#ef4444', '#10b981', '#f59e0b', '#6366f1']
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 4,
+                borderColor: '#ffffff',
+                hoverOffset: 20,
+                hoverBorderWidth: 5
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        font: {
+                            size: 13,
+                            weight: '500'
+                        },
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    padding: 16,
+                    titleFont: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 14
+                    },
+                    borderColor: function(context) {
+                        return colors[context.dataIndex];
+                    },
+                    borderWidth: 2,
+                    cornerRadius: 12,
+                    callbacks: {
+                        label: function(context) {
+                            const index = context.dataIndex;
+                            const porcentaje = ((data[index] / total) * 100).toFixed(1);
+                            return [
+                                `Porcentaje: ${porcentaje}%`,
+                                `Monto: $${montos[index].toLocaleString()}`,
+                                `Cantidad: ${data[index]} unidades`
+                            ];
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: true,
+                duration: 2000
+            }
         }
     });
 }
@@ -199,19 +344,94 @@ function crearGrafico3() {
     const ctx = document.getElementById('chart3');
     if (!ctx || typeof Chart === 'undefined') return;
     
+    const data = [320, 345, 330, 360, 340];
+    const labels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    const charolas = [64, 69, 66, 72, 68];
+    const merma = [12, 14, 13, 15, 14];
+    
     chartInstances.chart3 = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'],
+            labels: labels,
             datasets: [{
-                label: 'Comidas',
-                data: [320, 345, 330, 360, 340],
-                backgroundColor: '#10b981'
+                label: 'Comidas Servidas',
+                data: data,
+                backgroundColor: '#10b981',
+                borderRadius: 8,
+                borderSkipped: false,
+                barThickness: 45
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    padding: 16,
+                    titleFont: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 14
+                    },
+                    borderColor: '#10b981',
+                    borderWidth: 2,
+                    cornerRadius: 12,
+                    displayColors: false,
+                    callbacks: {
+                        title: function(context) {
+                            return labels[context[0].dataIndex];
+                        },
+                        label: function(context) {
+                            const index = context.dataIndex;
+                            const eficiencia = ((data[index] / (data[index] + merma[index] * 10)) * 100).toFixed(1);
+                            return [
+                                `🍽️ Comidas: ${data[index]}`,
+                                `📦 Charolas: ${charolas[index]}`,
+                                `📊 Merma: ${merma[index]} kg`,
+                                `📈 Eficiencia: ${eficiencia}%`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutBounce'
+            }
         }
     });
 }
@@ -220,20 +440,95 @@ function crearGrafico4() {
     const ctx = document.getElementById('chart4');
     if (!ctx || typeof Chart === 'undefined') return;
     
+    const data = [450, 320, 280, 250, 200];
+    const labels = ['Arroz', 'Frijoles', 'Pollo', 'Carne', 'Verduras'];
+    const tendencias = ['↑', '↑', '→', '↓', '→'];
+    
     chartInstances.chart4 = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Arroz', 'Frijoles', 'Pollo', 'Carne', 'Verduras'],
+            labels: labels,
             datasets: [{
                 label: 'Uso (kg)',
-                data: [450, 320, 280, 250, 200],
-                backgroundColor: '#f59e0b'
+                data: data,
+                backgroundColor: '#f59e0b',
+                borderRadius: 6,
+                borderSkipped: false,
+                barThickness: 40
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            indexAxis: 'y'
+            indexAxis: 'y',
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    padding: 16,
+                    titleFont: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 14
+                    },
+                    borderColor: '#f59e0b',
+                    borderWidth: 2,
+                    cornerRadius: 12,
+                    displayColors: false,
+                    callbacks: {
+                        title: function(context) {
+                            return labels[context[0].dataIndex];
+                        },
+                        label: function(context) {
+                            const index = context.dataIndex;
+                            return [
+                                `📊 Uso total: ${data[index]} kg`,
+                                `📈 Tendencia: ${tendencias[index]}`,
+                                `💰 Valor estimado: $${(data[index] * 15).toLocaleString()}`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        callback: function(value) {
+                            return value + ' kg';
+                        }
+                    }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
         }
     });
 }
@@ -242,27 +537,103 @@ function crearGrafico5() {
     const ctx = document.getElementById('chart5');
     if (!ctx || typeof Chart === 'undefined') return;
     
+    const data = [4.2, 4.4, 4.5, 4.6];
+    const labels = ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'];
+    const encuestas = [145, 152, 158, 165];
+    
     chartInstances.chart5 = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+            labels: labels,
             datasets: [{
                 label: 'Satisfacción',
-                data: [4.2, 4.4, 4.5, 4.6],
+                data: data,
                 borderColor: '#8b5cf6',
                 backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                tension: 0.4
+                borderWidth: 3,
+                pointRadius: 0,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#8b5cf6',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 3,
+                pointHoverBackgroundColor: '#7c3aed',
+                pointHoverBorderColor: '#ffffff',
+                pointHoverBorderWidth: 3,
+                tension: 0.4,
+                fill: true
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    padding: 16,
+                    titleFont: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 14
+                    },
+                    borderColor: '#8b5cf6',
+                    borderWidth: 2,
+                    cornerRadius: 12,
+                    displayColors: false,
+                    callbacks: {
+                        title: function(context) {
+                            return labels[context[0].dataIndex];
+                        },
+                        label: function(context) {
+                            const index = context.dataIndex;
+                            const cambio = index > 0 ? (data[index] - data[index - 1]).toFixed(1) : '0.0';
+                            return [
+                                `⭐ Calificación: ${data[index]}/5.0`,
+                                `📝 Encuestas: ${encuestas[index]}`,
+                                cambio >= 0 ? `↑ +${cambio} puntos` : `↓ ${cambio} puntos`
+                            ];
+                        }
+                    }
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: false,
-                    min: 3,
-                    max: 5
+                    min: 3.5,
+                    max: 5,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        stepSize: 0.2
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        }
+                    }
                 }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
             }
         }
     });
@@ -272,23 +643,125 @@ function crearGrafico6() {
     const ctx = document.getElementById('chart6');
     if (!ctx || typeof Chart === 'undefined') return;
     
+    const planificado = [50, 55, 52, 58, 54];
+    const merma = [5, 6, 4, 7, 5];
+    const labels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    
     chartInstances.chart6 = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'],
+            labels: labels,
             datasets: [{
                 label: 'Planificado',
-                data: [50, 55, 52, 58, 54],
-                backgroundColor: '#3b82f6'
+                data: planificado,
+                backgroundColor: '#3b82f6',
+                borderRadius: 8,
+                borderSkipped: false,
+                barThickness: 35
             }, {
                 label: 'Merma',
-                data: [5, 6, 4, 7, 5],
-                backgroundColor: '#ef4444'
+                data: merma,
+                backgroundColor: '#ef4444',
+                borderRadius: 8,
+                borderSkipped: false,
+                barThickness: 35
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        padding: 15,
+                        font: {
+                            size: 13,
+                            weight: '500'
+                        },
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    padding: 16,
+                    titleFont: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 14
+                    },
+                    borderWidth: 2,
+                    cornerRadius: 12,
+                    callbacks: {
+                        title: function(context) {
+                            return labels[context[0].dataIndex];
+                        },
+                        label: function(context) {
+                            const index = context.dataIndex;
+                            const datasetLabel = context.dataset.label;
+                            const value = context.parsed.y;
+                            
+                            if (datasetLabel === 'Planificado') {
+                                const eficiencia = ((1 - merma[index] / planificado[index]) * 100).toFixed(1);
+                                return [
+                                    `📋 ${datasetLabel}: ${value} kg`,
+                                    `📊 Eficiencia: ${eficiencia}%`
+                                ];
+                            } else {
+                                const porcentaje = ((merma[index] / planificado[index]) * 100).toFixed(1);
+                                return [
+                                    `⚠️ ${datasetLabel}: ${value} kg`,
+                                    `📉 ${porcentaje}% del planificado`
+                                ];
+                            }
+                        },
+                        afterBody: function(context) {
+                            const index = context[0].dataIndex;
+                            const diferencia = planificado[index] - merma[index];
+                            return [`✅ Neto: ${diferencia} kg`];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        callback: function(value) {
+                            return value + ' kg';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
         }
     });
 }
