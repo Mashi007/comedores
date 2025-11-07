@@ -1,4 +1,8 @@
-// Navegación
+// ============================================
+// NAVEGACIÓN Y FUNCIONES GLOBALES
+// ============================================
+
+// Declarar funciones globales primero para que estén disponibles inmediatamente
 function navegar(destino) {
     cambiarPantalla(getPantallaActual(), destino);
 }
@@ -107,7 +111,7 @@ function cambiarPantalla(ocultar, mostrar) {
     }
 }
 
-// Hacer funciones globales
+// Hacer funciones globales INMEDIATAMENTE para que estén disponibles en onclick
 window.cambiarPantalla = cambiarPantalla;
 window.navegar = navegar;
 window.toggleSidebar = toggleSidebar;
@@ -128,6 +132,7 @@ window.cerrarDashboardKardex = cerrarDashboardKardex;
 window.filtrarKardex = filtrarKardex;
 
 // Sidebar
+// Exponer toggleSidebar y otras funciones después de su declaración
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
