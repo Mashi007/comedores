@@ -1215,14 +1215,13 @@ function crearGrafico8() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
-            aspectRatio: 3, // Gráfico más ancho para una sola fila (3:1)
+            maintainAspectRatio: false,
             layout: {
                 padding: {
-                    top: 50, // Espacio superior para las etiquetas
-                    bottom: 20,
-                    left: 20,
-                    right: 20
+                    top: 30,
+                    bottom: 30,
+                    left: 30,
+                    right: 30
                 }
             },
             interaction: {

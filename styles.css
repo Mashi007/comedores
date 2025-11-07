@@ -5575,7 +5575,7 @@ body.sidebar-open .page-container {
 }
 
 .charts-grid-exec .chart-card-exec.chart-wide {
-    grid-column: span 1;
+    grid-column: span 3;
 }
 
 .charts-grid-exec .chart-card-exec canvas {
