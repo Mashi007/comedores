@@ -1535,8 +1535,13 @@ window.procesarFacturaOCR = function(btn, proveedor, factura, monto, productos) 
 };
 
 function cargarCompras() {
+    console.log('📦 [DEBUG] cargarCompras() ejecutándose');
     const tbody = document.getElementById('tablaCompras');
-    if (!tbody) return;
+    console.log('📦 [DEBUG] tbody encontrado:', !!tbody);
+    if (!tbody) {
+        console.error('❌ [ERROR] tablaCompras no encontrada');
+        return;
+    }
     
     tbody.innerHTML = mockData.compras.map(compra => `
         <tr>
@@ -1696,8 +1701,13 @@ window.procesarMovimientoInventario = function(event) {
 };
 
 function cargarInventario() {
+    console.log('📦 [DEBUG] cargarInventario() ejecutándose');
     const tbody = document.getElementById('tablaInventario');
-    if (!tbody) return;
+    console.log('📦 [DEBUG] tbody encontrado:', !!tbody);
+    if (!tbody) {
+        console.error('❌ [ERROR] tablaInventario no encontrada');
+        return;
+    }
     
     tbody.innerHTML = mockData.productos.map(producto => {
         const estado = producto.stock <= producto.stockMinimo ? 'danger' : 

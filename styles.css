@@ -40,13 +40,14 @@ body.sidebar-open {
     left: 0;
     right: 0;
     bottom: 0;
-    overflow-y: auto;
+    overflow-y: auto !important;
     overflow-x: hidden;
     transition: opacity 0.4s ease, transform 0.4s ease;
     opacity: 0;
     transform: translateY(20px);
     z-index: 1;
     -webkit-overflow-scrolling: touch;
+    max-height: 100vh;
 }
 
 .screen.active {
@@ -570,6 +571,7 @@ body.sidebar-open {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-bottom: 4rem; /* Espacio extra al final para scroll */
 }
 
 .menu-container > * {
@@ -649,6 +651,7 @@ body.sidebar-open {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-bottom: 4rem; /* Espacio extra al final para scroll */
 }
 
 .page-container > * {
