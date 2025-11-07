@@ -6972,9 +6972,110 @@ const calidadData = {
     verificaciones: [] // Historial de verificaciones
 };
 
+// Generar datos mock de órdenes de compra para calidad
+function generarDatosMockOrdenesCompra() {
+    if (!comprasData.ordenesCompra) {
+        comprasData.ordenesCompra = [];
+    }
+    
+    // Si ya hay órdenes, no generar más
+    if (comprasData.ordenesCompra.length > 0) {
+        return;
+    }
+    
+    const proveedores = ['Distribuidora Alimentos SA', 'Carnes Premium Ltda', 'Verduras Frescas SL', 'Granos y Cereales SA', 'Productos Lácteos del Sur'];
+    const productosBase = [
+        { nombre: 'Arroz Premium', unidad: 'kg', precioBase: 2.50 },
+        { nombre: 'Frijoles Negros', unidad: 'kg', precioBase: 3.20 },
+        { nombre: 'Pollo Entero', unidad: 'kg', precioBase: 4.50 },
+        { nombre: 'Carne Res', unidad: 'kg', precioBase: 8.00 },
+        { nombre: 'Lechuga', unidad: 'kg', precioBase: 1.80 },
+        { nombre: 'Tomates', unidad: 'kg', precioBase: 2.20 },
+        { nombre: 'Cebolla', unidad: 'kg', precioBase: 1.50 },
+        { nombre: 'Aceite Vegetal', unidad: 'L', precioBase: 3.50 },
+        { nombre: 'Huevos', unidad: 'unidad', precioBase: 0.15 },
+        { nombre: 'Leche Entera', unidad: 'L', precioBase: 1.20 }
+    ];
+    
+    // Generar 5 órdenes de compra pendientes
+    for (let i = 0; i < 5; i++) {
+        const proveedor = proveedores[Math.floor(Math.random() * proveedores.length)];
+        const fechaFactura = new Date();
+        fechaFactura.setDate(fechaFactura.getDate() - Math.floor(Math.random() * 7)); // Últimos 7 días
+        
+        // Seleccionar 3-6 productos aleatorios
+        const numProductos = Math.floor(Math.random() * 4) + 3;
+        const productosSeleccionados = [];
+        const productosUsados = new Set();
+        
+        for (let j = 0; j < numProductos; j++) {
+            let producto;
+            do {
+                producto = productosBase[Math.floor(Math.random() * productosBase.length)];
+            } while (productosUsados.has(producto.nombre));
+            
+            productosUsados.add(producto.nombre);
+            
+            const cantidad = producto.unidad === 'unidad' 
+                ? Math.floor(Math.random() * 200) + 50 
+                : Math.random() * 50 + 10;
+            const precioUnit = producto.precioBase * (0.9 + Math.random() * 0.2); // Variación ±10%
+            
+            productosSeleccionados.push({
+                producto: producto.nombre,
+                cantidad: parseFloat(cantidad.toFixed(2)),
+                unidad: producto.unidad,
+                precioUnit: parseFloat(precioUnit.toFixed(2)),
+                subtotal: parseFloat((cantidad * precioUnit).toFixed(2))
+            });
+        }
+        
+        const total = productosSeleccionados.reduce((sum, p) => sum + p.subtotal, 0);
+        
+        const ordenCompra = {
+            id: Date.now() + i,
+            numeroOrden: `OC-${String(Date.now() + i).slice(-6)}`,
+            proveedor: proveedor,
+            fechaFactura: fechaFactura.toISOString().split('T')[0],
+            numeroFactura: `FAC-${String(Date.now() + i).slice(-8)}`,
+            productos: productosSeleccionados,
+            total: parseFloat(total.toFixed(2)),
+            fechaRegistro: new Date().toISOString(),
+            estado: 'pendiente_verificacion',
+            verificacionCalidad: null
+        };
+        
+        comprasData.ordenesCompra.push(ordenCompra);
+        
+        // También crear factura para compatibilidad
+        const factura = {
+            id: ordenCompra.id,
+            proveedor: ordenCompra.proveedor,
+            fechaFactura: ordenCompra.fechaFactura,
+            numeroFactura: ordenCompra.numeroFactura,
+            productos: ordenCompra.productos,
+            total: ordenCompra.total,
+            fechaRegistro: ordenCompra.fechaRegistro,
+            ordenCompra: ordenCompra.numeroOrden
+        };
+        
+        if (!comprasData.facturas) {
+            comprasData.facturas = [];
+        }
+        comprasData.facturas.push(factura);
+    }
+    
+    // Guardar en memoria
+    guardarComprasEnMemoria();
+    console.log(`📦 Generadas ${comprasData.ordenesCompra.length} órdenes de compra mock para Control de Calidad`);
+}
+
 // Inicializar módulo de calidad
 function inicializarModuloCalidad() {
     console.log('✅ Inicializando módulo de control de calidad...');
+    
+    // Generar datos mock de órdenes de compra si no existen
+    generarDatosMockOrdenesCompra();
     
     // Cargar datos desde memoria
     recuperarCalidadDeMemoria();
