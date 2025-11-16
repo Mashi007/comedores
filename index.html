@@ -1,0 +1,2887 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Comedores Industriales</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍽️</text></svg>">
+    <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍽️</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍽️</text></svg>">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="utils.js" defer></script>
+</head>
+<body>
+    <div id="toast-container"></div>
+    
+    <!-- Portada -->
+    <div id="portada" class="screen active">
+        <div class="portada-background">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+        </div>
+        <div class="portada-container">
+            <div class="portada-content">
+                <div class="portada-logo">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 12H21M3 12C3 10.8954 3.89543 10 5 10H19C20.1046 10 21 10.8954 21 12M3 12C3 13.1046 3.89543 14 5 14H19C20.1046 14 21 13.1046 21 12M3 12V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V12M3 12V6C3 4.89543 3.89543 4 5 4H19C20.1046 4 21 4.89543 21 6V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="8" cy="12" r="1" fill="currentColor"/>
+                        <circle cx="12" cy="12" r="1" fill="currentColor"/>
+                        <circle cx="16" cy="12" r="1" fill="currentColor"/>
+                    </svg>
+                </div>
+                <h1 class="portada-title">
+                    <span class="title-line">Sistema de Gestión</span>
+                    <span class="title-line highlight">Comedores Industriales</span>
+                </h1>
+                <p class="portada-subtitle">Transforma la gestión de tu comedor con tecnología de vanguardia</p>
+                <div class="portada-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span>Analytics en Tiempo Real</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="8" cy="8" r="2" fill="currentColor"/>
+                                <path d="M18 14L14 10L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span>IA Integrada</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="currentColor"/>
+                            </svg>
+                        </span>
+                        <span>Optimización Automática</span>
+                    </div>
+                </div>
+                <button id="btnIniciar" class="btn-hero" type="button" onclick="cambiarPantalla('portada', 'menu'); return false;">
+                    <span>Ingresar al Sistema</span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <span class="logo-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 12H21M3 12C3 10.8954 3.89543 10 5 10H19C20.1046 10 21 10.8954 21 12M3 12C3 13.1046 3.89543 14 5 14H19C20.1046 14 21 13.1046 21 12M3 12V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V12M3 12V6C3 4.89543 3.89543 4 5 4H19C20.1046 4 21 4.89543 21 6V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="8" cy="12" r="1" fill="currentColor"/>
+                        <circle cx="12" cy="12" r="1" fill="currentColor"/>
+                        <circle cx="16" cy="12" r="1" fill="currentColor"/>
+                    </svg>
+                </span>
+                <div class="logo-text">
+                    <span class="logo-title">Comedores</span>
+                    <span class="logo-subtitle">Industrial</span>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item" onclick="navegar('menu'); return false;" data-section="menu">
+                <span class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="nav-text">Menú Principal</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('dashboard'); return false;" data-section="dashboard">
+                <span class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('compras'); return false;" data-section="compras">
+                <span class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
+                        <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
+                        <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="nav-text">Compras</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('inventario'); return false;" data-section="inventario">
+                <span class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                        <path d="M9 9H15M9 12H15M9 15H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                <span class="nav-text">Inventario</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('planificacion'); return false;" data-section="planificacion">
+                <span class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                        <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                <span class="nav-text">Planificación</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('produccion'); return false;" data-section="produccion">
+                <span class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="nav-text">Producción</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('servicio'); return false;" data-section="servicio">
+                <span class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="nav-text">Servicio al Cliente</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('notificaciones'); return false;" data-section="notificaciones">
+                <span class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="nav-text">Notificaciones</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('chat-ai'); return false;" data-section="chat-ai">
+                <span class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="8" cy="8" r="2" fill="currentColor"/>
+                        <path d="M18 14L14 10L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="nav-text">Chat AI</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('costos'); return false;" data-section="costos">
+                <span class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="nav-text">Costos Variables</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('calidad'); return false;" data-section="calidad">
+                <span class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="nav-text">Control de Calidad</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navegar('configuracion'); return false;" data-section="configuracion">
+                <span class="nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 1V3M12 21V23M23 12H21M3 12H1M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M19.07 19.07L17.66 17.66M6.34 6.34L4.93 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                <span class="nav-text">Configuración</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user" onclick="toggleUserMenu()">
+                <div class="user-avatar">U</div>
+                <div class="user-info">
+                    <span class="user-name">Usuario Demo</span>
+                    <span class="user-role">Administrador</span>
+                </div>
+                <span class="user-menu-arrow">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+            </div>
+            <div class="user-menu" id="userMenu">
+                <a href="#" class="user-menu-item" onclick="cerrarSesion(); return false;">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9M16 17L21 12M21 12L16 7M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Cerrar Sesión</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Menú Principal -->
+    <div id="menu" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <h1>Menú Principal</h1>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-card" onclick="navegar('dashboard')">
+                    <div class="menu-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Dashboard</h3>
+                    <p>Visualización de métricas y KPIs</p>
+                </div>
+                <div class="menu-card" onclick="navegar('compras')">
+                    <div class="menu-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
+                            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
+                            <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Compras</h3>
+                    <p>Gestión de compras y facturas</p>
+                </div>
+                <div class="menu-card" onclick="navegar('inventario')">
+                    <div class="menu-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M9 9H15M9 12H15M9 15H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Inventario</h3>
+                    <p>Control de inventario</p>
+                </div>
+                <div class="menu-card" onclick="navegar('planificacion')">
+                    <div class="menu-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Planificación</h3>
+                    <p>Planificación de menús</p>
+                </div>
+                <div class="menu-card" onclick="navegar('produccion')">
+                    <div class="menu-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Producción</h3>
+                    <p>Reporte de producción</p>
+                </div>
+                <div class="menu-card" onclick="navegar('servicio')">
+                    <div class="menu-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Servicio al Cliente</h3>
+                    <p>Encuestas y feedback</p>
+                </div>
+                <div class="menu-card" onclick="navegar('notificaciones')">
+                    <div class="menu-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Notificaciones</h3>
+                    <p>Alertas y novedades</p>
+                </div>
+                <div class="menu-card" onclick="navegar('chat-ai')">
+                    <div class="menu-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="8" cy="8" r="2" fill="currentColor"/>
+                            <path d="M18 14L14 10L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Chat AI</h3>
+                    <p>Asistente inteligente</p>
+                </div>
+                <div class="menu-card" onclick="navegar('costos')">
+                    <div class="menu-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Costos Variables</h3>
+                    <p>Análisis de costos</p>
+                </div>
+                <div class="menu-card" onclick="navegar('calidad')">
+                    <div class="menu-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Control de Calidad</h3>
+                    <p>Verificación de compras</p>
+                </div>
+                <div class="menu-card" onclick="navegar('configuracion')">
+                    <div class="menu-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 1V3M12 21V23M23 12H21M3 12H1M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M19.07 19.07L17.66 17.66M6.34 6.34L4.93 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Configuración</h3>
+                    <p>Ajustes del sistema</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <div class="header-left">
+                    <h1>Dashboard Gerencial</h1>
+                    <p class="header-subtitle">Vista ejecutiva de métricas y tendencias</p>
+                </div>
+                <div class="header-actions-dashboard">
+                    <select id="filtroPeriodoDashboard" onchange="actualizarDashboard()" class="dashboard-filter">
+                        <option value="7">Últimos 7 días</option>
+                        <option value="15">Últimos 15 días</option>
+                        <option value="30" selected>Últimos 30 días</option>
+                        <option value="90">Últimos 90 días</option>
+                    </select>
+                    <button class="btn-primary" onclick="exportarDashboard()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M17 8L12 3M12 3L7 8M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Exportar
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPIs Gerenciales -->
+            <div class="dashboard-kpis-exec">
+                <div class="kpi-exec-card primary">
+                    <div class="kpi-exec-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-exec-content">
+                        <h3 id="kpiEficienciaGeneral">0%</h3>
+                        <p>Eficiencia General</p>
+                        <div class="kpi-exec-trend">
+                            <span class="trend-icon">↑</span>
+                            <span class="trend-value">+5.2%</span>
+                            <span class="trend-label">vs mes anterior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="kpi-exec-card success">
+                    <div class="kpi-exec-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-exec-content">
+                        <h3 id="kpiProduccionTotal">0</h3>
+                        <p>Producción Total (Charolas)</p>
+                        <div class="kpi-exec-trend">
+                            <span class="trend-icon">↑</span>
+                            <span class="trend-value">+12%</span>
+                            <span class="trend-label">vs mes anterior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="kpi-exec-card warning">
+                    <div class="kpi-exec-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-exec-content">
+                        <h3 id="kpiCostoPromedio">$0.00</h3>
+                        <p>Costo Promedio por Charola</p>
+                        <div class="kpi-exec-trend">
+                            <span class="trend-icon">↓</span>
+                            <span class="trend-value">-3.1%</span>
+                            <span class="trend-label">vs mes anterior</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="kpi-exec-card info">
+                    <div class="kpi-exec-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-exec-content">
+                        <h3 id="kpiSatisfaccionPromedio">0.0</h3>
+                        <p>Satisfacción Promedio</p>
+                        <div class="kpi-exec-trend">
+                            <span class="trend-icon">↑</span>
+                            <span class="trend-value">+0.3</span>
+                            <span class="trend-label">vs mes anterior</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos Principales -->
+            <div class="dashboard-main-charts">
+                <div class="chart-card-exec large">
+                    <div class="chart-header-exec">
+                        <div>
+                            <h3>Tendencia de Producción y Costos</h3>
+                            <p class="chart-subtitle">Análisis comparativo de los últimos 30 días</p>
+                        </div>
+                        <div class="chart-legend-exec">
+                            <span class="legend-item"><span class="legend-color" style="background: #3b82f6;"></span> Producción</span>
+                            <span class="legend-item"><span class="legend-color" style="background: #10b981;"></span> Costos</span>
+                        </div>
+                    </div>
+                    <div style="position: relative; height: 400px; width: 100%;">
+                        <canvas id="chartTendenciaPrincipal"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid de Gráficos Secundarios - Reorganizado -->
+            <div class="charts-grid-exec">
+                <!-- Primera fila: 3 gráficos estándar -->
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Consumo de Inventario</h3>
+                        <button class="chart-action-btn" onclick="toggleChartView('chart1')" title="Cambiar vista">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart1"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Distribución de Compras</h3>
+                    </div>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart2"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Producción Mensual</h3>
+                        <p class="chart-subtitle" style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">Producción diaria de charolas - Últimos 30 días</p>
+                    </div>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart3"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Segunda fila: 3 gráficos estándar -->
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Top Productos</h3>
+                    </div>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart4"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Satisfacción del Cliente</h3>
+                    </div>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart5"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Merma vs Planificado</h3>
+                    </div>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart6"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Tercera fila: 3 gráficos -->
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Merma por Receta</h3>
+                    </div>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart7"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <h3>Costos por Tipo de Comida</h3>
+                    </div>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chart9"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card-exec">
+                    <div class="chart-header-exec">
+                        <div>
+                            <h3>Heatmap de Actividad Semanal</h3>
+                            <p class="chart-subtitle" style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">Intensidad de producción por día y comida</p>
+                        </div>
+                    </div>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chartHeatmap"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Cuarta fila: 1 gráfico centrado -->
+                <div class="chart-card-exec" style="grid-column: 2;">
+                    <div class="chart-header-exec">
+                        <div>
+                            <h3>Análisis de Desviaciones</h3>
+                            <p class="chart-subtitle" style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">Comparativa de variaciones</p>
+                        </div>
+                    </div>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chartDesviaciones"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compras -->
+    <div id="compras" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <h1>Gestión de Compras</h1>
+                <button class="btn-primary" onclick="mostrarSimuladorOCR()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                        <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V5C1 4.46957 1.21071 3.96086 1.58579 3.58579C1.96086 3.21071 2.46957 3 3 3H7L9 1H15L17 3H21C21.5304 3 22.0391 3.21071 22.4142 3.58579C22.7893 3.96086 23 4.46957 23 5V19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Simular OCR WhatsApp
+                </button>
+            </div>
+            
+            <!-- Simulador OCR -->
+            <div id="simuladorOCR" class="ocr-simulator" style="display: none;">
+                <div class="ocr-container">
+                    <div class="ocr-header">
+                        <h2>Simulador de OCR - Captura de Factura</h2>
+                        <button class="btn-close" onclick="cerrarSimuladorOCR()">×</button>
+                    </div>
+                    <div class="ocr-preview">
+                        <div class="factura-mock">
+                            <div class="factura-header">
+                                <h3>FACTURA DE COMPRA</h3>
+                                <p>Proveedor: <strong>Distribuidora Alimentos S.A.</strong></p>
+                                <p>Fecha: <strong id="fechaFactura">15/01/2025</strong></p>
+                                <p>N° Factura: <strong>FAC-2025-001234</strong></p>
+                            </div>
+                            <div class="factura-items">
+                                <table class="factura-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Unidad</th>
+                                            <th>Precio Unit.</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="facturaItems">
+                                        <tr>
+                                            <td>Arroz Premium</td>
+                                            <td>200</td>
+                                            <td>kg</td>
+                                            <td>$15.00</td>
+                                            <td>$3,000.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Frijoles Negros</td>
+                                            <td>50</td>
+                                            <td>kg</td>
+                                            <td>$25.00</td>
+                                            <td>$1,250.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Pollo Entero</td>
+                                            <td>150</td>
+                                            <td>kg</td>
+                                            <td>$30.00</td>
+                                            <td>$4,500.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="factura-total">
+                                <p><strong>TOTAL: $8,750.00</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ocr-actions">
+                        <button class="btn-secondary" onclick="cerrarSimuladorOCR()">Cancelar</button>
+                        <button class="btn-primary" onclick="procesarFacturaOCR()">Procesar Factura</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Digitalización -->
+            <div id="formularioDigitalizacion" class="digitalizacion-form" style="display: none;">
+                <div class="form-container">
+                    <div class="form-header">
+                        <h2>Digitalización de Factura</h2>
+                        <button class="btn-close" onclick="cerrarFormularioDigitalizacion()">×</button>
+                    </div>
+                    <form id="facturaForm" onsubmit="guardarFactura(event)">
+                        <div class="form-group">
+                            <label>Proveedor</label>
+                            <input type="text" id="proveedor" value="Distribuidora Alimentos S.A." required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Fecha de Factura</label>
+                                <input type="date" id="fechaFacturaInput" required>
+                            </div>
+                            <div class="form-group">
+                                <label>N° Factura</label>
+                                <input type="text" id="numeroFactura" value="FAC-2025-001234" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Productos</label>
+                            <div id="productosList">
+                                <div class="producto-item">
+                                    <input type="text" placeholder="Producto" value="Arroz Premium" required>
+                                    <input type="number" placeholder="Cantidad" value="200" step="0.01" required>
+                                    <select required>
+                                        <option value="kg" selected>kg</option>
+                                        <option value="g">g</option>
+                                        <option value="L">L</option>
+                                        <option value="unidad">unidad</option>
+                                    </select>
+                                    <input type="number" placeholder="Precio Unit." value="15.00" step="0.01" required>
+                                    <button type="button" class="btn-remove" onclick="this.parentElement.remove()">×</button>
+                                </div>
+                                <div class="producto-item">
+                                    <input type="text" placeholder="Producto" value="Frijoles Negros" required>
+                                    <input type="number" placeholder="Cantidad" value="50" step="0.01" required>
+                                    <select required>
+                                        <option value="kg" selected>kg</option>
+                                        <option value="g">g</option>
+                                        <option value="L">L</option>
+                                        <option value="unidad">unidad</option>
+                                    </select>
+                                    <input type="number" placeholder="Precio Unit." value="25.00" step="0.01" required>
+                                    <button type="button" class="btn-remove" onclick="this.parentElement.remove()">×</button>
+                                </div>
+                                <div class="producto-item">
+                                    <input type="text" placeholder="Producto" value="Pollo Entero" required>
+                                    <input type="number" placeholder="Cantidad" value="150" step="0.01" required>
+                                    <select required>
+                                        <option value="kg" selected>kg</option>
+                                        <option value="g">g</option>
+                                        <option value="L">L</option>
+                                        <option value="unidad">unidad</option>
+                                    </select>
+                                    <input type="number" placeholder="Precio Unit." value="30.00" step="0.01" required>
+                                    <button type="button" class="btn-remove" onclick="this.parentElement.remove()">×</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-add" onclick="agregarProducto()">+ Agregar Producto</button>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="cerrarFormularioDigitalizacion()">Cancelar</button>
+                            <button type="submit" class="btn-primary">Guardar y Ver KARDEX</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Dashboard KARDEX - PERMANENTE -->
+            <div id="dashboardKardex" class="kardex-dashboard">
+                <div class="kardex-header">
+                    <h2>KARDEX de Inventario</h2>
+                    <div class="kardex-filters">
+                        <select id="filtroProducto" onchange="filtrarKardex()">
+                            <option value="">Todos los productos</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="kardex-table-container">
+                    <table class="kardex-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Saldo Inicial</th>
+                                <th>Ingreso (Compra)</th>
+                                <th>Salida (Consumo)</th>
+                                <th>Saldo Final</th>
+                                <th>Consumo Promedio/día</th>
+                                <th>Días Estimados</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kardexBody">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Lista de compras -->
+            <div class="compras-list">
+                <h2>Historial de Compras</h2>
+                <div id="listaCompras">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventario -->
+    <div id="inventario" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <h1>Gestión de Inventario</h1>
+                <button class="btn-primary" onclick="mostrarFormularioInventario()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Nuevo Movimiento
+                </button>
+            </div>
+
+            <!-- KPIs de Estados de Inventario -->
+            <div class="inventario-kpis">
+                <div class="kpi-card inventario-minimo">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" fill="#ef4444"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiMinimo">0</h3>
+                        <p>Bajo Mínimo</p>
+                        <span class="kpi-trend negative">Crítico</span>
+                    </div>
+                </div>
+                <div class="kpi-card inventario-seguridad">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" fill="#f97316"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiSeguridad">0</h3>
+                        <p>En Seguridad</p>
+                        <span class="kpi-trend neutral">Atención</span>
+                    </div>
+                </div>
+                <div class="kpi-card inventario-adecuado">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" fill="#22c55e"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiAdecuado">0</h3>
+                        <p>Stock Adecuado</p>
+                        <span class="kpi-trend positive">Óptimo</span>
+                    </div>
+                </div>
+                <div class="kpi-card inventario-sobrestock">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" fill="#3b82f6"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiSobreStock">0</h3>
+                        <p>Sobre Stock</p>
+                        <span class="kpi-trend neutral">Exceso</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos de Inventario -->
+            <div class="inventario-charts">
+                <div class="chart-card">
+                    <h3>Distribución por Estado</h3>
+                    <canvas id="chartInventarioEstados" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Evolución de Inventario</h3>
+                    <canvas id="chartInventarioEvolucion" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Desempeño vs Planificación</h3>
+                    <canvas id="chartDesempenoPlanificacion" width="400" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Tabla de Inventario -->
+            <div class="inventario-table-container">
+                <div class="table-header">
+                    <h2>Inventario de Productos</h2>
+                    <div class="table-filters">
+                        <select id="filtroEstadoInventario" onchange="filtrarInventario()">
+                            <option value="">Todos los estados</option>
+                            <option value="minimo">Bajo Mínimo</option>
+                            <option value="seguridad">En Seguridad</option>
+                            <option value="adecuado">Stock Adecuado</option>
+                            <option value="sobrestock">Sobre Stock</option>
+                        </select>
+                        <input type="text" id="buscarProducto" placeholder="Buscar producto..." onkeyup="filtrarInventario()">
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="inventario-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Saldo Inicial</th>
+                                <th>Última Compra</th>
+                                <th>Ingresos</th>
+                                <th>Salidas</th>
+                                <th>Stock Actual</th>
+                                <th>Mínimo</th>
+                                <th>Seguridad</th>
+                                <th>Estado</th>
+                                <th>Desempeño</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaInventarioBody">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Historial de Movimientos -->
+            <div class="movimientos-container">
+                <h2>Historial de Movimientos</h2>
+                <div class="table-wrapper">
+                    <table class="movimientos-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Tipo</th>
+                                <th>Cantidad</th>
+                                <th>Quién Solicita</th>
+                                <th>Saldo Anterior</th>
+                                <th>Saldo Final</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historialMovimientosBody">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Movimiento de Inventario -->
+    <div id="formularioInventario" class="modal-inventario" style="display: none;">
+        <div class="modal-content-inventario">
+            <div class="modal-header">
+                <h2>Nuevo Movimiento de Inventario</h2>
+                <button class="btn-close" onclick="cerrarFormularioInventario()">×</button>
+            </div>
+            <form id="movimientoForm" onsubmit="procesarMovimientoInventario(event)">
+                <div class="form-group">
+                    <label for="tipoMovimiento">Tipo de Movimiento *</label>
+                    <select id="tipoMovimiento" required onchange="toggleSolicitante()">
+                        <option value="">Seleccione...</option>
+                        <option value="entrada">Entrada (Compra)</option>
+                        <option value="salida">Salida (Consumo)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productoMovimiento">Producto *</label>
+                    <select id="productoMovimiento" required>
+                        <option value="">Seleccione un producto...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cantidadMovimiento">Cantidad *</label>
+                    <input type="number" id="cantidadMovimiento" step="0.01" min="0.01" required placeholder="Ej: 50.5">
+                </div>
+                <div class="form-group">
+                    <label for="unidadMovimiento">Unidad *</label>
+                    <select id="unidadMovimiento" required>
+                        <option value="kg">kg</option>
+                        <option value="g">g</option>
+                        <option value="L">L</option>
+                        <option value="unidad">unidad</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fechaMovimiento">Fecha *</label>
+                    <input type="date" id="fechaMovimiento" required>
+                </div>
+                <div class="form-group" id="grupoSolicitante" style="display: none;">
+                    <label for="solicitanteMovimiento">Quién Solicita *</label>
+                    <input type="text" id="solicitanteMovimiento" placeholder="Ej: Cocina, Producción, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="observacionesMovimiento">Observaciones</label>
+                    <textarea id="observacionesMovimiento" rows="3" placeholder="Notas adicionales..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="cerrarFormularioInventario()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar Movimiento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Planificación - Módulo Ejecutivo -->
+    <div id="planificacion" class="screen planificacion-screen">
+        <div class="planificacion-container">
+            <!-- Header Ejecutivo -->
+            <div class="planificacion-header-exec">
+                <div class="header-left">
+                    <h1>Planificación de Menús</h1>
+                    <p class="header-subtitle">Gestión inteligente de recetas y productos</p>
+                </div>
+                <div class="header-actions-exec">
+                    <button class="btn-exec-secondary" onclick="vistaAnterior()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button class="btn-exec-primary" onclick="vistaSiguiente()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button class="btn-exec-primary" onclick="generarListaCompras()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
+                            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
+                            <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Generar Lista de Compras
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navegación de Mes -->
+            <div class="planificacion-nav">
+                <div class="nav-month">
+                    <span id="mesActual" class="month-display">Enero 2025</span>
+                </div>
+                <div class="nav-views">
+                    <button class="view-btn active" onclick="cambiarVista('mes')" data-vista="mes">Mes</button>
+                    <button class="view-btn" onclick="cambiarVista('semana')" data-vista="semana">Semana</button>
+                    <button class="view-btn" onclick="cambiarVista('dia')" data-vista="dia">Día</button>
+                </div>
+            </div>
+
+            <!-- Calendario Mensual -->
+            <div id="vistaMes" class="vista-calendario active">
+                <div class="calendario-grid">
+                    <div class="calendario-header">
+                        <div class="cal-dia-header">Lun</div>
+                        <div class="cal-dia-header">Mar</div>
+                        <div class="cal-dia-header">Mié</div>
+                        <div class="cal-dia-header">Jue</div>
+                        <div class="cal-dia-header">Vie</div>
+                        <div class="cal-dia-header">Sáb</div>
+                        <div class="cal-dia-header">Dom</div>
+                    </div>
+                    <div id="calendarioDias" class="calendario-dias">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Semana -->
+            <div id="vistaSemana" class="vista-calendario" style="display: none;">
+                <div class="semana-grid">
+                    <div class="semana-header">
+                        <div class="semana-hora-col"></div>
+                        <div class="semana-dia" id="semanaDias">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                    <div class="semana-body">
+                        <div class="semana-comidas">
+                            <div class="comida-slot desayuno" data-comida="desayuno">
+                                <div class="comida-label">Desayuno</div>
+                                <div class="recetas-container" id="semanaDesayuno">
+                                    <!-- Recetas -->
+                                </div>
+                            </div>
+                            <div class="comida-slot almuerzo" data-comida="almuerzo">
+                                <div class="comida-label">Almuerzo</div>
+                                <div class="recetas-container" id="semanaAlmuerzo">
+                                    <!-- Recetas -->
+                                </div>
+                            </div>
+                            <div class="comida-slot cena" data-comida="cena">
+                                <div class="comida-label">Cena</div>
+                                <div class="recetas-container" id="semanaCena">
+                                    <!-- Recetas -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Día -->
+            <div id="vistaDia" class="vista-calendario" style="display: none;">
+                <div class="dia-view">
+                    <div class="dia-header">
+                        <h2 id="diaActual">Lunes, 1 de Enero 2025</h2>
+                        <button class="btn-exec-secondary" onclick="agregarRecetaDia()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Agregar Receta
+                        </button>
+                    </div>
+                    <div class="dia-comidas">
+                        <div class="comida-card-exec desayuno-card" data-comida="desayuno">
+                            <div class="comida-card-header">
+                                <div class="comida-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <h3>Desayuno</h3>
+                                <button class="btn-add-receta" onclick="abrirModalReceta('desayuno')">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="recetas-list" id="recetasDesayuno">
+                                <!-- Recetas se cargarán aquí -->
+                            </div>
+                        </div>
+
+                        <div class="comida-card-exec almuerzo-card" data-comida="almuerzo">
+                            <div class="comida-card-header">
+                                <div class="comida-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <h3>Almuerzo</h3>
+                                <button class="btn-add-receta" onclick="abrirModalReceta('almuerzo')">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="recetas-list" id="recetasAlmuerzo">
+                                <!-- Recetas se cargarán aquí -->
+                            </div>
+                        </div>
+
+                        <div class="comida-card-exec cena-card" data-comida="cena">
+                            <div class="comida-card-header">
+                                <div class="comida-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <h3>Cena</h3>
+                                <button class="btn-add-receta" onclick="abrirModalReceta('cena')">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="recetas-list" id="recetasCena">
+                                <!-- Recetas se cargarán aquí -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Lateral de Resumen -->
+            <div class="planificacion-sidebar">
+                <div class="sidebar-section">
+                    <h3>Resumen del Período</h3>
+                    <div class="resumen-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Recetas Planificadas</span>
+                            <span class="stat-value" id="totalRecetas">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Productos Necesarios</span>
+                            <span class="stat-value" id="totalProductos">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Costo Estimado</span>
+                            <span class="stat-value" id="costoEstimado">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Productos Requeridos</h3>
+                    <div class="productos-list" id="productosRequeridos">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Acciones Rápidas</h3>
+                    <div class="acciones-rapidas">
+                        <button class="accion-btn" onclick="generarListaCompras()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
+                                <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
+                                <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Lista de Compras
+                        </button>
+                        <button class="accion-btn" onclick="exportarPlanificacion()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Exportar
+                        </button>
+                        <button class="accion-btn" onclick="duplicarSemana()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Duplicar Semana
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Receta -->
+    <div id="modalReceta" class="modal-exec" style="display: none;">
+        <div class="modal-exec-content">
+            <div class="modal-exec-header">
+                <h2 id="modalRecetaTitulo">Agregar Receta</h2>
+                <button class="btn-close-exec" onclick="cerrarModalReceta()">×</button>
+            </div>
+            <form id="formReceta" onsubmit="guardarReceta(event)">
+                <div class="form-exec-group">
+                    <label>Nombre de la Receta *</label>
+                    <input type="text" id="nombreReceta" required placeholder="Ej: Arroz con Frijoles">
+                </div>
+                <div class="form-exec-group">
+                    <label>Categoría</label>
+                    <select id="categoriaReceta">
+                        <option value="plato-principal">Plato Principal</option>
+                        <option value="acompanamiento">Acompañamiento</option>
+                        <option value="postre">Postre</option>
+                        <option value="bebida">Bebida</option>
+                        <option value="sopa">Sopa</option>
+                        <option value="ensalada">Ensalada</option>
+                    </select>
+                </div>
+                <div class="form-exec-group">
+                    <label>Rendimiento (porciones) *</label>
+                    <input type="number" id="rendimientoReceta" required min="1" value="10">
+                </div>
+                
+                <div class="form-exec-group">
+                    <label>Productos/Ingredientes *</label>
+                    <div class="productos-receta-container">
+                        <div id="productosRecetaList">
+                            <!-- Productos se agregarán aquí -->
+                        </div>
+                        <button type="button" class="btn-add-producto" onclick="agregarProductoReceta()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Agregar Producto
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-exec-group">
+                    <label>Costo Estimado por Porción</label>
+                    <input type="number" id="costoReceta" step="0.01" placeholder="0.00" readonly>
+                </div>
+
+                <div class="form-exec-actions">
+                    <button type="button" class="btn-exec-secondary" onclick="cerrarModalReceta()">Cancelar</button>
+                    <button type="submit" class="btn-exec-primary">Guardar Receta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Producción -->
+    <div id="produccion" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <h1>Gestión de Producción</h1>
+                <button class="btn-primary" onclick="mostrarSimuladorProduccion()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                        <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Reportar por WhatsApp
+                </button>
+            </div>
+
+            <!-- KPIs de Producción -->
+            <div class="produccion-kpis">
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiTotalCharolas">0</h3>
+                        <p>Total Charolas Hoy</p>
+                        <span class="kpi-trend neutral">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiMermaPromedio">0%</h3>
+                        <p>Merma Promedio</p>
+                        <span class="kpi-trend neutral">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiRecetasProducidas">0</h3>
+                        <p>Recetas Producidas</p>
+                        <span class="kpi-trend neutral">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiEficiencia">0%</h3>
+                        <p>Eficiencia de Producción</p>
+                        <span class="kpi-trend neutral">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen por Comida -->
+            <div class="produccion-resumen-comidas">
+                <h2>Resumen de Producción por Comida</h2>
+                <div class="comidas-grid">
+                    <div class="comida-resumen-card desayuno-resumen">
+                        <div class="comida-resumen-header">
+                            <h3>Desayuno</h3>
+                            <span class="comida-badge desayuno-badge">Desayuno</span>
+                        </div>
+                        <div class="comida-resumen-stats">
+                            <div class="stat-comida">
+                                <span class="stat-label">Total Charolas</span>
+                                <span class="stat-value" id="charolasDesayuno">0</span>
+                            </div>
+                            <div class="stat-comida">
+                                <span class="stat-label">Recetas</span>
+                                <span class="stat-value" id="recetasDesayuno">0</span>
+                            </div>
+                            <div class="stat-comida">
+                                <span class="stat-label">Merma Total</span>
+                                <span class="stat-value" id="mermaDesayuno">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comida-resumen-card almuerzo-resumen">
+                        <div class="comida-resumen-header">
+                            <h3>Almuerzo</h3>
+                            <span class="comida-badge almuerzo-badge">Almuerzo</span>
+                        </div>
+                        <div class="comida-resumen-stats">
+                            <div class="stat-comida">
+                                <span class="stat-label">Total Charolas</span>
+                                <span class="stat-value" id="charolasAlmuerzo">0</span>
+                            </div>
+                            <div class="stat-comida">
+                                <span class="stat-label">Recetas</span>
+                                <span class="stat-value" id="recetasAlmuerzo">0</span>
+                            </div>
+                            <div class="stat-comida">
+                                <span class="stat-label">Merma Total</span>
+                                <span class="stat-value" id="mermaAlmuerzo">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comida-resumen-card cena-resumen">
+                        <div class="comida-resumen-header">
+                            <h3>Cena</h3>
+                            <span class="comida-badge cena-badge">Cena</span>
+                        </div>
+                        <div class="comida-resumen-stats">
+                            <div class="stat-comida">
+                                <span class="stat-label">Total Charolas</span>
+                                <span class="stat-value" id="charolasCena">0</span>
+                            </div>
+                            <div class="stat-comida">
+                                <span class="stat-label">Recetas</span>
+                                <span class="stat-value" id="recetasCena">0</span>
+                            </div>
+                            <div class="stat-comida">
+                                <span class="stat-label">Merma Total</span>
+                                <span class="stat-value" id="mermaCena">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos de Producción -->
+            <div class="produccion-charts">
+                <div class="chart-card">
+                    <h3>Producción Diaria (Charolas)</h3>
+                    <canvas id="chartProduccionDiaria" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Merma por Receta</h3>
+                    <canvas id="chartMermaReceta" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Producción por Comida</h3>
+                    <canvas id="chartProduccionComida" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Tendencia de Merma</h3>
+                    <canvas id="chartTendenciaMerma" width="400" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Tabla de Producción -->
+            <div class="produccion-table-container">
+                <div class="table-header">
+                    <h2>Registro de Producción</h2>
+                    <div class="table-filters">
+                        <input type="date" id="filtroFechaProduccion" onchange="filtrarProduccion()">
+                        <select id="filtroComidaProduccion" onchange="filtrarProduccion()">
+                            <option value="">Todas las comidas</option>
+                            <option value="desayuno">Desayuno</option>
+                            <option value="almuerzo">Almuerzo</option>
+                            <option value="cena">Cena</option>
+                        </select>
+                        <input type="text" id="buscarRecetaProduccion" placeholder="Buscar receta..." onkeyup="filtrarProduccion()">
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="produccion-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Comida</th>
+                                <th>Receta</th>
+                                <th>Charolas</th>
+                                <th>Merma (%)</th>
+                                <th>Comentario Merma</th>
+                                <th>Responsable</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaProduccionBody">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulador WhatsApp Producción -->
+    <div id="simuladorProduccion" class="modal-exec" style="display: none;">
+        <div class="modal-exec-content" style="max-width: 700px;">
+            <div class="modal-exec-header">
+                <h2>Reportar Producción vía WhatsApp</h2>
+                <button class="btn-close-exec" onclick="cerrarSimuladorProduccion()">×</button>
+            </div>
+            <div class="whatsapp-simulator">
+                <div class="whatsapp-header">
+                    <div class="whatsapp-contact">
+                        <div class="contact-avatar">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="contact-info">
+                            <h4>Sistema de Producción</h4>
+                            <p>En línea</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="whatsapp-messages" id="whatsappMessagesProduccion">
+                    <div class="message received">
+                        <p>👋 Hola! Para reportar producción, envía el mensaje en este formato:</p>
+                        <p><strong>PRODUCCION</strong></p>
+                        <p>Comida: [desayuno/almuerzo/cena]</p>
+                        <p>Receta: [nombre de la receta]</p>
+                        <p>Charolas: [número]</p>
+                        <p>Merma: [porcentaje]</p>
+                        <p>Comentario: [detalle del desperdicio]</p>
+                    </div>
+                </div>
+                <div class="whatsapp-input-container">
+                    <textarea id="mensajeProduccion" placeholder="Escribe tu mensaje aquí..." rows="3"></textarea>
+                    <button class="btn-whatsapp-send" onclick="procesarMensajeProduccion()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="whatsapp-quick-actions">
+                    <button class="quick-action-btn" onclick="usarEjemploProduccion()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Usar Ejemplo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="servicio" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <h1>Satisfacción al Cliente</h1>
+                <button class="btn-primary" onclick="crearEncuesta()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                        <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M18.5 2.5C18.8978 2.10218 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10218 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10218 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Crear Nueva Encuesta
+                </button>
+            </div>
+            
+            <!-- KPIs de Satisfacción -->
+            <div class="satisfaccion-kpis">
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiPromedio">4.7</h3>
+                        <p>Calificación Promedio</p>
+                        <span class="kpi-trend positive">↑ +0.2</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiRespuestas">127</h3>
+                        <p>Total Respuestas</p>
+                        <span class="kpi-trend positive">↑ +12</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiNPS">68%</h3>
+                        <p>NPS (Net Promoter Score)</p>
+                        <span class="kpi-trend positive">↑ +5%</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M3.51 15C4.15839 16.8404 5.38734 18.4202 7.01166 19.5014C8.63598 20.5826 10.5677 21.1066 12.5157 20.9945C14.4637 20.8824 16.3226 20.1402 17.8121 18.8798C19.3017 17.6194 20.3411 15.909 20.7742 14C21.2073 12.0911 21.0101 10.0605 20.2126 8.26407C19.4152 6.46764 18.0605 5.00491 16.3528 4.12277C14.6451 3.24063 12.6768 2.98722 10.7447 3.40649C8.81265 3.82577 7.02091 4.80026 5.64 6.2L1 10M23 14L18.36 17.8C16.9791 19.1997 15.1874 20.1742 13.2553 20.5935C11.3232 21.0128 9.35488 20.7594 7.64718 19.8772C5.93949 18.9951 4.58484 17.5324 3.78737 15.7359C2.98991 13.9395 2.79273 11.9089 3.22582 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiRegreso">87%</h3>
+                        <p>Intención de Regreso</p>
+                        <span class="kpi-trend positive">↑ +3%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medidas de Tendencia Central -->
+            <div class="tendencia-central">
+                <h2>Medidas de Tendencia Central</h2>
+                <div class="tendencia-grid">
+                    <div class="tendencia-card">
+                        <h3>Media Aritmética</h3>
+                        <p class="tendencia-valor" id="mediaAritmetica">4.68</p>
+                        <p class="tendencia-desc">Promedio de todas las calificaciones</p>
+                    </div>
+                    <div class="tendencia-card">
+                        <h3>Mediana</h3>
+                        <p class="tendencia-valor" id="mediana">4.7</p>
+                        <p class="tendencia-desc">Valor central de las calificaciones</p>
+                    </div>
+                    <div class="tendencia-card">
+                        <h3>Moda</h3>
+                        <p class="tendencia-valor" id="moda">4.8</p>
+                        <p class="tendencia-desc">Calificación más frecuente</p>
+                    </div>
+                    <div class="tendencia-card">
+                        <h3>Desviación Estándar</h3>
+                        <p class="tendencia-valor" id="desviacion">0.42</p>
+                        <p class="tendencia-desc">Variabilidad de las respuestas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos Estratégicos -->
+            <div class="satisfaccion-charts">
+                <div class="chart-card">
+                    <h3>Evolución de Satisfacción</h3>
+                    <canvas id="chartSatisfaccionEvolucion" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Satisfacción por Categoría</h3>
+                    <canvas id="chartSatisfaccionCategorias" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Intención de Regreso (NPS)</h3>
+                    <canvas id="chartNPS" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Distribución de Calificaciones</h3>
+                    <canvas id="chartDistribucion" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Comparativa de Variables</h3>
+                    <canvas id="chartComparativa" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Satisfacción por Día de la Semana</h3>
+                    <canvas id="chartDiaSemana" width="400" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Análisis Detallado -->
+            <div class="analisis-detallado">
+                <h2>Análisis Detallado por Variable</h2>
+                <div class="variables-grid" id="variablesGrid">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Compartir Encuesta con QR -->
+            <div class="qr-encuesta-section">
+                <div class="qr-card">
+                    <div class="qr-header">
+                        <h2>Compartir Encuesta</h2>
+                        <p>Escanea el código QR para acceder al formulario de satisfacción</p>
+                    </div>
+                    <div class="qr-content">
+                        <div class="qr-display">
+                            <div id="qrCodeContainer">
+                                <img id="qrCodeImage" src="" alt="Código QR de Encuesta" style="display: none; max-width: 300px; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                <div id="qrPlaceholder" class="qr-placeholder">
+                                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="3" y="3" width="7" height="7" fill="currentColor"/>
+                                        <rect x="14" y="3" width="7" height="7" fill="currentColor"/>
+                                        <rect x="3" y="14" width="7" height="7" fill="currentColor"/>
+                                        <rect x="14" y="14" width="7" height="7" fill="currentColor"/>
+                                        <rect x="6" y="6" width="12" height="12" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                    <p>Generar QR</p>
+                                </div>
+                            </div>
+                            <div class="qr-actions">
+                                <button class="btn-primary" onclick="generarQREncuesta()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                        <path d="M12 2V6M12 18V22M6 12H2M22 12H18M19.07 19.07L16.24 16.24M19.07 4.93L16.24 7.76M4.93 19.07L7.76 16.24M4.93 4.93L7.76 7.76" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                    Generar Código QR
+                                </button>
+                                <button class="btn-secondary" id="btnDescargarQR" onclick="descargarQR()" style="display: none;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Descargar QR
+                                </button>
+                            </div>
+                        </div>
+                        <div class="qr-info">
+                            <h3>Instrucciones</h3>
+                            <ul>
+                                <li>Haz clic en "Generar Código QR" para crear el código</li>
+                                <li>Comparte el código QR con tus clientes</li>
+                                <li>Al escanearlo, se abrirá el formulario de satisfacción</li>
+                                <li>Puedes descargar el QR para imprimirlo o compartirlo digitalmente</li>
+                            </ul>
+                            <div class="qr-link">
+                                <label>Enlace directo:</label>
+                                <div class="link-container">
+                                    <input type="text" id="qrLink" readonly value="">
+                                    <button class="btn-copy" onclick="copiarEnlace()" title="Copiar enlace">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Encuesta (se abre desde QR) -->
+    <div id="formulario-encuesta" class="screen formulario-encuesta-screen">
+        <div class="formulario-encuesta-container">
+            <div class="formulario-encuesta-header">
+                <h1>Encuesta de Satisfacción</h1>
+                <p>Tu opinión es muy importante para nosotros</p>
+            </div>
+            <form id="formEncuestaCliente" class="formulario-encuesta-form" onsubmit="enviarEncuestaCliente(event)">
+                <div class="form-section">
+                    <h3>Datos Personales</h3>
+                    <div class="form-group">
+                        <label for="nombreCliente">Nombre (opcional)</label>
+                        <input type="text" id="nombreCliente" name="nombre" placeholder="Tu nombre">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailCliente">Email (opcional)</label>
+                        <input type="email" id="emailCliente" name="email" placeholder="tu@email.com">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Calificación General</h3>
+                    <div class="form-group">
+                        <label>¿Cómo calificarías tu experiencia general?</label>
+                        <div class="rating-stars" id="ratingGeneral">
+                            <input type="radio" name="calificacionGeneral" id="star5" value="5">
+                            <label for="star5" class="star-label">★</label>
+                            <input type="radio" name="calificacionGeneral" id="star4" value="4">
+                            <label for="star4" class="star-label">★</label>
+                            <input type="radio" name="calificacionGeneral" id="star3" value="3">
+                            <label for="star3" class="star-label">★</label>
+                            <input type="radio" name="calificacionGeneral" id="star2" value="2">
+                            <label for="star2" class="star-label">★</label>
+                            <input type="radio" name="calificacionGeneral" id="star1" value="1">
+                            <label for="star1" class="star-label">★</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Evaluación por Aspectos</h3>
+                    <div class="aspectos-grid">
+                        <div class="aspecto-item">
+                            <label>Sabor de la Comida</label>
+                            <div class="rating-stars-small">
+                                <input type="radio" name="sabor" id="sabor5" value="5">
+                                <label for="sabor5">★</label>
+                                <input type="radio" name="sabor" id="sabor4" value="4">
+                                <label for="sabor4">★</label>
+                                <input type="radio" name="sabor" id="sabor3" value="3">
+                                <label for="sabor3">★</label>
+                                <input type="radio" name="sabor" id="sabor2" value="2">
+                                <label for="sabor2">★</label>
+                                <input type="radio" name="sabor" id="sabor1" value="1">
+                                <label for="sabor1">★</label>
+                            </div>
+                        </div>
+                        <div class="aspecto-item">
+                            <label>Calidad de Ingredientes</label>
+                            <div class="rating-stars-small">
+                                <input type="radio" name="calidad" id="calidad5" value="5">
+                                <label for="calidad5">★</label>
+                                <input type="radio" name="calidad" id="calidad4" value="4">
+                                <label for="calidad4">★</label>
+                                <input type="radio" name="calidad" id="calidad3" value="3">
+                                <label for="calidad3">★</label>
+                                <input type="radio" name="calidad" id="calidad2" value="2">
+                                <label for="calidad2">★</label>
+                                <input type="radio" name="calidad" id="calidad1" value="1">
+                                <label for="calidad1">★</label>
+                            </div>
+                        </div>
+                        <div class="aspecto-item">
+                            <label>Presentación</label>
+                            <div class="rating-stars-small">
+                                <input type="radio" name="presentacion" id="presentacion5" value="5">
+                                <label for="presentacion5">★</label>
+                                <input type="radio" name="presentacion" id="presentacion4" value="4">
+                                <label for="presentacion4">★</label>
+                                <input type="radio" name="presentacion" id="presentacion3" value="3">
+                                <label for="presentacion3">★</label>
+                                <input type="radio" name="presentacion" id="presentacion2" value="2">
+                                <label for="presentacion2">★</label>
+                                <input type="radio" name="presentacion" id="presentacion1" value="1">
+                                <label for="presentacion1">★</label>
+                            </div>
+                        </div>
+                        <div class="aspecto-item">
+                            <label>Atención al Cliente</label>
+                            <div class="rating-stars-small">
+                                <input type="radio" name="servicio" id="servicio5" value="5">
+                                <label for="servicio5">★</label>
+                                <input type="radio" name="servicio" id="servicio4" value="4">
+                                <label for="servicio4">★</label>
+                                <input type="radio" name="servicio" id="servicio3" value="3">
+                                <label for="servicio3">★</label>
+                                <input type="radio" name="servicio" id="servicio2" value="2">
+                                <label for="servicio2">★</label>
+                                <input type="radio" name="servicio" id="servicio1" value="1">
+                                <label for="servicio1">★</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Preguntas Adicionales</h3>
+                    <div class="form-group">
+                        <label for="regresaria">¿Volverías a comer aquí?</label>
+                        <select id="regresaria" name="regresaria" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="si">Sí, definitivamente</option>
+                            <option value="probablemente">Probablemente</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="recomendaria">¿Recomendarías este comedor a otros?</label>
+                        <select id="recomendaria" name="recomendaria" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="si">Sí, definitivamente</option>
+                            <option value="probablemente">Probablemente</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="comentarios">Comentarios adicionales (opcional)</label>
+                        <textarea id="comentarios" name="comentarios" rows="4" placeholder="Comparte tus comentarios, sugerencias o recomendaciones..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Enviar Encuesta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notificaciones -->
+    <div id="notificaciones" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <h1>Notificaciones y Alertas</h1>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="filtrarNotificaciones('todas')">Todas</button>
+                    <button class="btn-primary" onclick="marcarTodasLeidas()">Marcar todas como leídas</button>
+                </div>
+            </div>
+
+            <!-- Filtros por Categoría -->
+            <div class="notificaciones-filtros">
+                <button class="filtro-btn active" data-categoria="todas" onclick="filtrarNotificaciones('todas')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 12L12 15L22 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 12V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Todas
+                    <span class="filtro-count" id="countTodas">0</span>
+                </button>
+                <button class="filtro-btn" data-categoria="urgente" onclick="filtrarNotificaciones('urgente')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.29 3.86L1.82 18C1.64534 18.3024 1.55299 18.6453 1.55201 18.9945C1.55103 19.3437 1.64151 19.6871 1.81445 19.9905C1.98738 20.2939 2.23675 20.5467 2.53773 20.7238C2.83871 20.9009 3.18082 20.9962 3.53 21H20.47C20.8192 20.9962 21.1613 20.9009 21.4623 20.7238C21.7633 20.5467 22.0126 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3547 18.3024 22.18 18L13.71 3.86C13.5322 3.56611 13.2807 3.32312 12.9812 3.15447C12.6817 2.98581 12.3438 2.89725 12 2.89725C11.6562 2.89725 11.3183 2.98581 11.0188 3.15447C10.7193 3.32312 10.4678 3.56611 10.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Urgentes
+                    <span class="filtro-count" id="countUrgente">0</span>
+                </button>
+                <button class="filtro-btn" data-categoria="desviacion" onclick="filtrarNotificaciones('desviacion')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Desviaciones
+                    <span class="filtro-count" id="countDesviacion">0</span>
+                </button>
+                <button class="filtro-btn" data-categoria="novedad" onclick="filtrarNotificaciones('novedad')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Novedades
+                    <span class="filtro-count" id="countNovedad">0</span>
+                </button>
+                <button class="filtro-btn" data-categoria="informativa" onclick="filtrarNotificaciones('informativa')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 16V12M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Informativas
+                    <span class="filtro-count" id="countInformativa">0</span>
+                </button>
+            </div>
+
+            <!-- Contenedor de Notificaciones -->
+            <div class="notificaciones-container">
+                <!-- Sección: Alertas Urgentes -->
+                <div class="notificaciones-seccion" id="seccionUrgente">
+                    <div class="seccion-header">
+                        <div class="seccion-icon urgente">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10.29 3.86L1.82 18C1.64534 18.3024 1.55299 18.6453 1.55201 18.9945C1.55103 19.3437 1.64151 19.6871 1.81445 19.9905C1.98738 20.2939 2.23675 20.5467 2.53773 20.7238C2.83871 20.9009 3.18082 20.9962 3.53 21H20.47C20.8192 20.9962 21.1613 20.9009 21.4623 20.7238C21.7633 20.5467 22.0126 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3547 18.3024 22.18 18L13.71 3.86C13.5322 3.56611 13.2807 3.32312 12.9812 3.15447C12.6817 2.98581 12.3438 2.89725 12 2.89725C11.6562 2.89725 11.3183 2.98581 11.0188 3.15447C10.7193 3.32312 10.4678 3.56611 10.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h2>Alertas Urgentes</h2>
+                        <span class="seccion-count" id="countSeccionUrgente">0</span>
+                    </div>
+                    <div class="notificaciones-grid" id="gridUrgente">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Sección: Desviaciones -->
+                <div class="notificaciones-seccion" id="seccionDesviacion">
+                    <div class="seccion-header">
+                        <div class="seccion-icon desviacion">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h2>Desviaciones de Planificación</h2>
+                        <span class="seccion-count" id="countSeccionDesviacion">0</span>
+                    </div>
+                    <div class="notificaciones-grid" id="gridDesviacion">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Sección: Novedades -->
+                <div class="notificaciones-seccion" id="seccionNovedad">
+                    <div class="seccion-header">
+                        <div class="seccion-icon novedad">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h2>Novedades</h2>
+                        <span class="seccion-count" id="countSeccionNovedad">0</span>
+                    </div>
+                    <div class="notificaciones-grid" id="gridNovedad">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Sección: Informativas -->
+                <div class="notificaciones-seccion" id="seccionInformativa">
+                    <div class="seccion-header">
+                        <div class="seccion-icon informativa">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 16V12M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h2>Informativas</h2>
+                        <span class="seccion-count" id="countSeccionInformativa">0</span>
+                    </div>
+                    <div class="notificaciones-grid" id="gridInformativa">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat AI -->
+    <div id="chat-ai" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <h1>Asistente AI para Gestión de Comedores</h1>
+            </div>
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message ai-message">
+                        <div class="message-avatar">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="8" cy="8" r="2" fill="currentColor"/>
+                                <path d="M18 14L14 10L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-text">¡Hola! Soy tu asistente AI para gestión de comedores. ¿En qué puedo ayudarte hoy?</div>
+                            <div class="message-time">Ahora</div>
+                        </div>
+                    </div>
+                    <div class="chat-message ai-message">
+                        <div class="message-avatar">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="8" cy="8" r="2" fill="currentColor"/>
+                                <path d="M18 14L14 10L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-text">Puedo ayudarte con:<br>• Análisis de consumo e inventario<br>• Sugerencias de menús<br>• Optimización de compras<br>• Análisis de satisfacción<br>• Y mucho más...</div>
+                            <div class="message-time">Ahora</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-suggestions">
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('Analiza el inventario actual')">Analizar inventario</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('¿Qué consumos están fuera de lo planificado?')">Consumos fuera de plan</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('¿Cuál es la receta con mayor merma y en qué fecha?')">Mayor merma</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('Sugiere un menú para mañana')">Sugerir menú</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('¿Qué productos están críticos?')">Productos críticos</button>
+                    <button class="suggestion-btn" onclick="enviarMensajeAI('Dame un reporte ejecutivo')">Reporte ejecutivo</button>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Escribe tu pregunta..." onkeypress="if(event.key === 'Enter') enviarMensajeAI()">
+                    <button class="chat-send-btn" onclick="enviarMensajeAI()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Costos Variables de Producción -->
+    <div id="costos" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <h1>Costos Variables de Producción</h1>
+                <button class="btn-primary" onclick="actualizarCostos()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                        <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3.51 15C4.15839 16.8404 5.38734 18.4202 7.01166 19.5014C8.63598 20.5826 10.5677 21.1066 12.5157 20.9945C14.4637 20.8824 16.3226 20.1402 17.8121 18.8798C19.3017 17.6194 20.3411 15.909 20.7742 14C21.2073 12.0911 21.0101 10.0605 20.2126 8.26407C19.4152 6.46764 18.0605 5.00491 16.3528 4.12277C14.6451 3.24063 12.6768 2.98722 10.7447 3.40649C8.81265 3.82577 7.02091 4.80026 5.64 6.2L1 10M23 14L18.36 17.8C16.9791 19.1997 15.1874 20.1742 13.2553 20.5935C11.3232 21.0128 9.35488 20.7594 7.64718 19.8772C5.93949 18.9951 4.58484 17.5324 3.78737 15.7359C2.98991 13.9395 2.79273 11.9089 3.22582 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Actualizar Costos
+                </button>
+            </div>
+
+            <!-- KPIs de Costos -->
+            <div class="costos-kpis">
+                <div class="kpi-card costo-total">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiCostoTotal">$0.00</h3>
+                        <p>Costo Total del Día</p>
+                        <span class="kpi-trend" id="kpiCostoTotalTrend">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card costo-promedio">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiPromedioIdeal">$0.00</h3>
+                        <p>Promedio Ideal</p>
+                        <span class="kpi-trend neutral">Referencia</span>
+                    </div>
+                </div>
+                <div class="kpi-card costo-desviacion">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiDesviacion">0.0%</h3>
+                        <p>Desviación</p>
+                        <span class="kpi-trend" id="kpiDesviacionTrend">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card costo-eficiencia">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiEficiencia">0.0%</h3>
+                        <p>Eficiencia</p>
+                        <span class="kpi-trend" id="kpiEficienciaTrend">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos de Costos -->
+            <div class="costos-charts">
+                <div class="chart-card">
+                    <h3>Costo Variable Total del Día</h3>
+                    <canvas id="chartCostoDiario" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Desviación del Promedio Ideal</h3>
+                    <canvas id="chartDesviacionPromedio" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Costos por Receta</h3>
+                    <canvas id="chartCostosReceta" width="400" height="250"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Tendencia de Costos (7 días)</h3>
+                    <canvas id="chartTendenciaCostos" width="400" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Tabla de Costos Detallados -->
+            <div class="costos-table-container">
+                <div class="table-header">
+                    <h2>Desglose de Costos por Receta/Menú</h2>
+                    <div class="table-filters">
+                        <select id="filtroFechaCostos" onchange="filtrarCostos()">
+                            <option value="hoy">Hoy</option>
+                            <option value="semana">Esta Semana</option>
+                            <option value="mes">Este Mes</option>
+                        </select>
+                        <input type="text" id="buscarReceta" placeholder="Buscar receta..." onkeyup="filtrarCostos()">
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="costos-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Receta/Menú</th>
+                                <th>Cantidad</th>
+                                <th>Costo Unitario</th>
+                                <th>Costo Total</th>
+                                <th>Desviación</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaCostosBody">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Resumen de Costos por Categoría -->
+            <div class="costos-categorias">
+                <h2>Costos por Categoría de Producto</h2>
+                <div class="categorias-grid" id="categoriasGrid">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Control de Calidad -->
+    <div id="calidad" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <h1>Control de Calidad</h1>
+                <div class="header-actions">
+                    <select id="filtroEstadoCalidad" onchange="filtrarOrdenesCalidad()" style="padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 0.5rem; background: var(--bg-color);">
+                        <option value="todas" selected>Todas las órdenes</option>
+                        <option value="pendiente">Pendientes</option>
+                        <option value="aprobada">Aprobadas</option>
+                        <option value="rechazada">Rechazadas</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- KPIs de Calidad -->
+            <div class="calidad-kpis">
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiOrdenesPendientes">0</h3>
+                        <p>Órdenes Pendientes</p>
+                        <span class="kpi-trend neutral">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" fill="currentColor"/>
+                            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" fill="currentColor"/>
+                            <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiDevoluciones">0</h3>
+                        <p>Devoluciones Totales</p>
+                        <span class="kpi-trend neutral">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiAjustes">0</h3>
+                        <p>Ajustes Realizados</p>
+                        <span class="kpi-trend neutral">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 id="kpiTasaAprobacion">0%</h3>
+                        <p>Tasa de Aprobación</p>
+                        <span class="kpi-trend neutral">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Órdenes de Compra -->
+            <div class="calidad-ordenes-container">
+                <h2>Órdenes de Compra Pendientes de Verificación</h2>
+                <div id="ordenesCalidadList" class="ordenes-calidad-grid">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Historial de Verificaciones -->
+            <div class="calidad-historial-container">
+                <h2>Historial de Verificaciones</h2>
+                <div class="table-wrapper">
+                    <table class="calidad-historial-table">
+                        <thead>
+                            <tr>
+                                <th>Orden</th>
+                                <th>Proveedor</th>
+                                <th>Fecha Recepción</th>
+                                <th>Estado</th>
+                                <th>Productos</th>
+                                <th>Devoluciones</th>
+                                <th>Ajustes</th>
+                                <th>Verificador</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historialCalidadBody">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Verificación de Calidad -->
+    <div id="modalVerificacionCalidad" class="modal-exec" style="display: none;">
+        <div class="modal-exec-content" style="max-width: 95vw; width: 1400px;">
+            <div class="modal-exec-header">
+                <h2 id="modalCalidadTitulo">Verificación de Calidad</h2>
+                <button class="btn-close-exec" onclick="cerrarModalCalidad()">×</button>
+            </div>
+            <div class="calidad-orden-info" id="calidadOrdenInfo">
+                <!-- Se llenará dinámicamente -->
+            </div>
+            <form id="formVerificacionCalidad" onsubmit="aprobarVerificacionCalidad(event)">
+                <div class="calidad-productos-container">
+                    <h3>Verificación de Productos</h3>
+                    <div class="table-wrapper" style="overflow-x: auto;">
+                        <table class="calidad-productos-table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad Facturada</th>
+                                    <th>Unidad</th>
+                                    <th>Precio Unit.</th>
+                                    <th>Cantidad Recibida</th>
+                                    <th>Ajuste</th>
+                                    <th>Devolución</th>
+                                    <th>Motivo Devolución</th>
+                                    <th>Estado</th>
+                                    <th>Observaciones Calidad</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productosCalidadBody">
+                                <!-- Se llenará dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="calidad-resumen">
+                    <div class="resumen-item">
+                        <span class="resumen-label">Total Facturado:</span>
+                        <span class="resumen-value" id="totalFacturadoCalidad">$0.00</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">Total Recibido:</span>
+                        <span class="resumen-value" id="totalRecibidoCalidad">$0.00</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span class="resumen-label">Total Devoluciones:</span>
+                        <span class="resumen-value negativo" id="totalDevolucionesCalidad">$0.00</span>
+                    </div>
+                    <div class="resumen-item destacado">
+                        <span class="resumen-label">Total a Aprobar:</span>
+                        <span class="resumen-value" id="totalAprobarCalidad">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="form-exec-group">
+                    <label>Observaciones Generales</label>
+                    <textarea id="observacionesGeneralesCalidad" rows="3" placeholder="Observaciones adicionales sobre la verificación de calidad..."></textarea>
+                </div>
+
+                <div class="form-exec-group">
+                    <label>Verificador</label>
+                    <input type="text" id="verificadorCalidad" placeholder="Nombre del verificador" required>
+                </div>
+
+                <div class="form-exec-actions">
+                    <button type="button" class="btn-exec-secondary" onclick="cerrarModalCalidad()">Cancelar</button>
+                    <button type="button" class="btn-exec-warning" onclick="rechazarVerificacionCalidad()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Rechazar
+                    </button>
+                    <button type="submit" class="btn-exec-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Aprobar y Procesar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Configuración -->
+    <div id="configuracion" class="screen">
+        <div class="page-container">
+            <div class="page-header">
+                <h1>Configuración del Sistema</h1>
+                <p class="header-subtitle">Gestión de parámetros, usuarios y preferencias</p>
+            </div>
+
+            <!-- Secciones de Configuración -->
+            <div class="configuracion-container">
+                <!-- Panel de Navegación -->
+                <div class="configuracion-sidebar">
+                    <div class="config-nav">
+                        <button class="config-nav-item active" onclick="mostrarSeccionConfig('general')" data-section="general">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 1V3M12 21V23M23 12H21M3 12H1M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M19.07 19.07L17.66 17.66M6.34 6.34L4.93 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span>General</span>
+                        </button>
+                        <button class="config-nav-item" onclick="mostrarSeccionConfig('usuarios')" data-section="usuarios">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <span>Usuarios</span>
+                        </button>
+                        <button class="config-nav-item" onclick="mostrarSeccionConfig('inventario')" data-section="inventario">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <path d="M9 9H15M9 12H15M9 15H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span>Inventario</span>
+                        </button>
+                        <button class="config-nav-item" onclick="mostrarSeccionConfig('produccion')" data-section="produccion">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Producción</span>
+                        </button>
+                        <button class="config-nav-item" onclick="mostrarSeccionConfig('notificaciones')" data-section="notificaciones">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Notificaciones</span>
+                        </button>
+                        <button class="config-nav-item" onclick="mostrarSeccionConfig('integraciones')" data-section="integraciones">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 3H6C4.89543 3 4 3.89543 4 5V19C4 20.1046 4.89543 21 6 21H18C19.1046 21 20 20.1046 20 19V5C20 3.89543 19.1046 3 18 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 17V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 11L12 7L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Integraciones</span>
+                        </button>
+                        <button class="config-nav-item" onclick="mostrarSeccionConfig('backup')" data-section="backup">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 16V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 8L12 3L17 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Respaldo</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Contenido de Configuración -->
+                <div class="configuracion-content">
+                    <!-- Sección General -->
+                    <div id="seccionGeneral" class="config-seccion active">
+                        <div class="config-section-header">
+                            <h2>Configuración General</h2>
+                            <p>Parámetros básicos del sistema</p>
+                        </div>
+                        <div class="config-form-grid">
+                            <div class="config-form-group">
+                                <label>Nombre del Comedor</label>
+                                <input type="text" id="nombreComedor" value="Comedor Industrial Central" placeholder="Nombre del establecimiento">
+                            </div>
+                            <div class="config-form-group">
+                                <label>Dirección</label>
+                                <input type="text" id="direccionComedor" value="Av. Principal 123, Ciudad" placeholder="Dirección completa">
+                            </div>
+                            <div class="config-form-group">
+                                <label>Teléfono</label>
+                                <input type="tel" id="telefonoComedor" value="+1 234 567 8900" placeholder="Teléfono de contacto">
+                            </div>
+                            <div class="config-form-group">
+                                <label>Email</label>
+                                <input type="email" id="emailComedor" value="contacto@comedor.com" placeholder="Email de contacto">
+                            </div>
+                            <div class="config-form-group">
+                                <label>Zona Horaria</label>
+                                <select id="zonaHoraria">
+                                    <option value="America/Mexico_City" selected>América/México (GMT-6)</option>
+                                    <option value="America/New_York">América/Nueva York (GMT-5)</option>
+                                    <option value="America/Los_Angeles">América/Los Ángeles (GMT-8)</option>
+                                    <option value="America/Bogota">América/Bogotá (GMT-5)</option>
+                                </select>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Idioma</label>
+                                <select id="idiomaSistema">
+                                    <option value="es" selected>Español</option>
+                                    <option value="en">English</option>
+                                    <option value="pt">Português</option>
+                                </select>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Moneda</label>
+                                <select id="monedaSistema">
+                                    <option value="USD">USD ($)</option>
+                                    <option value="MXN" selected>MXN ($)</option>
+                                    <option value="COP">COP ($)</option>
+                                    <option value="EUR">EUR (€)</option>
+                                </select>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Formato de Fecha</label>
+                                <select id="formatoFecha">
+                                    <option value="DD/MM/YYYY" selected>DD/MM/YYYY</option>
+                                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                                    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn-primary" onclick="guardarConfiguracion('general')">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                    <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M17 21V13H7V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M7 3V8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sección Usuarios -->
+                    <div id="seccionUsuarios" class="config-seccion">
+                        <div class="config-section-header">
+                            <h2>Gestión de Usuarios</h2>
+                            <p>Administración de usuarios y permisos</p>
+                        </div>
+                        <div class="config-table-container">
+                            <div class="table-header">
+                                <h3>Usuarios del Sistema</h3>
+                                <button class="btn-primary" onclick="abrirModalUsuario()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    Nuevo Usuario
+                                </button>
+                            </div>
+                            <div class="table-wrapper">
+                                <table class="config-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Usuario</th>
+                                            <th>Email</th>
+                                            <th>Rol</th>
+                                            <th>Estado</th>
+                                            <th>Último Acceso</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaUsuariosBody">
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección Inventario -->
+                    <div id="seccionInventario" class="config-seccion">
+                        <div class="config-section-header">
+                            <h2>Configuración de Inventario</h2>
+                            <p>Parámetros de control de inventario</p>
+                        </div>
+                        <div class="config-form-grid">
+                            <div class="config-form-group">
+                                <label>Días de Alerta de Inventario Mínimo</label>
+                                <input type="number" id="diasAlertaMinimo" value="3" min="1" max="30">
+                                <small>Días antes de alcanzar el mínimo para enviar alerta</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Porcentaje de Inventario de Seguridad</label>
+                                <input type="number" id="porcentajeSeguridad" value="20" min="0" max="100" step="5">
+                                <small>Porcentaje adicional sobre el mínimo para inventario de seguridad</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Unidad de Medida Predeterminada</label>
+                                <select id="unidadPredeterminada">
+                                    <option value="kg" selected>Kilogramos (kg)</option>
+                                    <option value="g">Gramos (g)</option>
+                                    <option value="L">Litros (L)</option>
+                                    <option value="unidad">Unidades</option>
+                                </select>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Actualización Automática de Stock</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="actualizacionAutomatica" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <small>Actualizar stock automáticamente al aprobar compras</small>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn-primary" onclick="guardarConfiguracion('inventario')">Guardar Cambios</button>
+                        </div>
+                    </div>
+
+                    <!-- Sección Producción -->
+                    <div id="seccionProduccion" class="config-seccion">
+                        <div class="config-section-header">
+                            <h2>Configuración de Producción</h2>
+                            <p>Parámetros de producción y merma</p>
+                        </div>
+                        <div class="config-form-grid">
+                            <div class="config-form-group">
+                                <label>Merma Objetivo (%)</label>
+                                <input type="number" id="mermaObjetivo" value="5" min="0" max="20" step="0.5">
+                                <small>Porcentaje objetivo de merma por receta</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Alertas de Merma Crítica (%)</label>
+                                <input type="number" id="mermaCritica" value="10" min="0" max="30" step="0.5">
+                                <small>Porcentaje de merma que activa alerta crítica</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Charolas por Lote Estándar</label>
+                                <input type="number" id="charolasLote" value="50" min="1" max="200">
+                                <small>Cantidad estándar de charolas por lote de producción</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Reporte Automático de Producción</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="reporteAutomatico" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <small>Generar reportes automáticos al finalizar el día</small>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn-primary" onclick="guardarConfiguracion('produccion')">Guardar Cambios</button>
+                        </div>
+                    </div>
+
+                    <!-- Sección Notificaciones -->
+                    <div id="seccionNotificaciones" class="config-seccion">
+                        <div class="config-section-header">
+                            <h2>Configuración de Notificaciones</h2>
+                            <p>Gestión de alertas y notificaciones del sistema</p>
+                        </div>
+                        <div class="config-form-grid">
+                            <div class="config-form-group">
+                                <label>Notificaciones por Email</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="notificacionesEmail" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <small>Enviar notificaciones importantes por email</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Notificaciones Push</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="notificacionesPush" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <small>Mostrar notificaciones en tiempo real</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Alertas de Inventario Crítico</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="alertasInventario" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <small>Activar alertas cuando el inventario esté crítico</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Alertas de Desviación de Costos</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="alertasCostos" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <small>Alertar cuando los costos se desvíen más del 10%</small>
+                            </div>
+                            <div class="config-form-group">
+                                <label>Frecuencia de Resumen</label>
+                                <select id="frecuenciaResumen">
+                                    <option value="diario" selected>Diario</option>
+                                    <option value="semanal">Semanal</option>
+                                    <option value="mensual">Mensual</option>
+                                </select>
+                                <small>Frecuencia de resumen de notificaciones</small>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn-primary" onclick="guardarConfiguracion('notificaciones')">Guardar Cambios</button>
+                        </div>
+                    </div>
+
+                    <!-- Sección Integraciones -->
+                    <div id="seccionIntegraciones" class="config-seccion">
+                        <div class="config-section-header">
+                            <h2>Integraciones</h2>
+                            <p>Configuración de servicios externos</p>
+                        </div>
+                        <div class="integraciones-grid">
+                            <div class="integracion-card">
+                                <div class="integracion-header">
+                                    <div class="integracion-icon">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M17.472 14.382C17.882 14.382 18.118 14.146 18.118 13.736C18.118 13.326 17.882 13.09 17.472 13.09H15.29V11.236H17.472C17.882 11.236 18.118 11 18.118 10.59C18.118 10.18 17.882 9.944 17.472 9.944H15.29V8.09H17.472C17.882 8.09 18.118 7.854 18.118 7.444C18.118 7.034 17.882 6.798 17.472 6.798H13.59C13.18 6.798 12.944 7.034 12.944 7.444V16.556C12.944 16.966 13.18 17.202 13.59 17.202H17.472C17.882 17.202 18.118 16.966 18.118 16.556C18.118 16.146 17.882 15.91 17.472 15.91H15.29V14.382H17.472Z" fill="currentColor"/>
+                                            <path d="M11.118 17.202H7.236C6.826 17.202 6.59 16.966 6.59 16.556V7.444C6.59 7.034 6.826 6.798 7.236 6.798H11.118C11.528 6.798 11.764 7.034 11.764 7.444V16.556C11.764 16.966 11.528 17.202 11.118 17.202ZM10.472 8.09H7.882V15.91H10.472V8.09Z" fill="currentColor"/>
+                                        </svg>
+                                    </div>
+                                    <div class="integracion-info">
+                                        <h3>WhatsApp Business</h3>
+                                        <p>Integración para recepción de facturas y reportes</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="whatsappEnabled" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="integracion-details">
+                                    <div class="config-form-group">
+                                        <label>Número de WhatsApp</label>
+                                        <input type="tel" id="whatsappNumber" value="+1 234 567 8900" placeholder="+1234567890">
+                                    </div>
+                                    <div class="config-form-group">
+                                        <label>Token de API</label>
+                                        <input type="password" id="whatsappToken" value="••••••••••••" placeholder="Token de acceso">
+                                        <button class="btn-text" onclick="togglePassword('whatsappToken')">Mostrar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="integracion-card">
+                                <div class="integracion-header">
+                                    <div class="integracion-icon">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M21 16V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M18 8L12 2L6 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M12 2V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <div class="integracion-info">
+                                        <h3>API Externa</h3>
+                                        <p>Conexión con sistemas de contabilidad</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="apiEnabled">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="integracion-details">
+                                    <div class="config-form-group">
+                                        <label>URL del API</label>
+                                        <input type="url" id="apiUrl" placeholder="https://api.ejemplo.com">
+                                    </div>
+                                    <div class="config-form-group">
+                                        <label>API Key</label>
+                                        <input type="password" id="apiKey" placeholder="Clave de API">
+                                        <button class="btn-text" onclick="togglePassword('apiKey')">Mostrar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="integracion-card">
+                                <div class="integracion-header">
+                                    <div class="integracion-icon">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M4 7C4 6.46957 4.21071 5.96086 4.58579 5.58579C4.96086 5.21071 5.46957 5 6 5H18C18.5304 5 19.0391 5.21071 19.4142 5.58579C19.7893 5.96086 20 6.46957 20 7V19C20 19.5304 19.7893 20.0391 19.4142 20.4142C19.0391 20.7893 18.5304 21 18 21H6C5.46957 21 4.96086 20.7893 4.58579 20.4142C4.21071 20.0391 4 19.5304 4 19V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M9 9H15M9 13H15M9 17H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                    </div>
+                                    <div class="integracion-info">
+                                        <h3>Email SMTP</h3>
+                                        <p>Configuración de servidor de correo</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="emailEnabled" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="integracion-details">
+                                    <div class="config-form-group">
+                                        <label>Servidor SMTP</label>
+                                        <input type="text" id="smtpServer" value="smtp.gmail.com" placeholder="smtp.ejemplo.com">
+                                    </div>
+                                    <div class="config-form-group">
+                                        <label>Puerto</label>
+                                        <input type="number" id="smtpPort" value="587" placeholder="587">
+                                    </div>
+                                    <div class="config-form-group">
+                                        <label>Usuario</label>
+                                        <input type="email" id="smtpUser" placeholder="usuario@ejemplo.com">
+                                    </div>
+                                    <div class="config-form-group">
+                                        <label>Contraseña</label>
+                                        <input type="password" id="smtpPassword" placeholder="Contraseña">
+                                        <button class="btn-text" onclick="togglePassword('smtpPassword')">Mostrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="config-actions">
+                            <button class="btn-primary" onclick="guardarConfiguracion('integraciones')">Guardar Cambios</button>
+                        </div>
+                    </div>
+
+                    <!-- Sección Respaldo -->
+                    <div id="seccionBackup" class="config-seccion">
+                        <div class="config-section-header">
+                            <h2>Respaldo y Restauración</h2>
+                            <p>Gestión de respaldos del sistema</p>
+                        </div>
+                        <div class="backup-section">
+                            <div class="backup-info-card">
+                                <div class="backup-info-item">
+                                    <span class="backup-label">Último Respaldo:</span>
+                                    <span class="backup-value" id="ultimoBackup">15/01/2025 14:30</span>
+                                </div>
+                                <div class="backup-info-item">
+                                    <span class="backup-label">Tamaño del Respaldo:</span>
+                                    <span class="backup-value" id="tamanoBackup">2.5 MB</span>
+                                </div>
+                                <div class="backup-info-item">
+                                    <span class="backup-label">Estado:</span>
+                                    <span class="backup-badge success">Completado</span>
+                                </div>
+                            </div>
+                            <div class="backup-actions">
+                                <button class="btn-primary" onclick="crearRespaldo()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                        <path d="M21 16V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7 8L12 3L17 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Crear Respaldo
+                                </button>
+                                <button class="btn-secondary" onclick="restaurarRespaldo()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                        <path d="M3 8V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M18 16L12 22L6 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 22V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Restaurar Respaldo
+                                </button>
+                            </div>
+                            <div class="backup-history">
+                                <h3>Historial de Respaldos</h3>
+                                <div class="table-wrapper">
+                                    <table class="config-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Tamaño</th>
+                                                <th>Tipo</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="historialBackupBody">
+                                            <!-- Se llenará dinámicamente -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Usuario -->
+    <div id="modalUsuario" class="modal-exec" style="display: none;">
+        <div class="modal-exec-content" style="max-width: 600px;">
+            <div class="modal-exec-header">
+                <h2 id="modalUsuarioTitulo">Nuevo Usuario</h2>
+                <button class="btn-close-exec" onclick="cerrarModalUsuario()">×</button>
+            </div>
+            <form id="formUsuario" onsubmit="guardarUsuario(event)">
+                <div class="form-exec-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="usuarioNombre" required placeholder="Nombre del usuario">
+                </div>
+                <div class="form-exec-group">
+                    <label>Email</label>
+                    <input type="email" id="usuarioEmail" required placeholder="email@ejemplo.com">
+                </div>
+                <div class="form-exec-group">
+                    <label>Rol</label>
+                    <select id="usuarioRol" required>
+                        <option value="">Seleccionar rol...</option>
+                        <option value="administrador">Administrador</option>
+                        <option value="gerente">Gerente</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="operador">Operador</option>
+                        <option value="lectura">Solo Lectura</option>
+                    </select>
+                </div>
+                <div class="form-exec-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="usuarioPassword" placeholder="Dejar vacío para no cambiar">
+                </div>
+                <div class="form-exec-group">
+                    <label>Estado</label>
+                    <label class="switch">
+                        <input type="checkbox" id="usuarioActivo" checked>
+                        <span class="slider"></span>
+                        <span class="switch-label">Usuario Activo</span>
+                    </label>
+                </div>
+                <div class="form-exec-actions">
+                    <button type="button" class="btn-exec-secondary" onclick="cerrarModalUsuario()">Cancelar</button>
+                    <button type="submit" class="btn-exec-primary">Guardar Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js" defer></script>
+</body>
+</html>
